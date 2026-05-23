@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, MapPin, Phone } from "lucide-react";
+import { useCallback } from "react";
 import { WA_NUMBER, waUrl } from "@/lib/constants";
 import { DecorativeImage } from "@/components/shared/DecorativeImage";
 
@@ -69,6 +72,16 @@ function formatWaDisplay(number: string): string {
 export function Footer() {
   const waDisplay = formatWaDisplay(WA_NUMBER);
 
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      window.history.replaceState(null, '', href);
+    }
+  }, []);
+
   return (
     <>
       {/* Wavy top edge transitioning into dark footer */}
@@ -125,6 +138,7 @@ export function Footer() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
                   className="text-sm text-white/70 transition-colors hover:text-primary"
                 >
                   {item.label}

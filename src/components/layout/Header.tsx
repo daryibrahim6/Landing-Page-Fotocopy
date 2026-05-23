@@ -82,6 +82,41 @@ export function Header() {
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      window.history.replaceState(null, '', href);
+      closeMenu();
+    }
+  }, [closeMenu]);
+
+  // Update URL hash on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100;
+      const sections = document.querySelectorAll('section[id]');
+      
+      for (const section of sections) {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        const sectionId = section.getAttribute('id');
+        
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+          if (sectionId && window.location.hash !== `#${sectionId}`) {
+            window.history.replaceState(null, '', `#${sectionId}`);
+          }
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <header
       className={cn(
@@ -96,7 +131,7 @@ export function Header() {
         {/* LEFT: Brand */}
         <Link
           href="#beranda"
-          onClick={closeMenu}
+          onClick={(e) => handleNavClick(e, '#beranda')}
           className="shrink-0 font-display text-xl font-black tracking-tight md:text-2xl"
         >
           <Image
@@ -118,6 +153,7 @@ export function Header() {
             <Link
               key={item.sectionId}
               href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
               className={cn(
                 "text-sm font-medium transition-colors",
                 activeSection === item.sectionId
@@ -186,7 +222,7 @@ export function Header() {
             <Link
               key={item.sectionId}
               href={item.href}
-              onClick={closeMenu}
+              onClick={(e) => handleNavClick(e, item.href)}
               className={cn(
                 "rounded-xl px-4 py-3 text-sm font-medium transition-colors",
                 activeSection === item.sectionId
