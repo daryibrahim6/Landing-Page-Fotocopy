@@ -36,24 +36,10 @@ export function ProductCard({ product, className, showTape = false }: ProductCar
         className,
       )}
     >
-      {/* Decoratives */}
-      {showTape && (
-        <DecorativeImage
-          src="/assets/decoratives/tape-strip.png"
-          width={136}
-          height={58}
-          rotate={-2}
-          className="-top-5 left-1/2 -translate-x-1/2 z-20 drop-shadow-sm"
-        />
-      )}
       {product.featured && (
-        <DecorativeImage
-          src="/assets/decoratives/badge-scalloped.png"
-          width={96}
-          height={100}
-          rotate={12}
-          className="-right-5 -top-5 z-10 drop-shadow-md"
-        />
+        <div className="absolute -right-5 -top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-white shadow-md">
+          ★
+        </div>
       )}
 
       {/* Image */}

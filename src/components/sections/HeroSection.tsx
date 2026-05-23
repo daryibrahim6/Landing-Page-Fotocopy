@@ -175,21 +175,13 @@ export function HeroSection() {
         >
           {/* Card wrapper */}
           <div className="relative w-full">
-            {/* Tape on top center of the card */}
-            <DecorativeImage
-              src="/assets/decoratives/tape-strip.png"
-              width={136}
-              height={58}
-              rotate={-3}
-              className="-top-7 left-1/2 -translate-x-1/2 z-20 drop-shadow-sm"
-            />
             {/* Blob floating behind the bottom left */}
             <DecorativeImage
               src="/assets/decoratives/blob-pink-glossy.png"
               width={240}
               height={242}
               opacity={0.6}
-              className="-left-12 -bottom-10 z-0"
+              className="-left-12 -bottom-10 z-0 hidden md:block"
             />
             
             {/* Vector Blobs behind */}
@@ -198,25 +190,25 @@ export function HeroSection() {
               size={180}
               opacity={0.25}
               variant={1}
-              className="-left-10 -top-8 -z-10"
+              className="-left-10 -top-8 -z-10 hidden md:block"
             />
             <BlobDecoration
               color="var(--color-accent-light)"
               size={180}
               opacity={0.3}
               variant={2}
-              className="-bottom-12 -right-12 -z-10"
+              className="-bottom-12 -right-12 -z-10 hidden md:block"
             />
 
             {/* Actual machine card */}
-            <div className="relative z-10 w-full flex items-center justify-center min-h-[320px] rounded-3xl bg-[var(--color-bg-soft)] shadow-2xl p-8 lg:p-12 border-2 border-[var(--color-border)]">
+            <div className="relative z-10 w-full flex items-center justify-center min-h-[240px] sm:min-h-[320px] rounded-3xl bg-[var(--color-bg-soft)] shadow-2xl p-6 sm:p-8 lg:p-12 border-2 border-[var(--color-border)]">
               <Image
                 src="/assets/machines/konica-c2060.png"
                 alt="Mesin Konica Minolta c2060 - mesin cetak profesional BisaPrint"
                 width={879}
                 height={419}
                 style={{ objectFit: "contain" }}
-                className="z-10 h-auto w-full max-w-[500px] object-contain drop-shadow-2xl transition-transform duration-500 hover:scale-105"
+                className="z-10 h-auto w-full max-w-[350px] sm:max-w-[500px] object-contain drop-shadow-2xl transition-transform duration-500 hover:scale-105"
                 priority
                 quality={95}
               />

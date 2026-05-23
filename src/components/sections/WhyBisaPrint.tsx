@@ -67,35 +67,8 @@ const cardVariants = {
 
 export function WhyBisaPrint() {
   return (
-    <SectionWrapper id="kenapa" bgVariant="white" className="relative overflow-hidden">
-      {/* Background Decoratives */}
-      <DecorativeImage
-        src="/assets/decoratives/swoosh-orange.png"
-        width={280}
-        height={54}
-        opacity={0.45}
-        className="bottom-4 right-4 z-0"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.png"
-        width={140}
-        height={140}
-        opacity={0.3}
-        rotate={30}
-        className="-left-6 top-1/2 z-0"
-      />
-
+    <SectionWrapper id="kenapa-bisaprint" bgVariant="white" className="relative overflow-hidden">
       <div className="flex flex-col items-center text-center">
-        <Image
-          src="/assets/decoratives/gem-crystal.png"
-          alt=""
-          width={80}
-          height={95}
-          className="mb-3 inline-block -rotate-12"
-          aria-hidden="true"
-          quality={90}
-          sizes="(max-width: 768px) 100px, 200px"
-        />
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Kenapa BisaPrint?
         </h2>

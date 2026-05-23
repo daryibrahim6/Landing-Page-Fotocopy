@@ -80,14 +80,14 @@ export function ContactSection() {
         width={200}
         height={150}
         opacity={0.45}
-        className="-bottom-6 -right-6 z-0"
+        className="-bottom-6 -right-6 z-0 hidden md:block"
       />
       <DecorativeImage
         src="/assets/decoratives/blob-pink-glossy.png"
         width={240}
         height={240}
         opacity={0.15}
-        className="-left-16 top-1/4 z-0"
+        className="-left-16 top-1/4 z-0 hidden md:block"
       />
       <DecorativeImage
         src="/assets/decoratives/bow-ribbon.png"
@@ -95,7 +95,7 @@ export function ContactSection() {
         height={138}
         opacity={0.4}
         rotate={-10}
-        className="right-12 top-12 z-0"
+        className="right-12 top-12 z-0 hidden md:block"
       />
 
       {/* Background decoratives */}
@@ -104,14 +104,14 @@ export function ContactSection() {
         size={160}
         opacity={0.2}
         variant={1}
-        className="-right-12 -top-8"
+        className="-right-12 -top-8 hidden md:block"
       />
       <BlobDecoration
         color="var(--color-accent-light)"
         size={120}
         opacity={0.15}
         variant={2}
-        className="-bottom-10 -left-10"
+        className="-bottom-10 -left-10 hidden md:block"
       />
 
       <motion.div
@@ -161,7 +161,7 @@ export function ContactSection() {
             alt=""
             width={90}
             height={93}
-            className="my-2 ml-4 md:ml-12 block rotate-[160deg] animate-pulse"
+            className="my-2 ml-4 md:ml-12 block rotate-[160deg] animate-pulse hidden sm:block"
             quality={90}
             sizes="(max-width: 768px) 100px, 200px"
           />

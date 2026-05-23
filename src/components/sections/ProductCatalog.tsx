@@ -45,29 +45,6 @@ export function ProductCatalog() {
         }}
       />
       
-      {/* Decorative squiggle from Task 2 */}
-      <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.png"
-        width={140}
-        height={140}
-        opacity={0.25}
-        className="right-4 top-4 z-0"
-      />
-      <BlobDecoration
-        color="var(--color-primary-light)"
-        size={200}
-        opacity={0.15}
-        variant={1}
-        className="-left-20 top-20 -z-10"
-      />
-      <BlobDecoration
-        color="var(--color-accent-light)"
-        size={150}
-        opacity={0.1}
-        variant={2}
-        className="-right-10 bottom-40 -z-10"
-      />
-
       {/* Section header */}
       <div className="flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">

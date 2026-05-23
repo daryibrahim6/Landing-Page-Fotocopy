@@ -146,7 +146,7 @@ function TestimonialCard({
             width={120}
             height={51}
             rotate={-3}
-            className="-top-5 left-1/2 -translate-x-1/2 z-20 drop-shadow-sm"
+            className="-top-5 left-1/2 -translate-x-1/2 z-20 drop-shadow-sm hidden sm:block"
           />
         )}
         <DecorativeImage
@@ -154,7 +154,7 @@ function TestimonialCard({
           width={80}
           height={85}
           rotate={10}
-          className="-right-5 -top-5 z-10 drop-shadow-sm"
+          className="-right-5 -top-5 z-10 drop-shadow-sm hidden sm:block"
         />
 
       {/* WhatsApp header bar */}
@@ -225,7 +225,7 @@ export function Testimonials() {
         width={90}
         height={88}
         opacity={0.5}
-        className="-left-6 -top-6 z-0"
+        className="-left-6 -top-6 z-0 hidden md:block"
       />
 
       {/* Section header */}

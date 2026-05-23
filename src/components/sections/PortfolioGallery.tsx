@@ -65,15 +65,6 @@ function PortfolioTile({
       }}
       transition={{ duration: 0.25, ease: "easeOut" }}
     >
-      {/* Masking tape at top */}
-      <DecorativeImage
-        src="/assets/decoratives/tape-strip.png"
-        width={136}
-        height={58}
-        rotate={(index % 3 === 0) ? -4 : (index % 3 === 1) ? 2 : -2}
-        className="-top-5 left-1/2 -translate-x-1/2 z-20 drop-shadow-sm"
-      />
-
       <div
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-[var(--color-border)] bg-white shadow-sm transition-shadow duration-300",
@@ -121,14 +112,14 @@ export function PortfolioGallery() {
         width={300}
         height={220}
         opacity={0.55}
-        className="-bottom-6 -left-6 z-0"
+        className="-bottom-6 -left-6 z-0 hidden md:block"
       />
       <DecorativeImage
         src="/assets/decoratives/sparkle-stars.png"
         width={120}
         height={118}
         opacity={0.6}
-        className="-right-6 top-8 z-0"
+        className="-right-6 top-8 z-0 hidden md:block"
       />
 
       {/* Section header */}
@@ -140,7 +131,7 @@ export function PortfolioGallery() {
             alt=""
             width={110}
             height={105}
-            className="ml-3 inline-block -rotate-8 align-middle animate-pulse"
+            className="ml-3 inline-block -rotate-8 align-middle animate-pulse hidden sm:block"
             quality={90}
             sizes="(max-width: 768px) 100px, 200px"
           />
