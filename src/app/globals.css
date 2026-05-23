@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* ─── BisaPrint brand tokens (AGENTS.md §3.2) ─── */
+:root {
+  /* Primary */
+  --color-primary: #e0187a;
+  --color-primary-light: #f48fb1;
+  --color-primary-muted: #ce7aa0;
+
+  /* Accent */
+  --color-accent: #e07820;
+  --color-accent-light: #ffb347;
+
+  /* Backgrounds */
+  --color-bg-base: #ffffff;
+  --color-bg-soft: #fff0f5;
+  --color-bg-card: #fff8fb;
+
+  /* Text */
+  --color-text-primary: #1a0a0f;
+  --color-text-secondary: #6b3a50;
+  --color-text-muted: #a06080;
+
+  /* Borders */
+  --color-border: #f0c0d8;
+  --color-border-strong: #e0187a;
+
+  /* shadcn / existing utility aliases (components unchanged) */
+  --background: var(--color-bg-base);
+  --foreground: var(--color-text-primary);
+  --primary: var(--color-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-bg-soft);
+  --secondary-foreground: var(--color-text-primary);
+  --accent: var(--color-accent);
+  --accent-foreground: #ffffff;
+  --accent-yellow: var(--color-accent-light);
+  --accent-yellow-foreground: var(--color-text-primary);
+  --muted: var(--color-bg-soft);
+  --muted-foreground: var(--color-text-muted);
+  --border: var(--color-border);
+  --ring: var(--color-primary);
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --radius: 1rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-muted: var(--color-primary-muted);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-light: var(--color-accent-light);
+  --color-accent-yellow: var(--accent-yellow);
+  --color-accent-yellow-foreground: var(--accent-yellow-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--color-border-strong);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-soft: var(--color-bg-soft);
+  --color-bg-card: var(--color-bg-card);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+  --font-sans: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  --font-display: var(--font-display);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-bg-base);
+    color: var(--color-text-primary);
+    font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    border-color: var(--color-border);
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+    color: var(--color-text-primary);
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Custom scrollbar - brand primary */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-bg-soft);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-bg-soft);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 9999px;
+  border: 2px solid var(--color-bg-soft);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-muted);
+}
