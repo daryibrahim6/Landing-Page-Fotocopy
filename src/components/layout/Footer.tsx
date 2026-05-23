@@ -42,12 +42,12 @@ function ShopeeIcon({ className }: { className?: string }) {
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const navLinks = [
-  { label: "Beranda", href: "/#beranda" },
-  { label: "Produk", href: "/#produk" },
-  { label: "Portfolio", href: "/#portfolio" },
-  { label: "Testimoni", href: "/#testimoni" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Kontak", href: "/#kontak" },
+  { label: "Beranda", href: "#beranda" },
+  { label: "Produk", href: "#produk" },
+  { label: "Portfolio", href: "#portfolio" },
+  { label: "Testimoni", href: "#testimoni" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Kontak", href: "#kontak" },
 ] as const;
 
 const socialLinks = [

@@ -10,12 +10,12 @@ import { cn } from "@/lib/utils";
 // ─── Navigation config ───────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { label: "Beranda", href: "/#beranda", sectionId: "beranda" },
-  { label: "Produk", href: "/#produk", sectionId: "produk" },
-  { label: "Portfolio", href: "/#portfolio", sectionId: "portfolio" },
-  { label: "Testimoni", href: "/#testimoni", sectionId: "testimoni" },
-  { label: "FAQ", href: "/#faq", sectionId: "faq" },
-  { label: "Kontak", href: "/#kontak", sectionId: "kontak" },
+  { label: "Beranda", href: "#beranda", sectionId: "beranda" },
+  { label: "Produk", href: "#produk", sectionId: "produk" },
+  { label: "Portfolio", href: "#portfolio", sectionId: "portfolio" },
+  { label: "Testimoni", href: "#testimoni", sectionId: "testimoni" },
+  { label: "FAQ", href: "#faq", sectionId: "faq" },
+  { label: "Kontak", href: "#kontak", sectionId: "kontak" },
 ] as const;
 
 const OBSERVED_SECTIONS = [
@@ -95,7 +95,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 md:h-20 lg:px-8">
         {/* LEFT: Brand */}
         <Link
-          href="/#beranda"
+          href="#beranda"
           onClick={closeMenu}
           className="shrink-0 font-display text-xl font-black tracking-tight md:text-2xl"
         >
