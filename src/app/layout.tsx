@@ -34,14 +34,6 @@ export const metadata: Metadata = {
     title: "BisaPrint - Percetakan Digital Bekasi",
     description:
       "Digital printing, sablon, dokumen, dan kebutuhan UMKM di Bekasi. Hasil premium, harga bersahabat. Pesan via WhatsApp.",
-    images: [
-      {
-        url: "/og-image.svg",
-        width: 1200,
-        height: 630,
-        alt: "BisaPrint Logo",
-      },
-    ],
   },
 };
 
