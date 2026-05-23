@@ -137,7 +137,7 @@ export function HeroSection() {
               width={110}
               height={75}
               rotate={-75}
-              className="hidden md:block -ml-30 mr-4 -mt-25 z-20"
+              className="hidden md:block -ml-30 mr-4 -mt-24 z-20"
               opacity={0.95}
             />
             <WhatsAppButton

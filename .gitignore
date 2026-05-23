@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dev-only markdown files & configs
+/AGENTS.md
+/ASSET_GUIDE.md
+/PROMPT_AUDIT_FIX.md
+/MIGRATION.md
+/CLAUDE.md
+
+# temp script scratch directories
+/scratch/
+
+# default Next.js template SVGs in public/
+/public/file.svg
+/public/globe.svg
+/public/next.svg
+/public/vercel.svg
+/public/window.svg
