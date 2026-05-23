@@ -26,7 +26,7 @@ const features = [
     emoji: "💰",
     title: "Harga Bersahabat",
     description:
-      "Harga transparan mulai dari, cocok untuk UMKM hingga kebutuhan personal.",
+      "Harga transparan mulai dari harga terjangkau, cocok untuk UMKM hingga kebutuhan personal.",
     rotate: "1deg",
     accent: "var(--color-primary-light)",
   },

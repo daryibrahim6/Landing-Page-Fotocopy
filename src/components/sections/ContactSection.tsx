@@ -47,6 +47,7 @@ function ShopeeIcon({ className }: { className?: string }) {
 
 // TODO: Replace placeholder links ("#") with actual social media profile URLs from the client.
 const socialLinks: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { label: "Instagram", href: "#", icon: InstagramIcon },
 ];
 
 // ─── Animation ───────────────────────────────────────────────────────────────
@@ -146,7 +147,7 @@ export function ContactSection() {
               <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
                 <MapPin className="size-4 text-primary" aria-hidden="true" />
               </span>
-              <span className="pt-1">Jl. Dalang I No.45, RT.003/RW.017, Pengasinan, Kec. Rawalumbu, Kota Bekasi, Jawa Barat 17115</span>
+              <span className="pt-1">Alamat lengkap akan diupdate setelah dikonfirmasi dengan klien</span>
             </p>
             <p className="flex items-start gap-3">
               <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10">

@@ -21,9 +21,9 @@ const nunitoSans = Nunito_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "BisaPrint - Percetakan Digital Bekasi",
+  title: "BisaPrint - Percetakan Digital Sumedang",
   description:
-    "Digital printing, sablon, dokumen, dan kebutuhan UMKM di Bekasi. Hasil premium, harga bersahabat. Pesan via WhatsApp.",
+    "Digital printing, sablon, dokumen, dan kebutuhan UMKM di Sumedang. Hasil premium, harga bersahabat. Pesan via WhatsApp.",
   icons: {
     icon: "/assets/brand/logo-tab.png",
     apple: "/assets/brand/logo-tab.png",
