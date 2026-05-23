@@ -172,7 +172,7 @@ export function Footer() {
                   className="mt-0.5 size-4 shrink-0 text-primary"
                   aria-hidden="true"
                 />
-                <span>Alamat lengkap akan diupdate setelah dikonfirmasi dengan klien</span>
+                <span>Jl. Dalang I No.45, RT.003/RW.017, Pengasinan, Kec. Rawalumbu, Kota Bekasi, Jawa Barat 17115</span>
               </li>
               <li className="flex items-start gap-2">
                 <Clock

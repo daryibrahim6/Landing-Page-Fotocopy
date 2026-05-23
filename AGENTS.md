@@ -7,7 +7,7 @@
 
 ## 1. PROJECT OVERVIEW
 
-**Klien:** BisaPrint — jasa percetakan digital lokal Sumedang  
+**Klien:** BisaPrint — jasa percetakan digital lokal Bekasi  
 **Tipe:** Single-page landing page (BUKAN multi-page, BUKAN e-commerce)  
 **Tujuan:** Branding + katalog produk + semua konversi ke WhatsApp  
 **Deploy:** Vercel  
@@ -236,7 +236,7 @@ Contoh salah: "Kami menyediakan layanan percetakan profesional."
 
 ## 9. SEO
 
-- Title: "BisaPrint — Percetakan Digital Sumedang"
+- Title: "BisaPrint — Percetakan Digital Bekasi"
 - Keywords: percetakan sumedang, cetak murah sumedang, digital printing sumedang
 - Locale: id_ID
 - LocalBusiness JSON-LD: tambahkan setelah alamat klien dikonfirmasi
