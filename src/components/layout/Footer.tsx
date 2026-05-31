@@ -114,8 +114,8 @@ export function Footer() {
                 className="h-auto w-auto"
               />
             </div>
-            <p className="mt-3 font-display text-lg font-bold text-primary-light">
-              Cetak Impianmu, Bisa!
+            <p className="mt-3 font-display text-lg font-bold text-[var(--color-primary-light)]">
+              Bisa Mewujudkan Imajinasimu
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
               Percetakan digital Bekasi untuk UMKM dan perorangan - digital

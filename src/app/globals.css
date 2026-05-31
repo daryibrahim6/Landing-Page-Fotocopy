@@ -2,28 +2,28 @@
 
 /* ─── BisaPrint brand tokens (AGENTS.md §3.2) ─── */
 :root {
-  /* Primary */
-  --color-primary: #e0187a;
-  --color-primary-light: #f48fb1;
-  --color-primary-muted: #ce7aa0;
+  /* Primary Brand Colors - Approved by Client */
+  --color-primary: #DE127A;
+  --color-primary-light: #EC91B4;
+  --color-primary-muted: #D66E9E;
 
-  /* Accent */
-  --color-accent: #e07820;
-  --color-accent-light: #ffb347;
+  /* Accent Orange */
+  --color-accent: #E87817;
+  --color-accent-light: #F5A860;
 
   /* Backgrounds */
   --color-bg-base: #ffffff;
-  --color-bg-soft: #fff0f5;
-  --color-bg-card: #fff8fb;
+  --color-bg-soft: #FFEAF4;
+  --color-bg-card: #FFF5F9;
 
   /* Text */
-  --color-text-primary: #1a0a0f;
-  --color-text-secondary: #6b3a50;
-  --color-text-muted: #a06080;
+  --color-text-primary: #2D1620;
+  --color-text-secondary: #6B3A50;
+  --color-text-muted: #9B6A7D;
 
   /* Borders */
-  --color-border: #f0c0d8;
-  --color-border-strong: #e0187a;
+  --color-border: #F0C0D8;
+  --color-border-strong: #DE127A;
 
   /* shadcn / existing utility aliases (components unchanged) */
   --background: var(--color-bg-base);

@@ -13,12 +13,12 @@ import { cn } from "@/lib/utils";
 const ROTATIONS = ["-1.5deg", "1deg", "-0.5deg", "1.5deg"] as const;
 
 const gradients = [
-  "from-[#E0187A] to-[#F48FB1]",      // pink
-  "from-[#E07820] to-[#FFB347]",      // orange
-  "from-[#CE7AA0] to-[#E0187A]",      // mauve-pink
-  "from-[#F48FB1] to-[#FFF0F5]",      // light pink
-  "from-[#E07820] to-[#CE7AA0]",      // orange-mauve
-  "from-[#A06080] to-[#F48FB1]",      // purple-pink
+  "from-[#DE127A] to-[#EC91B4]",      // brand pink
+  "from-[#E87817] to-[#F5A860]",      // brand orange
+  "from-[#D66E9E] to-[#DE127A]",      // muted pink
+  "from-[#EC91B4] to-[#FFEAF4]",      // light pink
+  "from-[#E87817] to-[#D66E9E]",      // orange-pink
+  "from-[#D66E9E] to-[#EC91B4]",      // pink gradient
 ];
 
 const fadeUp = {

@@ -82,7 +82,7 @@ export function HeroSection() {
             </span>
           </motion.div>
 
-          {/* H1 - two lines */}
+          {/* H1 - Client Slogan */}
           <div className="mb-6 overflow-visible">
             <motion.div
               custom={0.1}
@@ -91,9 +91,9 @@ export function HeroSection() {
               animate="visible"
             >
               <h1
-                className="font-display text-5xl font-black leading-none tracking-tight text-[var(--color-text-primary)] md:text-7xl"
+                className="font-display text-5xl font-black leading-tight tracking-tight text-[var(--color-text-primary)] md:text-7xl"
               >
-                Cetak Impianmu,
+                Bisa Mewujudkan
               </h1>
             </motion.div>
 
@@ -102,12 +102,12 @@ export function HeroSection() {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="mt-1"
+              className="mt-2"
             >
               <span
-                className="font-display text-5xl font-black leading-none tracking-tight text-[var(--color-accent)] md:text-7xl"
+                className="font-display text-5xl font-black leading-tight tracking-tight text-[var(--color-primary)] md:text-7xl"
               >
-                Bisa!
+                Imajinasimu
               </span>
             </motion.div>
           </div>
