@@ -93,9 +93,8 @@ function ClientBadgeCard({ badge }: { badge: ClientBadge }) {
   const Icon = badgeIcons[badge.icon] ?? Building2;
 
   return (
-    <motion.div
-      whileHover={{ y: -2, scale: 1.02 }}
-      className="flex items-center gap-3 rounded-xl border-2 border-[var(--color-border)] bg-white p-3 shadow-sm"
+    <div
+      className="flex items-center gap-3 rounded-xl border-2 border-[var(--color-border)] bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02]"
       style={{ borderLeftColor: badge.borderColor, borderLeftWidth: "4px" }}
     >
       <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
@@ -109,7 +108,7 @@ function ClientBadgeCard({ badge }: { badge: ClientBadge }) {
           <p className="truncate text-xs text-[var(--color-text-muted)]">{badge.description}</p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -117,10 +116,9 @@ function TestimonialCard({ item }: { item: Testimonial }) {
   const isWhatsApp = item.source === "whatsapp";
 
   return (
-    <motion.article
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
+    <article
       className={cn(
+        "transition-all duration-200 hover:scale-[1.02]",
         "flex h-full w-[300px] shrink-0 cursor-default flex-col overflow-hidden rounded-2xl border-2 shadow-sm",
         isWhatsApp ? "border-[#075E54]/30" : "border-[var(--color-border)]",
       )}
@@ -155,7 +153,7 @@ function TestimonialCard({ item }: { item: Testimonial }) {
           <StarRating rating={item.rating} />
         </footer>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
@@ -236,14 +234,12 @@ export function Testimonials() {
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          <motion.div
-            className="flex gap-6 px-4"
-            animate={isPaused ? undefined : { x: [0, -(testimonials.length * 316)] }}
-            transition={{
-              duration: autoScrollDuration,
-              repeat: Infinity,
-              ease: "linear",
-              repeatType: "loop",
+          <div
+            className="flex gap-6 px-4 animate-scroll-x"
+            style={{
+              width: `${duplicated.length * 316}px`,
+              animationDuration: `${autoScrollDuration}s`,
+              animationPlayState: isPaused ? "paused" : "running",
             }}
           >
             {duplicated.map((item, i) => (
@@ -251,7 +247,7 @@ export function Testimonials() {
                 <TestimonialCard item={item} />
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       ) : (
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

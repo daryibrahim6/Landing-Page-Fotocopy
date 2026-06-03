@@ -193,7 +193,7 @@ export function HeroSection() {
             ))}
           </motion.div>
 
-          <div className="mb-6 overflow-visible">
+          <div className="mb-6">
             <motion.h1
               className="font-display text-6xl font-black leading-[1.05] tracking-tight text-[var(--color-text-primary)] md:text-8xl lg:text-9xl"
               variants={headlineVariants}
@@ -287,17 +287,6 @@ export function HeroSection() {
                 sizes="(min-width: 1024px) 340px, 0px"
               />
             </div>
-            <div
-              className="absolute -top-2 left-8 z-20 h-6 w-24 rounded-sm opacity-80"
-              style={{
-                transform: "rotate(-3deg)",
-                background:
-                  "repeating-linear-gradient(90deg, rgba(244,162,97,0.3) 0px, rgba(244,162,97,0.3) 3px, rgba(255,243,224,0.6) 3px, rgba(255,243,224,0.6) 6px)",
-                backgroundColor: "rgba(255, 234, 244, 0.85)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              }}
-              aria-hidden="true"
-            />
           </div>
         </motion.div>
       </motion.div>

@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+
 import { portfolioItems } from "@/data/portfolio";
 import type { PortfolioItem } from "@/data/portfolio";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import type { Variants } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { cn } from "@/lib/utils";
 
@@ -56,16 +57,9 @@ function PortfolioTile({
   const rotation = ROTATIONS[index % ROTATIONS.length];
 
   return (
-    <motion.article
-      className="group relative mb-5 break-inside-avoid"
+    <div
+      className="group relative mb-5 break-inside-avoid transition-all duration-200 hover:rotate-0 hover:scale-[1.02] hover:shadow-[0_16px_40px_-8px_rgba(224,24,122,0.14),0_6px_16px_-4px_rgba(0,0,0,0.08)]"
       style={{ rotate: rotation }}
-      whileHover={{
-        rotate: "0deg",
-        scale: 1.02,
-        boxShadow:
-          "0 16px 40px -8px rgba(224,24,122,0.14), 0 6px 16px -4px rgba(0,0,0,0.08)",
-      }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
     >
       <div
         className={cn(
@@ -99,7 +93,7 @@ function PortfolioTile({
           </div>
         </div>
       </div>
-    </motion.article>
+    </div>
   );
 }
 
@@ -155,30 +149,11 @@ export function PortfolioGallery() {
       </ScrollReveal>
 
       {/* Masonry-like CSS columns grid */}
-      <motion.div
-        className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3"
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-80px" }}
-      >
+      <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3">
         {portfolioItems.map((item, index) => (
-          <motion.div key={item.id} variants={fadeUp}>
-            <PortfolioTile item={item} index={index} />
-          </motion.div>
+          <PortfolioTile key={item.id} item={item} index={index} />
         ))}
-      </motion.div>
-
-      <ScrollReveal className="relative z-10 mt-14 flex flex-col items-center gap-3 text-center">
-        <p className="text-base text-[var(--color-text-secondary)]">
-          Tertarik? Yuk, chat admin buat diskusi produkmu.
-        </p>
-        <WhatsAppButton
-          label="Chat via WhatsApp"
-          variant="primary"
-          size="md"
-        />
-      </ScrollReveal>
+      </div>
     </SectionWrapper>
   );
 }

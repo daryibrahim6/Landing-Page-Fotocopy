@@ -108,8 +108,7 @@ export function WhyBisaPrint() {
               <motion.article
                 key={item.title}
                 variants={cardVariants}
-                whileHover={{ y: -4 }}
-                className="flex flex-col items-center gap-3 rounded-2xl border-2 border-[var(--color-border)] bg-white p-5 text-center shadow-sm transition-colors hover:border-[var(--color-primary)] hover:shadow-md"
+                className="flex flex-col items-center gap-3 rounded-2xl border-2 border-[var(--color-border)] bg-white p-5 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-[var(--color-primary)] hover:shadow-md"
               >
                 <div className="flex size-12 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
                   <Icon className="size-[22px] text-[var(--color-primary)]" aria-hidden="true" />

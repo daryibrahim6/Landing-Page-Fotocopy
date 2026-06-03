@@ -118,8 +118,7 @@ export function PanduanFile() {
               <motion.div
                 key={i}
                 variants={itemVariants}
-                whileHover={{ x: 4 }}
-                className="relative flex items-start gap-5 rounded-2xl border-2 border-[var(--color-border)] bg-white p-5 shadow-sm transition-colors hover:border-[var(--color-primary)]"
+                className="relative flex items-start gap-5 rounded-2xl border-2 border-[var(--color-border)] bg-white p-5 shadow-sm transition-all duration-200 hover:translate-x-1 hover:border-[var(--color-primary)]"
               >
                 <div
                   className={cn(

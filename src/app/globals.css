@@ -168,3 +168,24 @@
 }
 .animate-pulse-wa { animation: pulse-wa 2.5s ease-in-out infinite; }
 .animate-pulse-sim { animation: pulse-sim 3s ease-in-out infinite; }
+
+/* Testimonials auto-scroll — GPU-composited */
+@keyframes scroll-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-scroll-x {
+  display: flex;
+  animation: scroll-x linear infinite;
+  will-change: transform;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+
 import { cn, formatRupiah } from "@/lib/utils";
 import { buildWAUrl } from "@/lib/wa";
 import type { Product } from "@/types";
@@ -25,11 +25,9 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const waHref = buildWAUrl("fromProduct", product.name);
 
   return (
-    <motion.article
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
+    <article
       className={cn(
-        "relative flex h-full flex-col overflow-hidden rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-sm transition-colors",
+        "relative flex h-full flex-col overflow-hidden rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-sm transition-all duration-200 hover:-translate-y-1",
         className,
       )}
     >
@@ -129,6 +127,6 @@ export function ProductCard({ product, className }: ProductCardProps) {
           )}
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }

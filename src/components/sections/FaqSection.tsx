@@ -110,89 +110,77 @@ export function FaqSection() {
         </StickyNote>
       </div>
 
-      <motion.div
-        className="relative mx-auto max-w-3xl space-y-4"
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-60px" }}
-      >
-        {faqItems.map((item, i) => {
+      <div className="relative mx-auto max-w-3xl space-y-4">
+        {faqItems.map((item) => {
           const isOpen = openId === item.id;
 
           return (
-            <motion.div
-              key={item.id}
-              custom={i}
-              variants={itemVariant}
-              whileHover={{ rotate: "0deg", scale: 1.01, transition: { duration: 0.2 } }}
-              className={cn(
-                "overflow-hidden rounded-2xl border-2 bg-white shadow-sm transition-colors",
-                isOpen
-                  ? "border-primary shadow-md shadow-primary/10"
-                  : "border-dashed border-[var(--color-border)]",
-              )}
-            >
-              <button
-                type="button"
-                onClick={() => toggle(item.id)}
-                id={`faq-btn-${item.id}`}
-                aria-expanded={isOpen}
-                aria-controls={`faq-panel-${item.id}`}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 rounded-2xl"
-              >
-                <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
-                  <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
-                    <DecorativeImage
-                      src="/assets/decoratives/pushpin.png"
-                      width={18}
-                      height={22}
-                      className="!static"
-                      rotate={-5}
-                      zIndex={1}
-                    />
-                  </span>
-                  {item.question}
-                </span>
-                <span
-                  className={cn(
-                    "flex size-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
-                    isOpen ? "bg-primary text-white" : "bg-[var(--color-bg-soft)] text-primary",
-                  )}
-                >
-                  <ChevronDown
-                    className={cn("size-4 transition-transform duration-300", isOpen && "rotate-180")}
-                    aria-hidden="true"
-                  />
-                </span>
-              </button>
-
+            <div key={item.id} className="transition-all duration-200 hover:scale-[1.01]">
               <div
-                id={`faq-panel-${item.id}`}
-                role="region"
-                aria-labelledby={`faq-btn-${item.id}`}
                 className={cn(
-                  "grid transition-[grid-template-rows] duration-300 ease-in-out",
-                  isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                  "overflow-hidden rounded-2xl border-2 bg-white shadow-sm transition-colors",
+                  isOpen
+                    ? "border-primary shadow-md shadow-primary/10"
+                    : "border-dashed border-[var(--color-border)]",
                 )}
               >
-                <div className="overflow-hidden">
-                  <p className="border-t border-[var(--color-border)] px-5 pb-5 pt-4 text-sm leading-relaxed text-[var(--color-text-secondary)] md:text-base">
-                    {item.answer}
-                  </p>
+                <button
+                  type="button"
+                  onClick={() => toggle(item.id)}
+                  id={`faq-btn-${item.id}`}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-panel-${item.id}`}
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 rounded-2xl"
+                >
+                  <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
+                    <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
+                      <DecorativeImage
+                        src="/assets/decoratives/pushpin.png"
+                        width={18}
+                        height={22}
+                        className="!static"
+                        rotate={-5}
+                        zIndex={1}
+                      />
+                    </span>
+                    {item.question}
+                  </span>
+                  <span
+                    className={cn(
+                      "flex size-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
+                      isOpen ? "bg-primary text-white" : "bg-[var(--color-bg-soft)] text-primary",
+                    )}
+                  >
+                    <ChevronDown
+                      className={cn("size-4 transition-transform duration-300", isOpen && "rotate-180")}
+                      aria-hidden="true"
+                    />
+                  </span>
+                </button>
+
+                <div
+                  id={`faq-panel-${item.id}`}
+                  role="region"
+                  aria-labelledby={`faq-btn-${item.id}`}
+                  className={cn(
+                    "grid transition-[grid-template-rows] duration-300 ease-in-out",
+                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <p className="border-t border-[var(--color-border)] px-5 pb-5 pt-4 text-sm leading-relaxed text-[var(--color-text-secondary)] md:text-base">
+                      {item.answer}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
-      </motion.div>
+      </div>
 
-      <motion.div
+      <div
         className="relative mx-auto mt-12 flex max-w-3xl flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
       >
         <p className="font-display text-lg font-bold text-[var(--color-text-primary)] md:text-xl">
           Pertanyaan lain? Langsung tanya aja.
@@ -204,7 +192,7 @@ export function FaqSection() {
           size="md"
           className="shrink-0"
         />
-      </motion.div>
+      </div>
     </SectionWrapper>
   );
 }

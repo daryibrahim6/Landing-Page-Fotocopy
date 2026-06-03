@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { categories } from "@/data/products";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export function KategoriProduk({ onSelect }: KategoriProdukProps) {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
           {categories.map((cat, i) => (
-            <motion.a
+            <a
               key={cat.id}
               href={`#produk`}
               onClick={(e) => {
@@ -44,12 +44,7 @@ export function KategoriProduk({ onSelect }: KategoriProdukProps) {
                 const el = document.getElementById("produk");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
-              className="group relative flex flex-col items-center gap-4 rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 text-center transition-colors hover:border-[var(--color-primary)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: i * 0.08, ease: "easeOut" }}
-              whileHover={{ scale: 1.03, y: -4, rotate: i % 2 === 0 ? 1 : -1 }}
+              className="group relative flex flex-col items-center gap-4 rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 text-center transition-all duration-200 hover:scale-[1.03] hover:-translate-y-1 hover:border-[var(--color-primary)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
               style={{ transform: `rotate(${i % 2 === 0 ? 1 : -1}deg)` }}
             >
               <span className="text-4xl" role="img" aria-hidden="true">
@@ -74,7 +69,7 @@ export function KategoriProduk({ onSelect }: KategoriProdukProps) {
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </span>
-            </motion.a>
+            </a>
           ))}
         </div>
       </div>

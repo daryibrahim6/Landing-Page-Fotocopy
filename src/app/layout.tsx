@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Fredoka, Poppins } from "next/font/google";
 import Script from "next/script";
+
+// Minimal inline styles to prevent FOUT before CSS loads
+const criticalCSS = `
+  body { margin: 0; }
+  .font-display { font-family: system-ui, sans-serif; }
+`;
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
@@ -115,11 +121,16 @@ export default function RootLayout({
   return (
     <html lang="id" className={`scroll-smooth ${fredoka.variable} ${poppins.variable}`}>
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
+        <link rel="preconnect" href="https://connect.facebook.net" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://app.sandbox.midtrans.com" />
         <MetaPixel pixelId={metaPixelId} />
         <GoogleAnalytics gaId={gaId} />
-        <script
+        <Script
+          id="schema-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          strategy="afterInteractive"
         />
         {midtransSnapUrl && (
           <Script

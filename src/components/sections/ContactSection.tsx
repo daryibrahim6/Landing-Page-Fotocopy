@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+
 import { MapPin, Clock, Printer } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { BlobDecoration } from "@/components/shared/BlobDecoration";
@@ -42,16 +42,6 @@ const socialLinks = [
     ),
   },
 ];
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
 
 export function ContactSection() {
   return (
@@ -94,14 +84,8 @@ export function ContactSection() {
         className="-bottom-10 -left-10 hidden md:block"
       />
 
-      <motion.div
-        className="relative grid gap-10 lg:grid-cols-2 lg:gap-12"
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-60px" }}
-      >
-        <motion.div variants={fadeUp} className="flex flex-col items-start">
+      <div className="relative grid gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="flex flex-col items-start">
           <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
             Hubungi Kami
           </h2>
@@ -172,9 +156,9 @@ export function ContactSection() {
               />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div variants={fadeUp}>
+        <div>
           <div
             className="relative overflow-hidden rounded-3xl border-2 border-[#25D366]/30 bg-white shadow-md p-8"
             style={{ transform: "rotate(1deg)" }}
@@ -215,8 +199,8 @@ export function ContactSection() {
               </a>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </SectionWrapper>
   );
 }
