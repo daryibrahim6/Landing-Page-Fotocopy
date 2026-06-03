@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Calculator, Menu, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Portfolio", href: "#portfolio", sectionId: "portfolio" },
   { label: "Cara Order", href: "#cara-order", sectionId: "cara-order" },
   { label: "FAQ", href: "#faq", sectionId: "faq" },
+  { label: "Simulasi", href: "/simulator", sectionId: "simulator" },
 ] as const;
 
 const OBSERVED_SECTIONS = [
@@ -44,6 +46,7 @@ const SECTION_TO_NAV: Record<string, string> = {
 };
 
 export function Header() {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("produk");
@@ -57,6 +60,11 @@ export function Header() {
 
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      if (href.startsWith("/")) {
+        closeMenu();
+        router.push(href);
+        return;
+      }
       e.preventDefault();
       const targetId = href.replace("#", "");
       const element = document.getElementById(targetId);
@@ -66,7 +74,7 @@ export function Header() {
         closeMenu();
       }
     },
-    [closeMenu],
+    [closeMenu, router],
   );
 
   useEffect(() => {

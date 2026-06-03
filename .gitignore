@@ -40,6 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# PRD / planning markdown files
+PRD_*.md
+*PRD*.md
+
 # dev-only markdown files & configs
 /AGENTS.md
 /ASSET_GUIDE.md

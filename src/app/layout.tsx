@@ -134,12 +134,12 @@ export default function RootLayout({
           <Header />
           <main id="main-content" className="flex-1">{children}</main>
           <Footer />
+          <FloatingSimulator />
           <WhatsAppButton
             label="Hubungi BisaPrint via WhatsApp"
             variant="floating"
             size="md"
           />
-          <FloatingSimulator />
         </div>
       </body>
     </html>

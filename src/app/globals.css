@@ -162,4 +162,9 @@
 .animate-float-y { animation: float-y 4s ease-in-out infinite; }
 .animate-sparkle { animation: sparkle 2s ease-in-out infinite; }
 .animate-bounce-y { animation: bounce-y 2s ease-in-out infinite; }
+@keyframes pulse-sim {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(222,18,122,0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(222,18,122,0); }
+}
 .animate-pulse-wa { animation: pulse-wa 2.5s ease-in-out infinite; }
+.animate-pulse-sim { animation: pulse-sim 3s ease-in-out infinite; }
