@@ -1,31 +1,32 @@
 @import "tailwindcss";
 
-/* ─── BisaPrint brand tokens (AGENTS.md §3.2) ─── */
+/* ─── BisaPrint brand tokens (moodboard Jun 2026) ─── */
 :root {
-  /* Primary Brand Colors - Approved by Client */
+  /* Primary */
   --color-primary: #DE127A;
   --color-primary-light: #EC91B4;
   --color-primary-muted: #D66E9E;
 
-  /* Accent Orange */
+  /* Accent */
   --color-accent: #E87817;
-  --color-accent-light: #F5A860;
+  --color-accent-light: #F4A261;
+  --color-accent-yellow: #FFD700;
 
   /* Backgrounds */
-  --color-bg-base: #ffffff;
+  --color-bg-base: #FFFFFF;
   --color-bg-soft: #FFEAF4;
-  --color-bg-card: #FFF5F9;
+  --color-bg-card: #FFF5FA;
 
   /* Text */
-  --color-text-primary: #2D1620;
-  --color-text-secondary: #6B3A50;
-  --color-text-muted: #9B6A7D;
+  --color-text-primary: #DE127A;
+  --color-text-secondary: #5D2E4C;
+  --color-text-muted: #A06080;
 
   /* Borders */
-  --color-border: #F0C0D8;
+  --color-border: #F3D1E5;
   --color-border-strong: #DE127A;
 
-  /* shadcn / existing utility aliases (components unchanged) */
+  /* shadcn / existing utility aliases */
   --background: var(--color-bg-base);
   --foreground: var(--color-text-primary);
   --primary: var(--color-primary);
@@ -34,7 +35,7 @@
   --secondary-foreground: var(--color-text-primary);
   --accent: var(--color-accent);
   --accent-foreground: #ffffff;
-  --accent-yellow: var(--color-accent-light);
+  --accent-yellow: var(--color-accent-yellow);
   --accent-yellow-foreground: var(--color-text-primary);
   --muted: var(--color-bg-soft);
   --muted-foreground: var(--color-text-muted);
@@ -140,3 +141,25 @@
 *::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-muted);
 }
+
+/* GPU-composited decorative animations (replaces Framer Motion Infinity) */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes bounce-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+@keyframes pulse-wa {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.animate-float-y { animation: float-y 4s ease-in-out infinite; }
+.animate-sparkle { animation: sparkle 2s ease-in-out infinite; }
+.animate-bounce-y { animation: bounce-y 2s ease-in-out infinite; }
+.animate-pulse-wa { animation: pulse-wa 2.5s ease-in-out infinite; }

@@ -1,30 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import { faqItems } from "@/data/faq";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
+import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { cn } from "@/lib/utils";
-
-// ─── Animation ───────────────────────────────────────────────────────────────
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.5, ease: "easeOut" as const },
   },
 };
 
 const staggerContainer = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.08 },
-  },
+  visible: { transition: { staggerChildren: 0.08 } },
 };
 
 const itemVariant = {
@@ -33,35 +31,26 @@ const itemVariant = {
     opacity: 1,
     y: 0,
     rotate: ["-0.4deg", "0.3deg", "-0.2deg", "0.4deg", "-0.3deg", "0.2deg"][i % 6],
-    transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1] as const,
-      delay: i * 0.08,
-    },
+    transition: { duration: 0.4, ease: "easeOut" as const, delay: i * 0.08 },
   }),
 };
 
-
-
-function StickyNote({ children }: { children: React.ReactNode }) {
+function StickyNote({ children }: { children: ReactNode }) {
   return (
     <motion.div
       initial={{ opacity: 0, rotate: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, rotate: "2deg", scale: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
       className="mx-auto mb-8 w-fit rounded-lg bg-[var(--color-accent-light)] px-5 py-3 shadow-md"
       style={{
-        boxShadow:
-          "2px 3px 0 rgba(0,0,0,0.06), 0 8px 24px -4px rgba(224,120,32,0.12)",
+        boxShadow: "2px 3px 0 rgba(0,0,0,0.06), 0 8px 24px -4px rgba(224,120,32,0.12)",
       }}
     >
       {children}
     </motion.div>
   );
 }
-
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export function FaqSection() {
   const [openId, setOpenId] = useState<string | null>(faqItems[0]?.id ?? null);
@@ -72,7 +61,15 @@ export function FaqSection() {
 
   return (
     <SectionWrapper id="faq" bgVariant="white" className="relative overflow-hidden">
-      {/* Halftone background texture */}
+      <DecorativeImage
+        src="/assets/decoratives/pushpin.png"
+        width={24}
+        height={30}
+        className="-left-2 top-12 z-10 hidden md:block"
+        rotate={-5}
+        zIndex={10}
+      />
+
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.02]"
         aria-hidden="true"
@@ -82,30 +79,17 @@ export function FaqSection() {
         }}
       />
 
-      {/* Section header */}
-      <motion.div
-        className="relative flex flex-col items-center text-center"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
+      <ScrollReveal className="relative flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Sering Ditanya
-          <Image
-            src="/assets/decoratives/gem-crystal.png"
-            alt=""
-            width={80}
-            height={95}
-            className="ml-2 inline-block rotate-6 align-middle"
-            quality={90}
-            sizes="(max-width: 768px) 100px, 200px"
-          />
+          <span className="ml-2 inline-flex size-10 items-center justify-center rounded-full bg-[var(--color-bg-soft)] align-middle">
+            <HelpCircle className="size-[22px] text-[var(--color-primary)]" aria-hidden="true" />
+          </span>
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] md:w-[240px] select-none pointer-events-none">
-          <Image 
+        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+          <Image
             src="/assets/decoratives/swoosh-orange.png"
-            alt="" 
+            alt=""
             fill
             className="object-contain opacity-80"
             aria-hidden="true"
@@ -116,9 +100,8 @@ export function FaqSection() {
         <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Jawaban buat pertanyaan yang paling sering muncul.
         </p>
-      </motion.div>
+      </ScrollReveal>
 
-      {/* Sticky note callout */}
       <div className="mt-10">
         <StickyNote>
           <p className="font-display text-sm font-black text-[var(--color-text-primary)]">
@@ -127,7 +110,6 @@ export function FaqSection() {
         </StickyNote>
       </div>
 
-      {/* FAQ accordion */}
       <motion.div
         className="relative mx-auto max-w-3xl space-y-4"
         variants={staggerContainer}
@@ -143,11 +125,7 @@ export function FaqSection() {
               key={item.id}
               custom={i}
               variants={itemVariant}
-              whileHover={{
-                rotate: "0deg",
-                scale: 1.01,
-                transition: { duration: 0.2 },
-              }}
+              whileHover={{ rotate: "0deg", scale: 1.01, transition: { duration: 0.2 } }}
               className={cn(
                 "overflow-hidden rounded-2xl border-2 bg-white shadow-sm transition-colors",
                 isOpen
@@ -161,31 +139,27 @@ export function FaqSection() {
                 aria-expanded={isOpen}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
               >
-                <span className="font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg flex items-center">
-                  <Image
-                    src="/assets/decoratives/pushpin.png"
-                    alt=""
-                    width={44}
-                    height={61}
-                    className="mr-3 inline-block -rotate-5 shrink-0 align-middle"
-                    quality={90}
-                    sizes="(max-width: 768px) 100px, 200px"
-                  />
+                <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
+                  <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
+                    <DecorativeImage
+                      src="/assets/decoratives/pushpin.png"
+                      width={18}
+                      height={22}
+                      className="!static"
+                      rotate={-5}
+                      zIndex={1}
+                    />
+                  </span>
                   {item.question}
                 </span>
                 <span
                   className={cn(
                     "flex size-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
-                    isOpen
-                      ? "bg-primary text-white"
-                      : "bg-[var(--color-bg-soft)] text-primary",
+                    isOpen ? "bg-primary text-white" : "bg-[var(--color-bg-soft)] text-primary",
                   )}
                 >
                   <ChevronDown
-                    className={cn(
-                      "size-4 transition-transform duration-300",
-                      isOpen && "rotate-180",
-                    )}
+                    className={cn("size-4 transition-transform duration-300", isOpen && "rotate-180")}
                     aria-hidden="true"
                   />
                 </span>
@@ -208,7 +182,6 @@ export function FaqSection() {
         })}
       </motion.div>
 
-      {/* Bottom CTA */}
       <motion.div
         className="relative mx-auto mt-12 flex max-w-3xl flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left"
         initial={{ opacity: 0, y: 20 }}

@@ -6,6 +6,8 @@ import { portfolioItems } from "@/data/portfolio";
 import type { PortfolioItem } from "@/data/portfolio";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { DecorativeImage } from "@/components/shared/DecorativeImage";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { cn } from "@/lib/utils";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -123,7 +125,7 @@ export function PortfolioGallery() {
       />
 
       {/* Section header */}
-      <div className="relative z-10 flex flex-col items-center text-center">
+      <ScrollReveal className="relative z-10 flex flex-col items-center text-center">
         <h2 className="inline-flex items-center font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Hasil Cetak Kami
           <Image
@@ -150,7 +152,7 @@ export function PortfolioGallery() {
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Ribuan produk sudah keluar dari mesin kami. Ini sebagian hasilnya.
         </p>
-      </div>
+      </ScrollReveal>
 
       {/* Masonry-like CSS columns grid */}
       <motion.div
@@ -166,6 +168,17 @@ export function PortfolioGallery() {
           </motion.div>
         ))}
       </motion.div>
+
+      <ScrollReveal className="relative z-10 mt-14 flex flex-col items-center gap-3 text-center">
+        <p className="text-base text-[var(--color-text-secondary)]">
+          Tertarik? Yuk, chat admin buat diskusi produkmu.
+        </p>
+        <WhatsAppButton
+          label="Chat via WhatsApp"
+          variant="primary"
+          size="md"
+        />
+      </ScrollReveal>
     </SectionWrapper>
   );
 }

@@ -4,53 +4,70 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { cn } from "@/lib/utils";
 
-// ─── Navigation config ───────────────────────────────────────────────────────
-
 const NAV_ITEMS = [
-  { label: "Beranda", href: "#beranda", sectionId: "beranda" },
   { label: "Produk", href: "#produk", sectionId: "produk" },
   { label: "Portfolio", href: "#portfolio", sectionId: "portfolio" },
-  { label: "Testimoni", href: "#testimoni", sectionId: "testimoni" },
+  { label: "Cara Order", href: "#cara-order", sectionId: "cara-order" },
   { label: "FAQ", href: "#faq", sectionId: "faq" },
-  { label: "Kontak", href: "#kontak", sectionId: "kontak" },
 ] as const;
 
 const OBSERVED_SECTIONS = [
-  "beranda",
-  "kenapa-bisaprint",
+  "hero",
   "produk",
+  "kategori-produk",
+  "why-bisaprint",
+  "cara-order",
+  "form-konsultasi",
   "portfolio",
   "testimoni",
+  "panduan-file",
   "faq",
   "kontak",
 ] as const;
 
 const SECTION_TO_NAV: Record<string, string> = {
-  beranda: "beranda",
-  "kenapa-bisaprint": "beranda",
+  hero: "produk",
   produk: "produk",
+  "kategori-produk": "produk",
+  "why-bisaprint": "produk",
+  "cara-order": "cara-order",
+  "form-konsultasi": "cara-order",
   portfolio: "portfolio",
-  testimoni: "testimoni",
+  testimoni: "portfolio",
+  "panduan-file": "faq",
   faq: "faq",
-  kontak: "kontak",
+  kontak: "faq",
 };
-
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("beranda");
+  const [activeSection, setActiveSection] = useState<string>("produk");
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 8);
+  });
+
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      e.preventDefault();
+      const targetId = href.replace("#", "");
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        window.history.replaceState(null, "", href);
+        closeMenu();
+      }
+    },
+    [closeMenu],
+  );
 
   useEffect(() => {
     const elements = OBSERVED_SECTIONS.map((id) =>
@@ -67,7 +84,10 @@ export function Header() {
 
         if (visible.length > 0) {
           const id = visible[0].target.id;
-          setActiveSection(SECTION_TO_NAV[id] ?? "beranda");
+          setActiveSection(SECTION_TO_NAV[id] ?? "produk");
+          if (window.location.hash !== `#${id}`) {
+            window.history.replaceState(null, "", `#${id}`);
+          }
         }
       },
       {
@@ -80,44 +100,6 @@ export function Header() {
     return () => observer.disconnect();
   }, []);
 
-  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
-
-  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const targetId = href.replace('#', '');
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      window.history.replaceState(null, '', href);
-      closeMenu();
-    }
-  }, [closeMenu]);
-
-  // Update URL hash on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
-      const sections = document.querySelectorAll('section[id]');
-      
-      for (const section of sections) {
-        const element = section as HTMLElement;
-        const sectionTop = element.offsetTop;
-        const sectionHeight = element.offsetHeight;
-        const sectionId = element.getAttribute('id');
-        
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          if (sectionId && window.location.hash !== `#${sectionId}`) {
-            window.history.replaceState(null, '', `#${sectionId}`);
-          }
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <header
       className={cn(
@@ -127,12 +109,10 @@ export function Header() {
           : "bg-transparent",
       )}
     >
-      {/* Main header bar */}
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 md:h-20 lg:px-8">
-        {/* LEFT: Brand */}
         <Link
-          href="#beranda"
-          onClick={(e) => handleNavClick(e, '#beranda')}
+          href="#hero"
+          onClick={(e) => handleNavClick(e, "#hero")}
           className="shrink-0 font-display text-xl font-black tracking-tight md:text-2xl"
         >
           <Image
@@ -145,7 +125,6 @@ export function Header() {
           />
         </Link>
 
-        {/* CENTER: Desktop nav */}
         <nav
           className="hidden items-center gap-6 md:flex"
           aria-label="Navigasi utama"
@@ -167,11 +146,10 @@ export function Header() {
           ))}
         </nav>
 
-        {/* RIGHT: CTA + mobile toggle */}
         <div className="flex items-center gap-3">
           <div className="hidden shrink-0 md:block">
             <WhatsAppButton
-              label="Pesan Sekarang"
+              label="Chat Admin"
               variant="primary"
               size="sm"
             />
@@ -193,7 +171,6 @@ export function Header() {
         </div>
       </div>
 
-      {/* Y2K rainbow gradient border */}
       <div
         className={cn(
           "h-0.5 w-full transition-opacity duration-300",
@@ -206,44 +183,43 @@ export function Header() {
         aria-hidden="true"
       />
 
-      {/* Mobile menu */}
-      <div
-        className={cn(
-          "overflow-hidden bg-white/95 backdrop-blur-md transition-[max-height,opacity] duration-300 md:hidden",
-          isMenuOpen
-            ? "max-h-[28rem] opacity-100"
-            : "max-h-0 opacity-0",
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden bg-white/95 backdrop-blur-md md:hidden"
+          >
+            <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Navigasi mobile">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.sectionId}
+                  href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className={cn(
+                    "rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                    activeSection === item.sectionId
+                      ? "bg-primary/10 font-semibold text-primary"
+                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-soft)]",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="mt-2 px-2">
+                <WhatsAppButton
+                  label="Chat Admin"
+                  variant="primary"
+                  size="sm"
+                  className="w-full justify-center"
+                />
+              </div>
+            </nav>
+          </motion.div>
         )}
-      >
-        <nav
-          className="flex flex-col gap-1 px-4 py-4"
-          aria-label="Navigasi mobile"
-        >
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.sectionId}
-              href={item.href}
-              onClick={(e) => handleNavClick(e, item.href)}
-              className={cn(
-                "rounded-xl px-4 py-3 text-sm font-medium transition-colors",
-                activeSection === item.sectionId
-                  ? "bg-primary/10 font-semibold text-primary"
-                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-soft)]",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <div className="mt-2 px-2">
-            <WhatsAppButton
-              label="Pesan Sekarang"
-              variant="primary"
-              size="sm"
-              className="w-full justify-center"
-            />
-          </div>
-        </nav>
-      </div>
+      </AnimatePresence>
     </header>
   );
 }

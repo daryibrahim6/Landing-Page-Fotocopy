@@ -1,220 +1,117 @@
 "use client";
 
-import Image from "next/image";
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { products } from "@/data/products";
-import { ProductCard } from "@/components/shared/ProductCard";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
-import { BlobDecoration } from "@/components/shared/BlobDecoration";
 import { DecorativeImage } from "@/components/shared/DecorativeImage";
+import { ProductCard } from "@/components/shared/ProductCard";
+import { categories, products } from "@/data/products";
 import { cn } from "@/lib/utils";
-import type { Product } from "@/types";
+import { buildWAUrl } from "@/lib/wa";
+import type { ProductCategory } from "@/types";
 
-type FilterKey = "all" | Product["category"];
-
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: "all", label: "Semua" },
-  { key: "digital-print", label: "Digital Print" },
-  { key: "document", label: "Dokumen" },
-  { key: "sablon", label: "Sablon" },
-  { key: "umkm", label: "Kebutuhan UMKM" },
+const categoryTabs: { id: ProductCategory | "all"; label: string }[] = [
+  { id: "all", label: "Semua" },
+  ...categories.map((c) => ({ id: c.id as ProductCategory, label: c.name })),
 ];
 
-
-
 export function ProductCatalog() {
-  const [filter, setFilter] = useState<FilterKey>("all");
+  const [activeCategory, setActiveCategory] = useState<ProductCategory | "all">("all");
 
-  const filteredProducts =
-    filter === "all"
+  const filtered =
+    activeCategory === "all"
       ? products
-      : products.filter((product) => product.category === filter);
+      : products.filter((p) => p.category === activeCategory);
 
   return (
-    <SectionWrapper id="produk" bgVariant="soft" className="relative overflow-hidden z-0">
-      {/* Background decoratives */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03] z-0"
-        aria-hidden="true"
-        style={{
-          backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
-          backgroundSize: "20px 20px",
-        }}
+    <SectionWrapper id="produk" bgVariant="white">
+      <DecorativeImage
+        src="/assets/decoratives/badge-scalloped.png"
+        width={56}
+        height={56}
+        className="-right-4 -top-4 z-10 hidden md:block"
+        rotate={12}
+        zIndex={10}
       />
-      
-      {/* Section header */}
-      <div className="flex flex-col items-center text-center">
-        <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
-          Produk & Layanan
-        </h2>
-        <div className="relative mt-2 h-7 w-[200px] md:w-[240px] select-none pointer-events-none">
-          <Image 
-            src="/assets/decoratives/swoosh-orange.png"
-            alt="" 
-            fill
-            className="object-contain opacity-80"
-            aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
-          />
+
+      <ScrollReveal>
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
+            Katalog Produk
+          </h2>
+          <p className="mt-3 text-base text-[var(--color-text-secondary)]">
+            Pilih produk yang kamu butuhkan, langsung chat admin untuk order
+          </p>
         </div>
-        <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
-          Semua kebutuhan cetak kamu, ada di sini.
-        </p>
+      </ScrollReveal>
+
+      <div className="mb-10 flex flex-wrap justify-center gap-2">
+        {categoryTabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveCategory(tab.id)}
+            className={cn(
+              "rounded-full px-5 py-2 text-sm font-bold transition-colors",
+              activeCategory === tab.id
+                ? "bg-primary text-white shadow-md"
+                : "border-2 border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Filter tabs with sliding indicator */}
-      <div
-        className="mt-10 flex flex-wrap justify-center gap-2 md:gap-3"
-        role="tablist"
-        aria-label="Filter kategori produk"
-      >
-        {FILTERS.map((tab) => {
-          const isActive = filter === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setFilter(tab.key)}
-              className={cn(
-                "relative rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 md:text-base",
-                isActive
-                  ? "bg-primary text-white shadow-md shadow-primary/25"
-                  : "border-2 border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary hover:text-primary",
-              )}
-            >
-              {tab.label}
-              {isActive && (
-                <motion.span
-                  layoutId="product-tab-indicator"
-                  className="absolute inset-0 -z-10 rounded-full bg-primary"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Wavy divider between tabs and grid */}
-      <div className="mx-auto mt-10 w-full max-w-4xl px-4" aria-hidden="true">
-        <svg
-          viewBox="0 0 400 12"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full opacity-30"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0 6C20 2 40 10 60 6C80 2 100 10 120 6C140 2 160 10 180 6C200 2 220 10 240 6C260 2 280 10 300 6C320 2 340 10 360 6C380 2 400 10 400 6"
-            stroke="var(--color-primary-muted)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray="4 4"
-          />
-        </svg>
-      </div>
-
-      {/* Product grid with AnimatePresence */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={filter}
-          initial={{ opacity: 0, y: 12 }}
+          key={activeCategory}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25 }}
-          className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4"
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} showTape={index % 2 === 0} />
-            ))
-          ) : (
-            /* Empty state */
-            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-              <p className="mt-4 font-display text-xl font-bold text-[var(--color-text-primary)]">
-                Belum ada produk di kategori ini
-              </p>
-              <p className="mt-2 max-w-sm text-sm text-[var(--color-text-muted)]">
-                Tapi tenang, kamu bisa tanya langsung ke kami lewat WhatsApp.
-                Kita bisa cetak apapun! 😉
-              </p>
-              <div className="mt-4">
-                <WhatsAppButton
-                  label="Tanya Produk"
-                  message="Halo BisaPrint, saya mencari produk cetak yang belum ada di katalog."
-                  variant="outline"
-                  size="sm"
-                />
-              </div>
-            </div>
-          )}
+          {filtered.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottom CTA banner - Y2K style */}
-      <div className="relative mt-14 overflow-hidden rounded-3xl bg-primary p-8 text-center shadow-lg md:p-10">
-        {/* Masking tape strip */}
-        <div
-          className="pointer-events-none absolute -top-2 left-10 z-20 h-6 w-20 select-none rounded-sm opacity-90"
-          style={{
-            transform: "rotate(-3deg)",
-            background:
-              "repeating-linear-gradient(90deg, rgba(224,120,32,0.2) 0px, rgba(224,120,32,0.2) 3px, rgba(255,179,71,0.35) 3px, rgba(255,179,71,0.35) 6px)",
-            backgroundColor: "rgba(255, 243, 224, 0.85)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          }}
-          aria-hidden="true"
-        />
-        {/* Dot pattern overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.08]"
-          aria-hidden="true"
-          style={{
-            backgroundImage: `radial-gradient(circle, white 1.5px, transparent 1.5px)`,
-            backgroundSize: "20px 20px",
-          }}
-        />
-        {/* Diagonal lines overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
-          aria-hidden="true"
-          style={{
-            backgroundImage: `repeating-linear-gradient(45deg, white 0px, white 1px, transparent 1px, transparent 12px)`,
-          }}
-        />
+      {filtered.length === 0 && (
+        <p className="py-12 text-center text-[var(--color-text-muted)]">
+          Tidak ada produk di kategori ini.
+        </p>
+      )}
 
-        <div className="relative z-10 flex flex-col items-center justify-between gap-6 md:flex-row md:text-left">
-          <div>
-            <p className="font-display text-xl font-black text-white md:text-2xl flex items-center justify-center md:justify-start">
-              <Image
-                src="/assets/decoratives/exclamation.png"
-                alt=""
-                width={72}
-                height={106}
-                className="mr-2 inline-block -rotate-6"
-                quality={90}
-                sizes="(max-width: 768px) 100px, 200px"
-              />
-              Tidak ketemu yang kamu cari?
-            </p>
-            <p className="mt-1 text-sm text-white/70">
-              Chat kami dulu - kita bisa cetak hampir apapun.
-            </p>
-          </div>
-          <WhatsAppButton
-            label="Chat WhatsApp"
-            message="Halo BisaPrint, saya punya kebutuhan cetak khusus. Bisa dibantu?"
-            variant="outline"
-            size="lg"
-            className="shrink-0 border-white text-white hover:bg-white/10"
-          />
-        </div>
+      <div className="relative mt-16 overflow-hidden rounded-3xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] px-8 py-10 text-center text-white shadow-lg">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          aria-hidden="true"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, #fff 1px, transparent 1px)",
+            backgroundSize: "16px 16px",
+          }}
+        />
+        <h3 className="relative font-display text-xl font-bold md:text-2xl">
+          Tidak nemu produk yang kamu cari?
+        </h3>
+        <p className="relative mx-auto mt-2 max-w-md text-sm text-white/80">
+          Langsung aja chat admin, kami siap bantu! Konsultasi gratis.
+        </p>
+        <a
+          href={buildWAUrl("general")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-[var(--color-primary)] shadow-lg transition hover:bg-white/90"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
+          </svg>
+          Chat Admin via WhatsApp
+        </a>
       </div>
     </SectionWrapper>
   );

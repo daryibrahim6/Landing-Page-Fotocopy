@@ -1,10 +1,43 @@
+export type ProductCategory =
+  | "digital-printing"
+  | "print-dokumen"
+  | "stiker-label"
+  | "dtf-apparel"
+  | "produk-custom";
+
 export interface Product {
   id: string;
   name: string;
-  category: "digital-print" | "document" | "sablon" | "umkm";
+  category: ProductCategory;
   description: string;
-  startingPrice: number;
-  image: string;
-  whatsappMessage: string;
-  featured?: boolean;
+  priceFrom: number;
+  unit: string;
+  sizes: string[];
+  materials: string[];
+  finishings: string[];
+  estimasi: string;
+  fileSpecs: string;
+  images: string[];
+  isCheckoutEnabled: boolean;
+  whatsappTemplate: string;
+}
+
+export interface CheckoutItem {
+  productId: string;
+  productName: string;
+  materialId: string;
+  materialName: string;
+  sizeId: string;
+  sizeName: string;
+  quantity: number;
+  pricePerUnit: number;
+  totalPrice: number;
+}
+
+export interface CheckoutPayload {
+  customerName: string;
+  customerPhone: string;
+  items: CheckoutItem[];
+  notes: string;
+  totalAmount: number;
 }

@@ -3,58 +3,48 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { cn, formatRupiah } from "@/lib/utils";
+import { buildWAUrl } from "@/lib/wa";
 import type { Product } from "@/types";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 
 interface ProductCardProps {
   product: Product;
   className?: string;
-  showTape?: boolean;
 }
 
 const CATEGORY_LABELS: Record<Product["category"], string> = {
-  "digital-print": "Digital Print",
-  document: "Dokumen",
-  sablon: "Sablon",
-  umkm: "UMKM",
+  "digital-printing": "Digital Print",
+  "print-dokumen": "Dokumen",
+  "stiker-label": "Stiker & Label",
+  "dtf-apparel": "DTF & Apparel",
+  "produk-custom": "Custom",
 };
 
-export function ProductCard({ product, className, showTape = false }: ProductCardProps) {
-  const hasImage = product.image.trim().length > 0;
+export function ProductCard({ product, className }: ProductCardProps) {
+  const imageSrc = product.images[0] ?? "";
+  const hasImage = imageSrc.length > 0;
+  const waHref = buildWAUrl("fromProduct", product.name);
 
   return (
     <motion.article
-      whileHover={{
-        y: -4,
-        boxShadow:
-          "0 16px 40px -8px rgba(224,24,122,0.16), 0 6px 16px -4px rgba(0,0,0,0.08)",
-      }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       className={cn(
         "relative flex h-full flex-col overflow-hidden rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-sm transition-colors",
         className,
       )}
     >
-      {product.featured && (
-        <div className="absolute -right-5 -top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-white shadow-md">
-          ★
-        </div>
-      )}
-
-      {/* Image */}
       <div className="relative aspect-[4/3] w-full overflow-hidden">
         {hasImage ? (
           <Image
-            src={product.image}
+            src={imageSrc}
             alt={product.name}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover"
             sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           />
         ) : (
           <div
-            className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-[var(--color-primary-light)] via-[var(--color-primary-muted)] to-[var(--color-primary)]"
+            className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-primary-light)] via-[var(--color-primary-muted)] to-[var(--color-primary)]"
             aria-hidden="true"
           >
             <span className="text-xs font-semibold text-white/80">
@@ -63,7 +53,18 @@ export function ProductCard({ product, className, showTape = false }: ProductCar
           </div>
         )}
 
-        {/* Category badge - stamp/sticker style */}
+        {product.isCheckoutEnabled && (
+          <span
+            className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full border-2 border-white bg-[var(--color-accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-md"
+            style={{ transform: "rotate(2deg)" }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-3">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+            Bisa Checkout
+          </span>
+        )}
+
         <span
           className="absolute left-3 top-3 z-10 inline-flex rounded-full border-2 border-white bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-md"
           style={{ transform: "rotate(-2deg)" }}
@@ -72,7 +73,6 @@ export function ProductCard({ product, className, showTape = false }: ProductCar
         </span>
       </div>
 
-      {/* Content */}
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <h3 className="font-display text-base font-bold text-[var(--color-text-primary)] sm:text-lg">
           {product.name}
@@ -82,30 +82,51 @@ export function ProductCard({ product, className, showTape = false }: ProductCar
           {product.description}
         </p>
 
-        {/* Price tag shape */}
         <div className="mt-3 flex items-center">
           <div
             className="relative inline-flex items-center gap-1 bg-[var(--color-accent)] px-3 py-1.5 text-xs font-bold text-white sm:text-sm"
             style={{
-              clipPath:
-                "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
+              clipPath: "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
             }}
           >
             <span className="pl-1">
-              Mulai {formatRupiah(product.startingPrice)}
+              Mulai {formatRupiah(product.priceFrom)}/{product.unit}
             </span>
           </div>
         </div>
 
-        {/* WA button - pill, full width */}
-        <div className="mt-auto pt-4">
-          <WhatsAppButton
-            label="Pesan via WA"
-            productName={product.name}
-            variant="primary"
-            size="sm"
-            className="w-full justify-center"
-          />
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {product.sizes.slice(0, 3).map((s) => (
+            <span
+              key={s}
+              className="rounded-full border border-[var(--color-border)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-text-muted)]"
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-auto flex flex-col gap-2 pt-4">
+          {product.isCheckoutEnabled ? (
+            <a
+              href={`/checkout?product=${product.id}`}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-primary/20 transition hover:opacity-90"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-4" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              Pesan Sekarang
+            </a>
+          ) : (
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-[var(--color-primary)] px-4 py-2.5 text-sm font-bold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-white"
+            >
+              Tanya Admin
+            </a>
+          )}
         </div>
       </div>
     </motion.article>

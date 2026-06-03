@@ -2,220 +2,328 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { BlobDecoration } from "@/components/shared/BlobDecoration";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
-import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
+import { DecorativeImage } from "@/components/shared/DecorativeImage";
 
-
-// ─── Animation variants ─────────────────────────────────────────────────────
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const, delay },
-  }),
-};
-
-const imageReveal = {
-  hidden: { opacity: 0, scale: 0.92, rotate: -1 },
+const headlineVariants = {
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
-    scale: 1,
-    rotate: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const, delay: 0.35 },
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 120, damping: 14, delay: 0.1 },
   },
 };
 
+const subtextVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: 0.2, ease: "easeOut" as const },
+  },
+};
 
+const ctaVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      delay: 0.3 + i * 0.15,
+      type: "spring" as const,
+      stiffness: 200,
+      damping: 15,
+    },
+  }),
+};
 
-// ─── Halftone background ─────────────────────────────────────────────────────
+const badgeContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.4 } },
+};
 
-function HalftonePattern() {
+const badgeItemVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4 } },
+};
+
+const proofVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.5, delay: 0.8 },
+  },
+};
+
+const photoVariants = {
+  hidden: { opacity: 0, scale: 0.9, rotate: -3 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 2,
+    transition: { duration: 0.8, delay: 0.6, ease: "easeOut" as const },
+  },
+};
+
+const BADGES = [
+  { icon: "star", text: "10.000+ Customer", rotate: "-1.5deg" },
+  { icon: "check", text: "Cetak Satuan Bisa", rotate: "1deg" },
+  { icon: "zap", text: "Estimasi Cepat", rotate: "-0.5deg" },
+] as const;
+
+function BadgeIcon({ icon }: { icon: string }) {
+  if (icon === "star")
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 text-[var(--color-accent)]" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      </svg>
+    );
+  if (icon === "check")
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="size-4 text-[var(--color-accent)]" aria-hidden="true">
+        <path d="M20 6L9 17l-5-5" />
+      </svg>
+    );
   return (
-    <div
-      className="pointer-events-none absolute inset-0 opacity-[0.03]"
-      aria-hidden="true"
-      style={{
-        backgroundImage: `radial-gradient(circle, #E0187A 1.5px, transparent 1.5px)`,
-        backgroundSize: "24px 24px",
-      }}
-    />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-4 text-[var(--color-accent)]" aria-hidden="true">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
   );
 }
 
-
-
-
-
-
-
-// ─── Main Component ──────────────────────────────────────────────────────────
-
 export function HeroSection() {
   return (
-    <SectionWrapper
-      id="beranda"
-      bgVariant="soft"
-      className="relative overflow-hidden"
+    <section
+      id="hero"
+      className="relative flex min-h-screen items-center overflow-hidden bg-[var(--color-bg-soft)]"
     >
-      <HalftonePattern />
+      <div className="absolute inset-0 z-0">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          aria-hidden="true"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, var(--color-primary) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse at 80% 20%, rgba(222,18,122,0.08) 0%, transparent 60%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse at 20% 80%, rgba(232,120,23,0.06) 0%, transparent 50%)",
+          }}
+        />
+      </div>
 
-      <div className="relative grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-        {/* ── Left column: text ── */}
-        <div className="flex flex-col">
-          {/* Badge / sticker label */}
+      <div
+        className="pointer-events-none absolute -bottom-8 -left-16 z-0 select-none animate-float-y"
+        aria-hidden="true"
+      >
+        <Image
+          src="/assets/decoratives/blob-pink-glossy.png"
+          alt=""
+          width={200}
+          height={200}
+          className="h-auto w-full opacity-[0.65]"
+          draggable={false}
+          quality={90}
+          sizes="200px"
+        />
+      </div>
+
+      <div
+        className="pointer-events-none absolute left-[6%] top-[28%] z-10 select-none animate-sparkle"
+        style={{ animationDelay: "0.4s" }}
+        aria-hidden="true"
+      >
+        <Image
+          src="/assets/decoratives/sparkle-stars.png"
+          alt=""
+          width={72}
+          height={72}
+          className="h-auto w-full"
+          draggable={false}
+          quality={90}
+          sizes="72px"
+        />
+      </div>
+
+      <DecorativeImage
+        src="/assets/decoratives/tape-strip.png"
+        width={100}
+        height={43}
+        className="-top-3 left-1/2 z-20 hidden -translate-x-1/2 md:block"
+        rotate={-3}
+        opacity={0.85}
+        zIndex={20}
+      />
+
+      <motion.div
+        className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8"
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="flex flex-col py-20 lg:py-0">
           <motion.div
-            custom={0}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="mb-6 w-fit"
+            className="mb-6 flex flex-wrap gap-2"
+            variants={badgeContainerVariants}
           >
-            <span
-              className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--color-border-strong)] bg-white px-5 py-2 font-display text-sm font-bold text-[var(--color-primary)] shadow-md"
-              style={{ transform: "rotate(-1.5deg)" }}
-            >
-              Percetakan Digital Terpercaya
-            </span>
+            {BADGES.map((badge) => (
+              <motion.span
+                key={badge.text}
+                variants={badgeItemVariants}
+                className="inline-flex items-center gap-1.5 rounded-full border-2 border-[var(--color-primary)]/20 bg-white px-4 py-1.5 text-xs font-bold text-[var(--color-primary)] shadow-sm"
+                style={{ transform: badge.rotate }}
+              >
+                <BadgeIcon icon={badge.icon} />
+                {badge.text}
+              </motion.span>
+            ))}
           </motion.div>
 
-          {/* H1 - Client Slogan */}
           <div className="mb-6 overflow-visible">
-            <motion.div
-              custom={0.1}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
+            <motion.h1
+              className="font-display text-6xl font-black leading-[1.05] tracking-tight text-[var(--color-text-primary)] md:text-8xl lg:text-9xl"
+              variants={headlineVariants}
             >
-              <h1
-                className="font-display text-5xl font-black leading-tight tracking-tight text-[var(--color-text-primary)] md:text-7xl"
-              >
-                Bisa Mewujudkan
-              </h1>
-            </motion.div>
-
-            <motion.div
-              custom={0.2}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="mt-2"
-            >
-              <span
-                className="font-display text-5xl font-black leading-tight tracking-tight text-[var(--color-primary)] md:text-7xl"
-              >
-                Imajinasimu
+              bisa mewujudkan
+              <br />
+              <span className="text-[var(--color-accent)]">
+                imajinasi mu
               </span>
+            </motion.h1>
+          </div>
+
+          <motion.p
+            className="max-w-md text-base leading-relaxed text-[var(--color-text-secondary)] md:text-lg"
+            variants={subtextVariants}
+          >
+            Cetak apa saja &mdash; cepat, rapi, berkualitas.
+          </motion.p>
+
+          <div className="relative mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <motion.div custom={0} variants={ctaVariants}>
+              <WhatsAppButton
+                label="Order via WhatsApp"
+                message="Halo BisaPrint, saya ingin pesan cetak."
+                variant="primary"
+                size="lg"
+                className="bg-[#25D366] text-white hover:bg-[#1ebe5d] shadow-lg shadow-[#25D366]/30"
+              />
+            </motion.div>
+            <motion.div custom={1} variants={ctaVariants}>
+              <a
+                href="#produk"
+                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--color-primary)] px-6 py-3 font-display text-base font-bold text-[var(--color-primary)] transition duration-200 hover:bg-[var(--color-primary)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 sm:px-8 sm:py-4"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="size-5"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                Lihat Produk
+              </a>
             </motion.div>
           </div>
 
-          {/* Subheadline */}
-          <motion.p
-            custom={0.3}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="max-w-lg font-body text-base leading-relaxed text-[var(--color-text-secondary)] md:text-lg"
-          >
-            Dari brosur hingga banner, dari dokumen hingga sablon - semua bisa
-            di BisaPrint. Hasil premium, harga bersahabat, kirim via WhatsApp.
-          </motion.p>
-
-          {/* CTAs */}
           <motion.div
-            custom={0.4}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="relative mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4"
+            className="mt-8 flex items-center gap-3"
+            variants={proofVariants}
           >
-            <DecorativeImage
-              src="/assets/decoratives/arrow-curved.png"
-              width={110}
-              height={75}
-              rotate={-75}
-              className="hidden md:block -ml-30 mr-4 -mt-24 z-20"
-              opacity={0.95}
-            />
-            <WhatsAppButton
-              label="Pesan Sekarang"
-              message="Halo BisaPrint, saya ingin pesan cetak."
-              variant="primary"
-              size="lg"
-            />
-            <a
-              href="#produk"
-              className="inline-flex items-center justify-center rounded-full border-2 border-[var(--color-primary)] bg-transparent px-6 py-3 font-display text-base font-bold text-[var(--color-primary)] transition duration-200 hover:bg-[var(--color-primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 sm:px-8 sm:py-4"
-            >
-              Lihat Produk
-            </a>
+            <div className="flex -space-x-1">
+              <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-white">
+                1
+              </span>
+              <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-xs font-bold text-white">
+                0
+              </span>
+              <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-white">
+                K
+              </span>
+            </div>
+            <p className="text-sm font-bold text-[var(--color-text-primary)]">
+              10.000+ Customer{" "}
+              <span className="font-normal text-[var(--color-text-muted)]">
+                &bull;
+              </span>{" "}
+              Dipercaya sejak 2020
+            </p>
           </motion.div>
-
-          {/* Social proof */}
-          <motion.p
-            custom={0.5}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="mt-6 font-body text-sm text-[var(--color-text-muted)]"
-          >
-            Dipercaya ratusan UMKM &amp; perorangan di Bekasi
-          </motion.p>
         </div>
 
-        {/* ── Right column: visual ── */}
         <motion.div
-          variants={imageReveal}
-          initial="hidden"
-          animate="visible"
-          className="relative mx-auto w-full max-w-md p-6 lg:max-w-none lg:p-8"
+          className="hidden lg:flex lg:flex-col lg:items-end lg:gap-6"
+          variants={photoVariants}
         >
-          {/* Card wrapper */}
-          <div className="relative w-full">
-            {/* Blob floating behind the bottom left */}
-            <DecorativeImage
-              src="/assets/decoratives/blob-pink-glossy.png"
-              width={240}
-              height={242}
-              opacity={0.6}
-              className="-left-12 -bottom-10 z-0 hidden md:block"
-            />
-            
-            {/* Vector Blobs behind */}
-            <BlobDecoration
-              color="var(--color-primary-light)"
-              size={180}
-              opacity={0.25}
-              variant={1}
-              className="-left-10 -top-8 -z-10 hidden md:block"
-            />
-            <BlobDecoration
-              color="var(--color-accent-light)"
-              size={180}
-              opacity={0.3}
-              variant={2}
-              className="-bottom-12 -right-12 -z-10 hidden md:block"
-            />
-
-            {/* Actual machine card */}
-            <div className="relative z-10 w-full flex items-center justify-center min-h-[240px] sm:min-h-[320px] rounded-3xl bg-[var(--color-bg-soft)] shadow-2xl p-6 sm:p-8 lg:p-12 border-2 border-[var(--color-border)]">
+          <div
+            className="relative w-[340px] overflow-hidden rounded-3xl border-4 border-white shadow-2xl"
+            style={{ transform: "rotate(2deg)" }}
+          >
+            <div className="relative aspect-[3/4] w-full">
               <Image
-                src="/assets/machines/konica-c2060.png"
-                alt="Mesin Konica Minolta c2060 - mesin cetak profesional BisaPrint"
-                width={879}
-                height={419}
-                style={{ objectFit: "contain" }}
-                className="z-10 h-auto w-full max-w-[350px] sm:max-w-[500px] object-contain drop-shadow-2xl transition-transform duration-500 hover:scale-105"
+                src="/assets/hero/company-photo.webp"
+                alt="BisaPrint — Percetakan Digital"
+                fill
+                className="object-cover"
                 priority
-                quality={95}
+                quality={90}
+                sizes="(min-width: 1024px) 340px, 0px"
               />
             </div>
+            <div
+              className="absolute -top-2 left-8 z-20 h-6 w-24 rounded-sm opacity-80"
+              style={{
+                transform: "rotate(-3deg)",
+                background:
+                  "repeating-linear-gradient(90deg, rgba(244,162,97,0.3) 0px, rgba(244,162,97,0.3) 3px, rgba(255,243,224,0.6) 3px, rgba(255,243,224,0.6) 6px)",
+                backgroundColor: "rgba(255, 234, 244, 0.85)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              }}
+              aria-hidden="true"
+            />
           </div>
         </motion.div>
+      </motion.div>
+
+      <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
+        <div className="flex flex-col items-center gap-2 animate-bounce-y">
+          <span className="text-xs font-medium text-[var(--color-text-muted)]">
+            Scroll
+          </span>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            className="text-[var(--color-primary-muted)]"
+          >
+            <path
+              d="M10 4v12m0 0l-4-4m4 4l4-4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

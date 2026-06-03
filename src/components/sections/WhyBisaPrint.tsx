@@ -2,80 +2,86 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
+import { CheckCheck, MessageCircle, Package, Users, Palette, HeadphonesIcon, Rocket } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
+import { DecorativeImage } from "@/components/shared/DecorativeImage";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import type { LucideIcon } from "lucide-react";
 
-const features = [
+const advantages: { icon: LucideIcon; title: string; description: string }[] = [
   {
-    emoji: "🖨️",
-    title: "Mesin Professional",
-    description:
-      "Konica Minolta c2060 untuk warna akurat, Konica Minolta 958 untuk dokumen hitam putih massal.",
-    rotate: "-1.2deg",
-    accent: "var(--color-primary-light)",
+    icon: MessageCircle,
+    title: "Proses Order Mudah",
+    description: "Pemesanan gampang lewat WhatsApp, tanpa ribet",
   },
   {
-    emoji: "⏱️",
-    title: "Pengerjaan Cepat",
-    description:
-      "Sebagian besar order selesai di hari yang sama. Urgent? Bilang aja.",
-    rotate: "0.8deg",
-    accent: "var(--color-accent-light)",
+    icon: Package,
+    title: "Satuan Maupun Banyak",
+    description: "Bisa cetak 1 lembar atau ribuan sekalipun",
   },
   {
-    emoji: "💰",
-    title: "Harga Bersahabat",
-    description:
-      "Harga transparan mulai dari harga terjangkau, cocok untuk UMKM hingga kebutuhan personal.",
-    rotate: "1deg",
-    accent: "var(--color-primary-light)",
+    icon: Users,
+    title: "Cocok untuk Semua",
+    description: "UMKM, event, sekolah, kantor, dan personal",
   },
   {
-    emoji: "📦",
-    title: "Berbagai Layanan",
-    description:
-      "Digital printing, sablon, dokumen, kebutuhan UMKM - semua dalam satu tempat.",
-    rotate: "-0.5deg",
-    accent: "var(--color-accent-light)",
+    icon: Palette,
+    title: "Banyak Pilihan Produk",
+    description: "Ratusan produk cetak tersedia untuk semua kebutuhan",
   },
-] as const;
+  {
+    icon: HeadphonesIcon,
+    title: "Tim yang Responsif",
+    description: "Tim produksi dan CS yang cepat tanggap",
+  },
+  {
+    icon: CheckCheck,
+    title: "Cek Desain Sebelum Cetak",
+    description: "File dan desain dicek dulu sebelum proses produksi",
+  },
+  {
+    icon: Rocket,
+    title: "Cepat & Custom",
+    description: "Cocok untuk kebutuhan mendesak dan personalisasi tinggi",
+  },
+];
 
-
-
-function RibbonBadge() {
-  return (
-    <div className="absolute -left-3 -top-3 z-10 flex items-center gap-1 rounded-full bg-[var(--color-accent)] px-3 py-1.5 shadow-md">
-      <span className="font-display text-xs font-black text-white">
-        Pro
-      </span>
-    </div>
-  );
-}
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 36 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.55,
-      ease: [0.22, 1, 0.36, 1] as const,
-      delay: i * 0.1,
-    },
-  }),
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
 export function WhyBisaPrint() {
   return (
-    <SectionWrapper id="kenapa-bisaprint" bgVariant="white" className="relative overflow-hidden">
-      <div className="flex flex-col items-center text-center">
+    <SectionWrapper id="why-bisaprint" bgVariant="white" className="relative overflow-hidden">
+      <DecorativeImage
+        src="/assets/decoratives/gem-crystal.png"
+        width={70}
+        height={82}
+        opacity={0.4}
+        className="-right-4 top-6 z-0 hidden md:block"
+      />
+      <DecorativeImage
+        src="/assets/decoratives/squiggle-orange.png"
+        width={100}
+        height={50}
+        opacity={0.3}
+        className="-bottom-4 left-4 z-0 hidden md:block"
+      />
+
+      <ScrollReveal className="flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
-          Kenapa BisaPrint?
+          Kenapa Bisa Print?
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] md:w-[240px] select-none pointer-events-none">
-          <Image 
+        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+          <Image
             src="/assets/decoratives/swoosh-orange.png"
-            alt="" 
+            alt=""
             fill
             className="object-contain opacity-80"
             aria-hidden="true"
@@ -83,78 +89,42 @@ export function WhyBisaPrint() {
             sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
-        <p className="mx-auto mt-4 max-w-2xl font-body text-base text-[var(--color-text-secondary)] md:text-lg">
-          Bukan cuma cetak. Kita pastikan hasilnya bikin klienmu terkesan.
+        <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
+          Kenapa harus pilih Bisa Print? Ini alasannya.
         </p>
+      </ScrollReveal>
+
+      <div className="mt-12 rounded-3xl border-2 border-dashed border-[var(--color-accent)] bg-[var(--color-bg-soft)] p-6 sm:p-8 md:p-10">
+        <motion.div
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
+          {advantages.map((item) => {
+            const Icon = item.icon;
+            return (
+              <motion.article
+                key={item.title}
+                variants={cardVariants}
+                whileHover={{ y: -4 }}
+                className="flex flex-col items-center gap-3 rounded-2xl border-2 border-[var(--color-border)] bg-white p-5 text-center shadow-sm transition-colors hover:border-[var(--color-primary)] hover:shadow-md"
+              >
+                <div className="flex size-12 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
+                  <Icon className="size-[22px] text-[var(--color-primary)]" aria-hidden="true" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[var(--color-text-primary)]">
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                  {item.description}
+                </p>
+              </motion.article>
+            );
+          })}
+        </motion.div>
       </div>
-
-      {/* Feature cards - sticky note style */}
-      <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2">
-        {features.map((feature, i) => {
-          const rotations = ["-1.2deg", "0.8deg", "1deg", "-0.5deg"];
-          const cardRotate = rotations[i % rotations.length];
-          return (
-            <motion.article
-              key={feature.title}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-60px" }}
-              style={{ rotate: cardRotate }}
-              whileHover={{
-                rotate: "0deg",
-                scale: 1.03,
-                boxShadow:
-                  "0 12px 32px -4px rgba(224,24,122,0.18), 0 4px 12px -2px rgba(0,0,0,0.08)",
-                transition: { duration: 0.25, ease: "easeOut" },
-              }}
-              className="cursor-default rounded-3xl border-2 border-dashed border-primary-light bg-white p-6 shadow-sm"
-            >
-            {/* Emoji badge */}
-            <div
-              className="mb-4 flex size-12 items-center justify-center rounded-full"
-              style={{ backgroundColor: feature.accent }}
-            >
-              <span className="text-2xl" aria-hidden="true">
-                {feature.emoji}
-              </span>
-            </div>
-
-            <h3 className="font-display text-lg font-black text-[var(--color-text-primary)]">
-              {feature.title}
-            </h3>
-            <p className="mt-2 font-body text-sm leading-relaxed text-[var(--color-text-secondary)]">
-              {feature.description}
-            </p>
-          </motion.article>
-        )})}
-      </div>
-
-      {/* Machine photo placeholder */}
-      <motion.figure
-        className="relative mx-auto mt-14 max-w-sm overflow-hidden sm:overflow-visible"
-        initial={{ opacity: 0, y: 32 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <RibbonBadge />
-        <div className="relative mt-8 flex h-[380px] w-full items-center justify-center overflow-hidden rounded-3xl bg-[var(--color-bg-soft)] p-6 shadow-md">
-          <Image
-            src="/assets/machines/konica-958.png"
-            alt="Konica Minolta 958 (B&W) - standar produksi profesional BisaPrint"
-            width={319}
-            height={577}
-            style={{ objectFit: "contain" }}
-            className="z-10 h-full w-auto transition-transform duration-500 hover:scale-105"
-            quality={95}
-          />
-        </div>
-        <figcaption className="mt-3 text-center font-body text-sm text-[var(--color-text-muted)]">
-          Konica Minolta 958 (B&W) - standar produksi profesional
-        </figcaption>
-      </motion.figure>
     </SectionWrapper>
   );
 }

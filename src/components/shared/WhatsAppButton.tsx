@@ -1,15 +1,13 @@
-import {
-  WA_DEFAULT_MSG,
-  WA_NUMBER,
-  waUrl,
-  waUrlProduct,
-} from "@/lib/constants";
+"use client";
+
+import { motion } from "framer-motion";
+import { WA_NUMBER, WA_DEFAULT_MSG, waUrl } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/tracking";
 
 interface WhatsAppButtonProps {
   label: string;
   message?: string;
-  productName?: string;
   variant: "primary" | "outline" | "floating";
   size: "sm" | "md" | "lg";
   className?: string;
@@ -29,16 +27,8 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-function resolveHref(
-  message?: string,
-  productName?: string,
-): string {
-  if (productName) {
-    return waUrlProduct(productName);
-  }
-  if (message) {
-    return waUrl(message);
-  }
+function resolveHref(message?: string): string {
+  if (message) return waUrl(message);
   return `https://wa.me/${WA_NUMBER}?text=${WA_DEFAULT_MSG}`;
 }
 
@@ -75,29 +65,36 @@ const floatingIconSizes = {
 export function WhatsAppButton({
   label,
   message,
-  productName,
   variant,
   size,
   className,
 }: WhatsAppButtonProps) {
-  const href = resolveHref(message, productName);
+  const href = resolveHref(message);
 
   if (variant === "floating") {
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={label}
-        className={cn(
-          "fixed bottom-6 right-6 z-50 inline-flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition hover:bg-[#1ebe5d] hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#25D366]/40",
-          sizeStyles.floating[size],
-          className,
-        )}
-      >
-        <WhatsAppIcon className={floatingIconSizes[size]} />
-        <span className="sr-only">{label}</span>
-      </a>
+      <div className="fixed bottom-6 right-6 z-50">
+        <motion.a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          onClick={() => trackEvent("Lead", { source: "floating-wa" })}
+          whileHover={{ scale: 1.1 }}
+          className={cn(
+            "group relative inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-[#1ebe5d] hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#25D366]/40 animate-pulse-wa",
+            sizeStyles.floating[size],
+            className,
+          )}
+        >
+          <WhatsAppIcon className="size-5" />
+          <span className="text-sm font-bold">Chat WA</span>
+          <span className="sr-only">{label}</span>
+          <span className="absolute bottom-full right-0 mb-2 scale-0 rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition group-hover:scale-100" role="tooltip">
+            Chat Admin
+          </span>
+        </motion.a>
+      </div>
     );
   }
 

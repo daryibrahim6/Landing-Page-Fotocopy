@@ -9,7 +9,52 @@ export interface Testimonial {
   screenshot: string;
 }
 
-// TODO: Replace placeholder screenshot paths ("") with real testimonial screenshots when client provides them.
+export interface ClientBadge {
+  id: string;
+  name: string;
+  icon: string;
+  description?: string;
+  borderColor: string;
+}
+
+export const clientBadges: ClientBadge[] = [
+  {
+    id: "cb-001",
+    name: "Rotiboy Bakeshoppe",
+    icon: "building",
+    description: "Digital Printing",
+    borderColor: "#E87817",
+  },
+  {
+    id: "cb-002",
+    name: "Future Gate",
+    icon: "book",
+    description: "Pembuatan buku pelajaran",
+    borderColor: "#4285F4",
+  },
+  {
+    id: "cb-003",
+    name: "Griya Ilmu",
+    icon: "book-2",
+    description: "Pembuatan buku pelajaran",
+    borderColor: "#34A853",
+  },
+  {
+    id: "cb-004",
+    name: "Kementerian Agama RI",
+    icon: "mosque",
+    description: "Pembuatan ijazah provinsi DKI Jakarta dan Banten",
+    borderColor: "#DE127A",
+  },
+  {
+    id: "cb-005",
+    name: "10.000+ Customer Shopee",
+    icon: "shopping-bag",
+    description: "Terpercaya di marketplace",
+    borderColor: "#EE4D2D",
+  },
+];
+
 export const testimonials: Testimonial[] = [
   {
     id: "bt-001",

@@ -17,16 +17,16 @@ type GoogleMapProps = {
  * Koordinat: PT Harmony Sistem, Kota Bekasi
  */
 export default function GoogleMap({
-  placeName = "PT Harmony Sistem, Kota Bekasi",
+  placeName = "BisaPrint, Jl. Dalang I No.45, Pengasinan, Rawalumbu, Kota Bekasi",
   height = 400,
   className = "",
 }: GoogleMapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
-  // Koordinat Kota Bekasi (pusat)
-  const lat = -6.2383;
-  const lng = 106.9756;
-  const zoom = 15;
+  // Koordinat Rawalumbu, Kota Bekasi
+  const lat = -6.2546;
+  const lng = 106.9931;
+  const zoom = 16;
 
   if (!apiKey) {
     // Fallback: tombol buka Google Maps di tab baru

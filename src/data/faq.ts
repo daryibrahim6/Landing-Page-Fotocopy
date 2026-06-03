@@ -7,50 +7,62 @@ export interface FaqItem {
 export const faqItems: FaqItem[] = [
   {
     id: "faq-001",
-    question: "Apakah ada minimum order?",
+    question: "Apakah bisa cetak satuan?",
     answer:
-      "Minimum order tergantung jenis layanan. Untuk digital print dan dokumen biasanya mulai 1 pcs, sedangkan sablon dan beberapa produk UMKM ada minimum quantity. Chat kami dulu untuk cek detail produk yang kamu butuhkan.",
+      "Bisa! Kami melayani cetak satuan maupun jumlah banyak. Untuk digital print dan dokumen biasanya mulai 1 pcs.",
   },
   {
     id: "faq-002",
-    question: "Format file apa yang bisa dikirim?",
+    question: "Apakah bisa order lewat WhatsApp?",
     answer:
-      "Kami menerima PDF, AI, CDR, PSD, dan JPG/PNG resolusi tinggi. Untuk hasil terbaik, kirim file desain dalam format asli (AI/CDR) atau PDF dengan outline/font sudah di-convert.",
+      "Tentu. Order lewat WhatsApp adalah cara termudah. Kamu tinggal kirim detail produk dan file desain, admin akan bantu estimasi harga.",
   },
   {
     id: "faq-003",
-    question: "Metode pembayaran apa yang tersedia?",
+    question: "Apakah bisa desain sekalian?",
     answer:
-      "Pembayaran bisa via transfer bank dan tunai di toko. Untuk order besar, kami bisa bantu bagi termin setelah detail order disepakati.",
+      "Bisa. Tim kami siap bantu desain untuk kebutuhan cetak kamu. Biaya desain tergantung tingkat kerumitan — konsultasi dulu ya.",
   },
   {
     id: "faq-004",
-    question: "Berapa lama waktu pengerjaan?",
+    question: "Berapa lama proses produksi?",
     answer:
-      "Sebagian besar order standar selesai di hari yang sama selama file siap sebelum jam operasional. Order urgent atau volume besar akan kami infokan estimasi khusus.",
+      "Order standar biasanya selesai 1-2 hari kerja. Order yang lebih besar atau custom bisa 3-5 hari kerja tergantung jumlah dan jenis produk.",
   },
   {
     id: "faq-005",
-    question: "Apakah ada layanan antar atau harus pickup?",
+    question: "Apakah bisa kirim ke luar kota?",
     answer:
-      "Pickup di toko Bekasi tersedia. Untuk area Bekasi dan sekitarnya, pengiriman bisa diatur dengan biaya sesuai jarak dan ukuran order.",
+      "Bisa. Kami melayani pengiriman ke luar kota via jasa ekspedisi. Ongkos kirim menyesuaikan alamat tujuan dan berat paket.",
   },
   {
     id: "faq-006",
-    question: "Bagaimana kebijakan revisi desain?",
+    question: "File desain harus format apa?",
     answer:
-      "Revisi minor sebelum proses cetak biasanya gratis 1x. Revisi setelah cetak atau perubahan besar mungkin dikenakan biaya tambahan sesuai material yang sudah dipakai.",
+      "Kami terima PDF, PNG, JPG, CDR, AI, dan PSD. Resolusi minimal 300 dpi, warna CMYK disarankan. Untuk teks, convert ke outline atau embed font.",
   },
   {
     id: "faq-007",
-    question: "Bisa cetak ukuran custom?",
+    question: "Apakah file bisa dicek dulu?",
     answer:
-      "Bisa. Kami melayani ukuran custom untuk banner, stiker, dan berbagai kebutuhan digital print. Kirim ukuran final dan file desain untuk estimasi harga.",
+      "Ya! File kamu akan kami cek dulu sebelum diproses. Kalau ada yang perlu diperbaiki, admin akan kasih tahu lewat WA.",
   },
   {
     id: "faq-008",
-    question: "Ada paket khusus untuk order UMKM dalam jumlah banyak?",
+    question: "Apakah bisa ambil langsung di toko?",
     answer:
-      "Ada. Untuk order bulk UMKM (kartu nama, kemasan, merch, dan lainnya) kami berikan penawaran harga paket. Semakin banyak quantity, semakin hemat per pcs.",
+      "Bisa. Kamu bisa ambil langsung di toko kami di Bekasi. Jam operasional: Senin–Sabtu, 08.00–18.00 WIB.",
+  },
+  {
+    id: "faq-009",
+    question: "Pembayaran lewat apa saja?",
+    answer:
+      "Pembayaran via transfer bank (BCA, Mandiri, BRI) dan QRIS. Untuk order besar bisa diatur termin setelah detail order disepakati.",
+  },
+  {
+    id: "faq-010",
+    question: "Apakah bisa konsultasi bahan dulu?",
+    answer:
+      "Tentu! Admin kami siap bantu pilihkan bahan yang paling cocok untuk kebutuhan cetak kamu. Konsultasi gratis via WhatsApp.",
   },
 ];
