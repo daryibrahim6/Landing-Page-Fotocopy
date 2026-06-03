@@ -136,8 +136,10 @@ export function FaqSection() {
               <button
                 type="button"
                 onClick={() => toggle(item.id)}
+                id={`faq-btn-${item.id}`}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                aria-controls={`faq-panel-${item.id}`}
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 rounded-2xl"
               >
                 <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
                   <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
@@ -166,6 +168,9 @@ export function FaqSection() {
               </button>
 
               <div
+                id={`faq-panel-${item.id}`}
+                role="region"
+                aria-labelledby={`faq-btn-${item.id}`}
                 className={cn(
                   "grid transition-[grid-template-rows] duration-300 ease-in-out",
                   isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",

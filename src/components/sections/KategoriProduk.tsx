@@ -44,7 +44,7 @@ export function KategoriProduk({ onSelect }: KategoriProdukProps) {
                 const el = document.getElementById("produk");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
-              className="group relative flex flex-col items-center gap-4 rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 text-center transition-colors hover:border-[var(--color-primary)] hover:bg-white"
+              className="group relative flex flex-col items-center gap-4 rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 text-center transition-colors hover:border-[var(--color-primary)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}

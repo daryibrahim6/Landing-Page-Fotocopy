@@ -28,7 +28,7 @@
 
   /* shadcn / existing utility aliases */
   --background: var(--color-bg-base);
-  --foreground: var(--color-text-primary);
+  --foreground: var(--color-text-secondary);
   --primary: var(--color-primary);
   --primary-foreground: #ffffff;
   --secondary: var(--color-bg-soft);
@@ -96,7 +96,7 @@
 
   body {
     background: var(--color-bg-base);
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

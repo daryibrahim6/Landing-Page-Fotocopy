@@ -62,26 +62,28 @@ export function FormKonsultasi() {
           viewport={{ once: true, margin: "-50px" }}
         >
           <motion.div custom={0} variants={fieldVariants}>
-            <label className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
+            <label htmlFor="form-nama" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
               Nama <span className="text-[var(--color-accent)]">*</span>
             </label>
             <input
+              id="form-nama"
               type="text"
               placeholder="Masukkan nama kamu"
               value={fields.nama}
               onChange={(e) => handleChange("nama", e.target.value)}
-              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)]"
+              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
             />
           </motion.div>
 
           <motion.div custom={1} variants={fieldVariants}>
-            <label className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
+            <label htmlFor="form-produk" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
               Produk <span className="text-[var(--color-accent)]">*</span>
             </label>
             <select
+              id="form-produk"
               value={fields.produk}
               onChange={(e) => handleChange("produk", e.target.value)}
-              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)]"
+              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
             >
               <option value="">— Pilih produk —</option>
               {products.map((p) => (
@@ -95,56 +97,60 @@ export function FormKonsultasi() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <motion.div custom={2} variants={fieldVariants}>
-              <label className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
+              <label htmlFor="form-jumlah" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
                 Jumlah <span className="text-[var(--color-accent)]">*</span>
               </label>
               <input
+                id="form-jumlah"
                 type="number"
                 min={1}
                 placeholder="Contoh: 50"
                 value={fields.jumlah}
                 onChange={(e) => handleChange("jumlah", e.target.value)}
-                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)]"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
               />
             </motion.div>
 
             <motion.div custom={3} variants={fieldVariants}>
-              <label className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
+              <label htmlFor="form-ukuran" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
                 Ukuran
               </label>
               <input
+                id="form-ukuran"
                 type="text"
                 placeholder="Contoh: A4"
                 value={fields.ukuran}
                 onChange={(e) => handleChange("ukuran", e.target.value)}
-                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)]"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
               />
             </motion.div>
 
             <motion.div custom={4} variants={fieldVariants}>
-              <label className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
+              <label htmlFor="form-bahan" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
                 Bahan
               </label>
               <input
+                id="form-bahan"
                 type="text"
                 placeholder="Contoh: Chromo"
                 value={fields.bahan}
                 onChange={(e) => handleChange("bahan", e.target.value)}
-                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)]"
+                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
               />
             </motion.div>
           </div>
 
           <motion.div custom={5} variants={fieldVariants}>
-            <label className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
+            <label htmlFor="form-catatan" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
               Catatan
             </label>
             <textarea
+              id="form-catatan"
               rows={3}
               placeholder="Tambah catatan atau permintaan khusus"
               value={fields.catatan}
               onChange={(e) => handleChange("catatan", e.target.value)}
-              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)]"
+              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
             />
           </motion.div>
 
