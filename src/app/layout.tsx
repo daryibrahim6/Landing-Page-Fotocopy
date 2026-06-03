@@ -114,7 +114,7 @@ export default function RootLayout({
 
   return (
     <html lang="id" className={`scroll-smooth ${fredoka.variable} ${poppins.variable}`}>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <MetaPixel pixelId={metaPixelId} />
         <GoogleAnalytics gaId={gaId} />
         <script
