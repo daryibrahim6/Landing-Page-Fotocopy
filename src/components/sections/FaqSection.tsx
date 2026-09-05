@@ -6,34 +6,9 @@ import { motion } from "framer-motion";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { faqItems } from "@/data/faq";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { cn } from "@/lib/utils";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const itemVariant = {
-  hidden: { opacity: 0, y: 16, rotate: 0 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    rotate: ["-0.4deg", "0.3deg", "-0.2deg", "0.4deg", "-0.3deg", "0.2deg"][i % 6],
-    transition: { duration: 0.4, ease: "easeOut" as const, delay: i * 0.08 },
-  }),
-};
 
 function StickyNote({ children }: { children: ReactNode }) {
   return (
@@ -42,10 +17,7 @@ function StickyNote({ children }: { children: ReactNode }) {
       whileInView={{ opacity: 1, rotate: "2deg", scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="mx-auto mb-8 w-fit rounded-lg bg-[var(--color-accent-light)] px-5 py-3 shadow-md"
-      style={{
-        boxShadow: "2px 3px 0 rgba(0,0,0,0.06), 0 8px 24px -4px rgba(224,120,32,0.12)",
-      }}
+      className="mx-auto mb-8 w-fit rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-soft)] px-5 py-3 shadow-sm"
     >
       {children}
     </motion.div>
@@ -61,21 +33,12 @@ export function FaqSection() {
 
   return (
     <SectionWrapper id="faq" bgVariant="white" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/pushpin.webp"
-        width={24}
-        height={30}
-        className="-left-2 top-12 z-10 hidden md:block"
-        rotate={-5}
-        zIndex={10}
-      />
-
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.02]"
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
         aria-hidden="true"
         style={{
-          backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
-          backgroundSize: "20px 20px",
+          backgroundImage: `radial-gradient(circle, var(--color-border) 1px, transparent 1px)`,
+          backgroundSize: "24px 24px",
         }}
       />
 
@@ -86,15 +49,13 @@ export function FaqSection() {
             <HelpCircle className="size-[22px] text-[var(--color-primary)]" aria-hidden="true" />
           </span>
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.webp"
+            src="/assets/illustrations/underline-accent.svg"
             alt=""
             fill
-            className="object-contain opacity-80"
+            className="object-contain"
             aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
         <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg">
@@ -133,15 +94,8 @@ export function FaqSection() {
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 rounded-2xl"
                 >
                   <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
-                    <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
-                      <DecorativeImage
-                        src="/assets/decoratives/pushpin.webp"
-                        width={18}
-                        height={22}
-                        className="!static"
-                        rotate={-5}
-                        zIndex={1}
-                      />
+                    <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-primary)] text-sm font-black">
+                      {item.id}
                     </span>
                     {item.question}
                   </span>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ProductCard } from "@/components/shared/ProductCard";
 import { categories, products } from "@/data/products";
 import { cn } from "@/lib/utils";
@@ -25,16 +24,7 @@ export function ProductCatalog() {
       : products.filter((p) => p.category === activeCategory);
 
   return (
-    <SectionWrapper id="produk" bgVariant="white">
-      <DecorativeImage
-        src="/assets/decoratives/badge-scalloped.webp"
-        width={56}
-        height={56}
-        className="-right-4 -top-4 z-10 hidden md:block"
-        rotate={12}
-        zIndex={10}
-      />
-
+    <SectionWrapper id="produk" bgVariant="white" className="relative overflow-hidden">
       <ScrollReveal>
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
@@ -85,27 +75,18 @@ export function ProductCatalog() {
         </p>
       )}
 
-      <div className="relative mt-16 overflow-hidden rounded-3xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] px-8 py-10 text-center text-white shadow-lg">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
-          aria-hidden="true"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, #fff 1px, transparent 1px)",
-            backgroundSize: "16px 16px",
-          }}
-        />
-        <h3 className="relative font-display text-xl font-bold md:text-2xl">
+      <div className="relative mt-16 overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft-2)] px-8 py-10 text-center shadow-sm">
+        <h3 className="relative font-display text-xl font-bold text-[var(--color-text-primary)] md:text-2xl">
           Tidak nemu produk yang kamu cari?
         </h3>
-        <p className="relative mx-auto mt-2 max-w-md text-sm text-white/80">
+        <p className="relative mx-auto mt-2 max-w-md text-sm text-[var(--color-text-secondary)]">
           Langsung aja chat admin, kami siap bantu! Konsultasi gratis.
         </p>
         <a
           href={buildWAUrl("general")}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-[var(--color-primary)] shadow-lg transition hover:bg-white/90"
+          className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 font-bold text-white shadow-lg transition hover:bg-[var(--color-primary-muted)]"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />

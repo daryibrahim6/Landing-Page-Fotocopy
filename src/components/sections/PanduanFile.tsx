@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { FileText, Image as ImageIcon, Ruler, Droplet, Crop, Type, AlertTriangle } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
@@ -66,35 +65,18 @@ const itemVariants = {
 
 export function PanduanFile() {
   return (
-    <SectionWrapper id="panduan-file" bgVariant="soft" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/gem-crystal.webp"
-        width={60}
-        height={70}
-        opacity={0.3}
-        className="-left-4 top-8 z-0 hidden md:block"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.webp"
-        width={100}
-        height={50}
-        opacity={0.2}
-        className="-right-4 bottom-4 z-0 hidden md:block"
-      />
-
+    <SectionWrapper id="panduan-file" bgVariant="white" className="relative overflow-hidden">
       <ScrollReveal className="flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Panduan File Siap Cetak
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.webp"
+            src="/assets/illustrations/underline-accent.svg"
             alt=""
             fill
-            className="object-contain opacity-80"
+            className="object-contain"
             aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
@@ -103,7 +85,7 @@ export function PanduanFile() {
       </ScrollReveal>
 
       <div className="relative mx-auto mt-12 max-w-3xl">
-        <div className="absolute -left-3 top-0 h-full w-1 rounded-full bg-[var(--color-primary)] opacity-20 max-md:hidden" aria-hidden="true" />
+        <div className="absolute -left-3 top-0 h-full w-1 rounded-full bg-[var(--color-border)] max-md:hidden" aria-hidden="true" />
 
         <motion.div
           className="space-y-6"
@@ -118,7 +100,7 @@ export function PanduanFile() {
               <motion.div
                 key={i}
                 variants={itemVariants}
-                className="relative flex items-start gap-5 rounded-2xl border-2 border-[var(--color-border)] bg-white p-5 shadow-sm transition-all duration-200 hover:translate-x-1 hover:border-[var(--color-primary)]"
+                className="relative flex items-start gap-5 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm transition-all duration-200 hover:translate-x-1 hover:border-[var(--color-primary)]"
               >
                 <div
                   className={cn(

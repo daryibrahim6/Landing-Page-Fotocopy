@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { CheckCheck, MessageCircle, Package, Users, Palette, HeadphonesIcon, Rocket } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import type { LucideIcon } from "lucide-react";
 
@@ -59,34 +58,17 @@ const cardVariants = {
 export function WhyBisaPrint() {
   return (
     <SectionWrapper id="why-bisaprint" bgVariant="white" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/gem-crystal.webp"
-        width={70}
-        height={82}
-        opacity={0.4}
-        className="-right-4 top-6 z-0 hidden md:block"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.webp"
-        width={100}
-        height={50}
-        opacity={0.3}
-        className="-bottom-4 left-4 z-0 hidden md:block"
-      />
-
       <ScrollReveal className="flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Kenapa Bisa Print?
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.webp"
+            src="/assets/illustrations/underline-accent.svg"
             alt=""
             fill
-            className="object-contain opacity-80"
+            className="object-contain"
             aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
@@ -94,7 +76,7 @@ export function WhyBisaPrint() {
         </p>
       </ScrollReveal>
 
-      <div className="mt-12 rounded-3xl border-2 border-dashed border-[var(--color-accent)] bg-[var(--color-bg-soft)] p-6 sm:p-8 md:p-10">
+      <div className="mt-12 rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6 sm:p-8 md:p-10">
         <motion.div
           className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           variants={containerVariants}

@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { Star, Building2, BookOpen, Landmark, ShoppingBag } from "lucide-react";
 import { testimonials, clientBadges } from "@/data/testimonials";
 import type { Testimonial, TestimonialSource, ClientBadge } from "@/data/testimonials";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
@@ -168,29 +167,18 @@ export function Testimonials() {
   const autoScrollDuration = prefersReduced ? 0 : baseDuration;
 
   return (
-    <SectionWrapper id="testimoni" bgVariant="soft" className="relative">
-      <DecorativeImage
-        src="/assets/decoratives/bow-ribbon.webp"
-        width={52}
-        height={52}
-        className="-right-1 -top-1 z-10 hidden md:block"
-        rotate={10}
-        zIndex={10}
-      />
-
+    <SectionWrapper id="testimoni" bgVariant="white" className="relative">
       <ScrollReveal className="flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Klien & Testimoni
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.webp"
+            src="/assets/illustrations/underline-accent.svg"
             alt=""
             fill
-            className="object-contain opacity-80"
+            className="object-contain"
             aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
@@ -199,19 +187,19 @@ export function Testimonials() {
       </ScrollReveal>
 
       <div className="mt-10">
-        <div className="mx-auto mb-10 grid max-w-3xl grid-cols-3 overflow-hidden rounded-2xl bg-[var(--color-accent)] shadow-lg">
+        <div className="mx-auto mb-10 grid max-w-3xl grid-cols-3 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] shadow-sm">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
               className={cn(
                 "flex flex-col items-center gap-1 px-3 py-4 text-center",
-                i < stats.length - 1 && "border-r border-white/20",
+                i < stats.length - 1 && "border-r border-[var(--color-border)]",
               )}
             >
-              <span className="font-display text-2xl font-black text-white md:text-3xl">
+              <span className="font-display text-2xl font-black text-[var(--color-primary)] md:text-3xl">
                 {stat.value}
               </span>
-              <span className="text-xs font-medium text-white/80 md:text-sm">
+              <span className="text-xs font-medium text-[var(--color-text-secondary)] md:text-sm">
                 {stat.label}
               </span>
             </div>

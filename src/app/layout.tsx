@@ -3,11 +3,6 @@ import type { ReactNode } from "react";
 import { Fredoka, Poppins } from "next/font/google";
 import Script from "next/script";
 
-// Minimal inline styles to prevent FOUT before CSS loads
-const criticalCSS = `
-  body { margin: 0; }
-  .font-display { font-family: system-ui, sans-serif; }
-`;
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Mengapa memilih BisaPrint">
+  <rect width="400" height="300" fill="#F8FAFC" rx="16"/>
+  <rect x="40" y="60" width="320" height="200" rx="20" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
+
+  <!-- Checklist -->
+  <rect x="70" y="90" width="260" height="36" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <circle cx="90" cy="108" r="10" fill="#DE127A" opacity="0.15"/>
+  <path d="M85 108l3.5 3.5 7-7" stroke="#DE127A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="110" y="100" width="200" height="8" rx="4" fill="#E2E8F0"/>
+  <rect x="110" y="114" width="140" height="6" rx="3" fill="#F1F5F9"/>
+
+  <rect x="70" y="138" width="260" height="36" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <circle cx="90" cy="156" r="10" fill="#E87817" opacity="0.15"/>
+  <path d="M85 156l3.5 3.5 7-7" stroke="#E87817" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="110" y="148" width="200" height="8" rx="4" fill="#E2E8F0"/>
+
+  <rect x="70" y="186" width="260" height="36" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <circle cx="90" cy="204" r="10" fill="#DE127A" opacity="0.15"/>
+  <path d="M85 204l3.5 3.5 7-7" stroke="#DE127A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="110" y="196" width="180" height="8" rx="4" fill="#E2E8F0"/>
+
+  <!-- Star badge -->
+  <circle cx="330" cy="78" r="20" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
+  <path d="M330 68l4.5 9.2 10.1 1.5-7.3 7.1 1.7 10-9-4.7-9 4.7 1.7-10-7.3-7.1 10.1-1.5z" fill="#E87817"/>
+
+  <!-- Person side -->
+  <circle cx="75" cy="240" r="16" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <path d="M55 278c0-12 8-20 20-20s20 8 20 20" fill="#DE127A" opacity="0.1"/>
+</svg>

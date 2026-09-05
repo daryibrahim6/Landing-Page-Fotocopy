@@ -12,18 +12,19 @@
   --color-accent-light: #F4A261;
   --color-accent-yellow: #FFD700;
 
-  /* Backgrounds */
+  /* Backgrounds — clean white/gray, no pink tint */
   --color-bg-base: #FFFFFF;
-  --color-bg-soft: #FFEAF4;
-  --color-bg-card: #FFF5FA;
+  --color-bg-soft: #F8FAFC;
+  --color-bg-soft-2: #F1F5F9;
+  --color-bg-card: #FFFFFF;
 
-  /* Text */
-  --color-text-primary: #DE127A;
-  --color-text-secondary: #5D2E4C;
-  --color-text-muted: #A06080;
+  /* Text — professional slate, pink only for brand CTAs */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
 
   /* Borders */
-  --color-border: #F3D1E5;
+  --color-border: #E2E8F0;
   --color-border-strong: #DE127A;
 
   /* shadcn / existing utility aliases */

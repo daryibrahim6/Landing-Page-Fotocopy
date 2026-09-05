@@ -6,7 +6,7 @@
 
 ## Current Milestone
 
-Milestone 2 — Checkout & Midtrans Integration (in progress)
+Milestone 2 — Checkout & Midtrans Integration (in progress) — UI/UX clean pass done
 
 ## Flow Status
 
@@ -20,14 +20,16 @@ Milestone 2 — Checkout & Midtrans Integration (in progress)
 
 ## Open Items
 
-1. **Build & TypeScript verification** — ✅ DONE. `npx tsc --noEmit` clean, `npm run build` sukses, `npm run lint` 0 error (13 warnings non-blocking), `npm test` 19/19 pass.
+1. **Build & TypeScript verification** — ✅ DONE. `npx tsc --noEmit` clean, `npm run build` sukses, `npm run lint` 0 error (0 warning), `npm test` 19/19 pass.
 2. **Public assets** — ✅ DONE. Semua PNG dikonversi ke WebP, folder rapih, referensi kode diupdate.
 3. **Product data** — ✅ DONE. Materials di `src/data/products.ts` sudah disesuaikan dengan `docs/ketentuan-produk-bisaprint.docx`.
 4. **Vitest setup** — ✅ DONE. `vitest` diinstall, `npm test` berjalan, unit test untuk `paper-sizes`, `wa`, `midtrans`, `utils` ditambahkan.
 5. **OG image** — ✅ DONE. `public/assets/brand/og-image.webp` (1200×630) dibuat sebagai placeholder dari logo & brand text.
 6. **Checkout integration** — ✅ DONE. `CheckoutForm.tsx` sudah terhubung ke `/api/midtrans/create-token`, handle token Snap, simulation, redirect success, dan fallback WhatsApp. Tinggal test live dengan Midtrans keys.
 7. **Harga produk** — ✅ DONE. `priceFrom` di `src/data/products.ts` diupdate ke harga pasar realistis.
-8. **Production dashboard & admin WhatsApp notification** — Backlog v2.
+8. **UI/UX clean pass** — ✅ DONE. Background putih murni/abu, pink hanya di brand CTA, decorative images diganti dengan SVG ilustrasi Story Set style, typography & spacing dirapikan.
+9. **Vercel build prep** — ✅ DONE. `turbopack` block dihapus dari `next.config.ts`, dependencies diperbaiki (`lucide-react` v0, `@types/jspdf` ke devDeps), unused imports dibersihkan.
+10. **Production dashboard & admin WhatsApp notification** — Backlog v2.
 
 ## Recently Completed
 

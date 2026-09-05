@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
-import { WA_NUMBER, waUrl, IG_URL, EMAIL_URL, SHOPEE_URL } from "@/lib/constants";
+import { WA_NUMBER, waUrl, IG_URL, SHOPEE_URL } from "@/lib/constants";
 
 function formatWaDisplay(number: string): string {
   if (number.startsWith("62")) {
@@ -39,12 +39,12 @@ export function Footer() {
         />
       </div>
 
-      <footer className="relative overflow-hidden bg-[#DE127A] text-white">
+      <footer className="relative overflow-hidden border-t border-[var(--color-border)] bg-white text-[var(--color-text-secondary)]">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
           aria-hidden="true"
           style={{
-            backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
             backgroundSize: "24px 24px",
           }}
         />

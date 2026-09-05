@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { buildWAFormUrl } from "@/lib/wa";
 import { products } from "@/data/products";
@@ -36,15 +35,7 @@ export function FormKonsultasi() {
   const waHref = buildWAFormUrl(fields);
 
   return (
-    <SectionWrapper id="form-konsultasi" bgVariant="soft" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.webp"
-        width={100}
-        height={80}
-        opacity={0.15}
-        className="-left-4 top-10 z-0 hidden md:block"
-      />
-
+    <SectionWrapper id="form-konsultasi" bgVariant="white" className="relative overflow-hidden">
       <div className="mx-auto max-w-2xl">
         <ScrollReveal className="flex flex-col items-center text-center">
           <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
@@ -63,7 +54,7 @@ export function FormKonsultasi() {
         >
           <motion.div custom={0} variants={fieldVariants}>
             <label htmlFor="form-nama" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
-              Nama <span className="text-[var(--color-accent)]">*</span>
+              Nama <span className="text-[var(--color-primary)]">*</span>
             </label>
             <input
               id="form-nama"
@@ -77,7 +68,7 @@ export function FormKonsultasi() {
 
           <motion.div custom={1} variants={fieldVariants}>
             <label htmlFor="form-produk" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
-              Produk <span className="text-[var(--color-accent)]">*</span>
+              Produk <span className="text-[var(--color-primary)]">*</span>
             </label>
             <select
               id="form-produk"
@@ -98,7 +89,7 @@ export function FormKonsultasi() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <motion.div custom={2} variants={fieldVariants}>
               <label htmlFor="form-jumlah" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
-                Jumlah <span className="text-[var(--color-accent)]">*</span>
+                Jumlah <span className="text-[var(--color-primary)]">*</span>
               </label>
               <input
                 id="form-jumlah"

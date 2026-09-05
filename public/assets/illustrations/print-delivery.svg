@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Ilustrasi cetak dan kirim BisaPrint">
+  <rect width="400" height="300" fill="#F8FAFC" rx="16"/>
+  <!-- Clean jar -->
+  <rect x="40" y="60" width="320" height="200" rx="20" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
+
+  <!-- Package box -->
+  <rect x="110" y="120" width="120" height="90" rx="8" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="120" y="95" width="100" height="35" rx="4" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="130" y="140" width="80" height="8" rx="4" fill="#E2E8F0"/>
+  <rect x="130" y="155" width="60" height="8" rx="4" fill="#E2E8F0"/>
+  <path d="M110 150h120" stroke="#DE127A" stroke-width="2" stroke-dasharray="4 4" opacity="0.5"/>
+  <text x="170" y="242" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#0F172A" text-anchor="middle">Siap Cetak</text>
+
+  <!-- Delivery scooter/motorbike -->
+  <circle cx="300" cy="190" r="18" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+  <circle cx="340" cy="190" r="18" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+  <path d="M270 165h75c5 0 10 5 10 10v25h-95v-25c0-5 5-10 10-10z" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="140" width="45" height="35" rx="4" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
+  <circle cx="350" cy="125" r="6" fill="#DE127A" opacity="0.3"/>
+
+  <!-- Flying papers -->
+  <rect x="55" y="90" width="50" height="65" rx="4" fill="#ffffff" stroke="#E2E8F0" stroke-width="2" transform="rotate(-8 55 90)"/>
+  <rect x="65" y="105" width="35" height="5" rx="2" fill="#E2E8F0" transform="rotate(-8 55 90)"/>
+  <rect x="65" y="115" width="25" height="5" rx="2" fill="#E2E8F0" transform="rotate(-8 55 90)"/>
+  <rect x="65" y="125" width="30" height="5" rx="2" fill="#E2E8F0" transform="rotate(-8 55 90)"/>
+
+  <!-- Labels -->
+  <text x="320" y="242" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#0F172A" text-anchor="middle">Cepat Antar</text>
+</svg>

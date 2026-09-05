@@ -4,7 +4,6 @@ import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 
 export default function Error({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };

@@ -4,9 +4,6 @@ import Image from "next/image";
 
 import { MapPin, Clock, Printer } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { BlobDecoration } from "@/components/shared/BlobDecoration";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
-import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { IG_URL, waUrl, EMAIL_URL, MAPS_EMBED_URL } from "@/lib/constants";
 
 const socialLinks = [
@@ -45,59 +42,19 @@ const socialLinks = [
 
 export function ContactSection() {
   return (
-    <SectionWrapper id="kontak" bgVariant="soft" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/torn-paper-tape.webp"
-        width={200}
-        height={150}
-        opacity={0.45}
-        className="-bottom-6 -right-6 z-0 hidden md:block"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/blob-pink-glossy.webp"
-        width={240}
-        height={240}
-        opacity={0.15}
-        className="-left-16 top-1/4 z-0 hidden md:block"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/bow-ribbon.webp"
-        width={130}
-        height={138}
-        opacity={0.4}
-        rotate={-10}
-        className="right-12 top-12 z-0 hidden md:block"
-      />
-
-      <BlobDecoration
-        color="var(--color-primary-light)"
-        size={160}
-        opacity={0.2}
-        variant={1}
-        className="-right-12 -top-8 hidden md:block"
-      />
-      <BlobDecoration
-        color="var(--color-accent-light)"
-        size={120}
-        opacity={0.15}
-        variant={2}
-        className="-bottom-10 -left-10 hidden md:block"
-      />
-
+    <SectionWrapper id="kontak" bgVariant="white" className="relative overflow-hidden">
       <div className="relative grid gap-10 lg:grid-cols-2 lg:gap-12">
         <div className="flex flex-col items-start">
           <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
             Hubungi Kami
           </h2>
-          <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+          <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
             <Image
-              src="/assets/decoratives/swoosh-orange.webp"
+              src="/assets/illustrations/underline-accent.svg"
               alt=""
               fill
-              className="object-contain opacity-80"
+              className="object-contain"
               aria-hidden="true"
-              quality={90}
-              sizes="(max-width: 768px) 200px, 400px"
             />
           </div>
           <p className="mt-4 max-w-md text-base text-[var(--color-text-secondary)]">

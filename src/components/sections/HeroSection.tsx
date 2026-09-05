@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 
 const headlineVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -97,16 +96,16 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen items-center overflow-hidden bg-[var(--color-bg-soft)]"
+      className="relative flex min-h-screen items-center overflow-hidden bg-white"
     >
       <div className="absolute inset-0 z-0">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
           aria-hidden="true"
           style={{
             backgroundImage:
-              "radial-gradient(circle, var(--color-primary) 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
+              "radial-gradient(circle, var(--color-border) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
           }}
         />
         <div
@@ -114,7 +113,7 @@ export function HeroSection() {
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse at 80% 20%, rgba(222,18,122,0.08) 0%, transparent 60%)",
+              "radial-gradient(ellipse at 80% 20%, rgba(15,23,42,0.04) 0%, transparent 60%)",
           }}
         />
         <div
@@ -122,53 +121,10 @@ export function HeroSection() {
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 80%, rgba(232,120,23,0.06) 0%, transparent 50%)",
+              "radial-gradient(ellipse at 20% 80%, rgba(15,23,42,0.03) 0%, transparent 50%)",
           }}
         />
       </div>
-
-      <div
-        className="pointer-events-none absolute -bottom-8 -left-16 z-0 select-none animate-float-y"
-        aria-hidden="true"
-      >
-        <Image
-          src="/assets/decoratives/blob-pink-glossy.webp"
-          alt=""
-          width={200}
-          height={200}
-          className="h-auto w-full opacity-[0.65]"
-          draggable={false}
-          quality={90}
-          sizes="200px"
-        />
-      </div>
-
-      <div
-        className="pointer-events-none absolute left-[6%] top-[28%] z-10 select-none animate-sparkle"
-        style={{ animationDelay: "0.4s" }}
-        aria-hidden="true"
-      >
-        <Image
-          src="/assets/decoratives/sparkle-stars.webp"
-          alt=""
-          width={72}
-          height={72}
-          className="h-auto w-full"
-          draggable={false}
-          quality={90}
-          sizes="72px"
-        />
-      </div>
-
-      <DecorativeImage
-        src="/assets/decoratives/tape-strip.webp"
-        width={100}
-        height={43}
-        className="-top-3 left-1/2 z-20 hidden -translate-x-1/2 md:block"
-        rotate={-3}
-        opacity={0.85}
-        zIndex={20}
-      />
 
       <motion.div
         className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8"
@@ -184,7 +140,7 @@ export function HeroSection() {
               <motion.span
                 key={badge.text}
                 variants={badgeItemVariants}
-                className="inline-flex items-center gap-1.5 rounded-full border-2 border-[var(--color-primary)]/20 bg-white px-4 py-1.5 text-xs font-bold text-[var(--color-primary)] shadow-sm"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-soft)] px-4 py-1.5 text-xs font-bold text-[var(--color-text-secondary)] shadow-sm"
                 style={{ transform: badge.rotate }}
               >
                 <BadgeIcon icon={badge.icon} />
@@ -195,12 +151,12 @@ export function HeroSection() {
 
           <div className="mb-6">
             <motion.h1
-              className="font-display text-6xl font-black leading-[1.05] tracking-tight text-[var(--color-text-primary)] md:text-8xl lg:text-9xl"
+              className="font-display text-6xl font-black leading-[1.05] tracking-tight text-[var(--color-text-primary)] md:text-8xl"
               variants={headlineVariants}
             >
               bisa mewujudkan
               <br />
-              <span className="text-[var(--color-accent)]">
+              <span className="text-[var(--color-primary)]">
                 imajinasi mu
               </span>
             </motion.h1>
@@ -226,7 +182,7 @@ export function HeroSection() {
             <motion.div custom={1} variants={ctaVariants}>
               <a
                 href="#produk"
-                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--color-primary)] px-6 py-3 font-display text-base font-bold text-[var(--color-primary)] transition duration-200 hover:bg-[var(--color-primary)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 sm:px-8 sm:py-4"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-bg-soft-2)] px-6 py-3 font-display text-base font-bold text-[var(--color-text-primary)] transition duration-200 hover:bg-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 sm:px-8 sm:py-4"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -247,14 +203,14 @@ export function HeroSection() {
             className="mt-8 flex items-center gap-3"
             variants={proofVariants}
           >
-            <div className="flex -space-x-1">
-              <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-white">
+            <div className="flex -space-x-2">
+              <span className="flex size-8 items-center justify-center rounded-full border border-white bg-[var(--color-bg-soft-2)] text-xs font-bold text-[var(--color-text-secondary)] shadow-sm">
                 1
               </span>
-              <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-xs font-bold text-white">
+              <span className="flex size-8 items-center justify-center rounded-full border border-white bg-[var(--color-bg-soft-2)] text-xs font-bold text-[var(--color-text-secondary)] shadow-sm">
                 0
               </span>
-              <span className="flex size-8 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-white">
+              <span className="flex size-8 items-center justify-center rounded-full border border-white bg-[var(--color-primary)] text-xs font-bold text-white shadow-sm">
                 K
               </span>
             </div>
@@ -273,17 +229,15 @@ export function HeroSection() {
           variants={photoVariants}
         >
           <div
-            className="relative w-[340px] overflow-hidden rounded-3xl border-4 border-white shadow-2xl"
-            style={{ transform: "rotate(2deg)" }}
+            className="relative w-[340px] overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white shadow-xl"
           >
-            <div className="relative aspect-[3/4] w-full">
+            <div className="relative aspect-[4/3] w-full">
               <Image
-                src="/assets/hero/company-photo.webp"
+                src="/assets/illustrations/print-team.svg"
                 alt="BisaPrint — Percetakan Digital"
                 fill
-                className="object-cover"
+                className="object-cover p-4"
                 priority
-                quality={90}
                 sizes="(min-width: 1024px) 340px, 0px"
               />
             </div>
@@ -301,7 +255,7 @@ export function HeroSection() {
             height="20"
             viewBox="0 0 20 20"
             fill="none"
-            className="text-[var(--color-primary-muted)]"
+            className="text-[var(--color-text-muted)]"
           >
             <path
               d="M10 4v12m0 0l-4-4m4 4l4-4"

@@ -5,10 +5,7 @@ import Image from "next/image";
 import { portfolioItems } from "@/data/portfolio";
 import type { PortfolioItem } from "@/data/portfolio";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
-import type { Variants } from "framer-motion";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { cn } from "@/lib/utils";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -23,20 +20,6 @@ const gradients = [
   "from-[#E87817] to-[#D66E9E]",      // orange-pink
   "from-[#D66E9E] to-[#EC91B4]",      // pink gradient
 ];
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
-};
 
 
 
@@ -103,44 +86,18 @@ function PortfolioTile({
 export function PortfolioGallery() {
   return (
     <SectionWrapper id="portfolio" bgVariant="white" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/torn-paper-corner.webp"
-        width={300}
-        height={220}
-        opacity={0.55}
-        className="-bottom-6 -left-6 z-0 hidden md:block"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/sparkle-stars.webp"
-        width={120}
-        height={118}
-        opacity={0.6}
-        className="-right-6 top-8 z-0 hidden md:block"
-      />
-
       {/* Section header */}
       <ScrollReveal className="relative z-10 flex flex-col items-center text-center">
-        <h2 className="inline-flex items-center font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
+        <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Hasil Cetak Kami
-          <Image
-            src="/assets/decoratives/camera-sticker.webp"
-            alt=""
-            width={110}
-            height={105}
-            className="ml-3 inline-block -rotate-8 align-middle animate-pulse hidden sm:block"
-            quality={90}
-            sizes="(max-width: 768px) 100px, 200px"
-          />
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] md:w-[240px] select-none pointer-events-none">
-          <Image 
-            src="/assets/decoratives/swoosh-orange.webp"
-            alt="" 
+        <div className="relative mt-2 h-3.5 w-[200px] md:w-[240px] select-none pointer-events-none">
+          <Image
+            src="/assets/illustrations/underline-accent.svg"
+            alt=""
             fill
-            className="object-contain opacity-80"
+            className="object-contain"
             aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">

@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingBag, MessageCircle, FileText, Search, CreditCard, Printer, MapPin } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
-import { DecorativeImage } from "@/components/shared/DecorativeImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import type { LucideIcon } from "lucide-react";
 
@@ -57,35 +56,18 @@ const stepVariants = {
 
 export function CaraOrderSection() {
   return (
-    <SectionWrapper id="cara-order" bgVariant="soft" className="relative overflow-hidden">
-      <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.webp"
-        width={120}
-        height={60}
-        opacity={0.25}
-        className="-right-4 top-6 z-0 hidden md:block"
-      />
-      <DecorativeImage
-        src="/assets/decoratives/sparkle-stars.webp"
-        width={80}
-        height={78}
-        opacity={0.35}
-        className="-left-4 bottom-10 z-0 hidden md:block"
-      />
-
+    <SectionWrapper id="cara-order" bgVariant="white" className="relative overflow-hidden">
       <ScrollReveal className="relative flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Cara Order via WhatsApp
         </h2>
-        <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
+        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.webp"
+            src="/assets/illustrations/underline-accent.svg"
             alt=""
             fill
-            className="object-contain opacity-80"
+            className="object-contain"
             aria-hidden="true"
-            quality={90}
-            sizes="(max-width: 768px) 200px, 400px"
           />
         </div>
         <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg">
@@ -98,7 +80,7 @@ export function CaraOrderSection() {
           className="pointer-events-none absolute left-0 right-0 top-8 hidden h-0.5 lg:block"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(90deg, var(--color-accent) 0px, var(--color-accent) 8px, transparent 8px, transparent 14px)",
+              "repeating-linear-gradient(90deg, var(--color-border) 0px, var(--color-border) 8px, transparent 8px, transparent 14px)",
           }}
           aria-hidden="true"
         />
@@ -117,7 +99,7 @@ export function CaraOrderSection() {
                 whileHover={{ y: -4 }}
                 className="relative flex flex-col items-center text-center"
               >
-                <div className="relative z-10 flex size-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-xl font-bold text-white shadow-lg shadow-primary/25">
+                <div className="relative z-10 flex size-14 items-center justify-center rounded-full border-2 border-[var(--color-primary)] bg-white text-xl font-bold text-[var(--color-primary)] shadow-md">
                   {i + 1}
                 </div>
 

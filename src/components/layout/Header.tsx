@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Calculator, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
@@ -186,7 +186,7 @@ export function Header() {
         )}
         style={{
           background:
-            "linear-gradient(to right, var(--color-primary), var(--color-accent-light), var(--color-primary))",
+            "linear-gradient(to right, transparent, var(--color-border), transparent)",
         }}
         aria-hidden="true"
       />
