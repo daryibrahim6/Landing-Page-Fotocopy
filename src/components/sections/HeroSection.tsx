@@ -96,7 +96,7 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen items-center overflow-hidden bg-white"
+      className="relative flex h-screen items-center overflow-hidden bg-white"
     >
       <div className="absolute inset-0 z-0">
         <div
@@ -131,7 +131,7 @@ export function HeroSection() {
         initial="hidden"
         animate="visible"
       >
-        <div className="flex flex-col py-20 lg:py-0">
+        <div className="flex flex-col py-12 sm:py-16 lg:py-0">
           <motion.div
             className="mb-6 flex flex-wrap gap-2"
             variants={badgeContainerVariants}
@@ -151,7 +151,7 @@ export function HeroSection() {
 
           <div className="mb-6">
             <motion.h1
-              className="font-display text-6xl font-black leading-[1.05] tracking-tight text-[var(--color-text-primary)] md:text-8xl"
+              className="font-display text-4xl font-black leading-[1.1] tracking-tight text-[var(--color-text-primary)] sm:text-5xl md:text-6xl lg:text-7xl"
               variants={headlineVariants}
             >
               bisa mewujudkan
@@ -169,7 +169,7 @@ export function HeroSection() {
             Cetak apa saja &mdash; cepat, rapi, berkualitas.
           </motion.p>
 
-          <div className="relative mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="relative mt-6 flex flex-col items-stretch gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
             <motion.div custom={0} variants={ctaVariants}>
               <WhatsAppButton
                 label="Order via WhatsApp"

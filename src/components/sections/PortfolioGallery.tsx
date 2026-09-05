@@ -10,15 +10,13 @@ import { cn } from "@/lib/utils";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const ROTATIONS = ["-1.5deg", "1deg", "-0.5deg", "1.5deg"] as const;
-
 const gradients = [
-  "from-[#DE127A] to-[#EC91B4]",      // brand pink
-  "from-[#E87817] to-[#F5A860]",      // brand orange
-  "from-[#D66E9E] to-[#DE127A]",      // muted pink
-  "from-[#EC91B4] to-[#FFEAF4]",      // light pink
-  "from-[#E87817] to-[#D66E9E]",      // orange-pink
-  "from-[#D66E9E] to-[#EC91B4]",      // pink gradient
+  "from-slate-800 to-slate-600",
+  "from-slate-700 to-slate-500",
+  "from-neutral-700 to-neutral-500",
+  "from-zinc-700 to-zinc-500",
+  "from-stone-700 to-stone-500",
+  "from-gray-700 to-gray-500",
 ];
 
 
@@ -37,16 +35,14 @@ function PortfolioTile({
   const hasImage = item.image.trim().length > 0;
   const aspects = ["aspect-square", "aspect-[4/5]", "aspect-[3/4]", "aspect-square", "aspect-[4/5]", "aspect-[3/4]"];
   const aspect = aspects[index % aspects.length];
-  const rotation = ROTATIONS[index % ROTATIONS.length];
 
   return (
     <div
-      className="group relative mb-5 break-inside-avoid transition-all duration-200 hover:rotate-0 hover:scale-[1.02] hover:shadow-[0_16px_40px_-8px_rgba(224,24,122,0.14),0_6px_16px_-4px_rgba(0,0,0,0.08)]"
-      style={{ rotate: rotation }}
+      className="group relative mb-5 break-inside-avoid transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_16px_40px_-8px_rgba(15,23,42,0.12),0_6px_16px_-4px_rgba(0,0,0,0.08)]"
     >
       <div
         className={cn(
-          "relative w-full overflow-hidden rounded-2xl border-2 border-[var(--color-border)] bg-white shadow-sm transition-shadow duration-300",
+          "relative w-full overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white shadow-sm transition-shadow duration-300",
           aspect,
         )}
       >

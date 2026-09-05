@@ -84,8 +84,7 @@ export function ContactSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={link.label}
-                className="inline-flex items-center gap-2 rounded-full border-2 border-dashed border-[var(--color-border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition hover:border-primary hover:text-primary"
-                style={{ transform: "rotate(-1deg)" }}
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
               >
                 {link.icon}
                 {link.handle}
@@ -95,7 +94,7 @@ export function ContactSection() {
 
           <a
             href="/simulator"
-            className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-[var(--color-accent)] bg-[var(--color-accent)]/10 px-5 py-2.5 text-sm font-bold text-[var(--color-accent)] transition hover:bg-[var(--color-accent)] hover:text-white"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-soft)] px-5 py-2.5 text-sm font-bold text-[var(--color-text-primary)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
           >
             <Printer className="size-4" aria-hidden="true" />
             Simulasi Cetak &mdash; Upload &amp; Preview
@@ -117,14 +116,13 @@ export function ContactSection() {
 
         <div>
           <div
-            className="relative overflow-hidden rounded-3xl border-2 border-[#25D366]/30 bg-white shadow-md p-8"
-            style={{ transform: "rotate(1deg)" }}
+            className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white shadow-md p-8"
           >
             <div
               className="pointer-events-none absolute inset-0 opacity-[0.03]"
               aria-hidden="true"
               style={{
-                backgroundImage: `radial-gradient(circle, #25D366 1px, transparent 1px)`,
+                backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
                 backgroundSize: "16px 16px",
               }}
             />

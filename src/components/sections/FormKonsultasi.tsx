@@ -36,7 +36,7 @@ export function FormKonsultasi() {
 
   return (
     <SectionWrapper id="form-konsultasi" bgVariant="white" className="relative overflow-hidden">
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6 shadow-sm sm:p-8 md:p-10">
         <ScrollReveal className="flex flex-col items-center text-center">
           <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
             Konsultasi Order
@@ -62,7 +62,7 @@ export function FormKonsultasi() {
               placeholder="Masukkan nama kamu"
               value={fields.nama}
               onChange={(e) => handleChange("nama", e.target.value)}
-              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+              className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
             />
           </motion.div>
 
@@ -74,7 +74,7 @@ export function FormKonsultasi() {
               id="form-produk"
               value={fields.produk}
               onChange={(e) => handleChange("produk", e.target.value)}
-              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+              className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
             >
               <option value="">— Pilih produk —</option>
               {products.map((p) => (
@@ -98,7 +98,7 @@ export function FormKonsultasi() {
                 placeholder="Contoh: 50"
                 value={fields.jumlah}
                 onChange={(e) => handleChange("jumlah", e.target.value)}
-                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+                className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
               />
             </motion.div>
 
@@ -112,7 +112,7 @@ export function FormKonsultasi() {
                 placeholder="Contoh: A4"
                 value={fields.ukuran}
                 onChange={(e) => handleChange("ukuran", e.target.value)}
-                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+                className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
               />
             </motion.div>
 
@@ -126,7 +126,7 @@ export function FormKonsultasi() {
                 placeholder="Contoh: Chromo"
                 value={fields.bahan}
                 onChange={(e) => handleChange("bahan", e.target.value)}
-                className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+                className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
               />
             </motion.div>
           </div>
@@ -141,7 +141,7 @@ export function FormKonsultasi() {
               placeholder="Tambah catatan atau permintaan khusus"
               value={fields.catatan}
               onChange={(e) => handleChange("catatan", e.target.value)}
-              className="w-full rounded-2xl border-2 border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+              className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
             />
           </motion.div>
 

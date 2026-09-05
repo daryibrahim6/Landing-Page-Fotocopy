@@ -161,7 +161,7 @@ export function PanduanFile() {
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.3 }}
       >
-        <div className="rounded-2xl border-2 border-dashed border-[var(--color-accent)] bg-white p-6">
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6">
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
             <strong className="text-[var(--color-text-primary)]">Masih bingung?</strong>{" "}
             Gak usah khawatir — kirim aja file kamu, admin kami bakal cek dan kasih tahu kalau ada yang perlu diperbaiki.{" "}

@@ -134,8 +134,8 @@ function TestimonialCard({ item }: { item: Testimonial }) {
             to bottom,
             transparent 0px,
             transparent 27px,
-            rgba(255,77,141,0.04) 27px,
-            rgba(255,77,141,0.04) 28px
+            rgba(15,23,42,0.04) 27px,
+            rgba(15,23,42,0.04) 28px
           )`,
         }}
       >

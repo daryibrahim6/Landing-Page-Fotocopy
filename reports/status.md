@@ -20,7 +20,7 @@ Milestone 2 — Checkout & Midtrans Integration (in progress) — UI/UX clean pa
 
 ## Open Items
 
-1. **Build & TypeScript verification** — ✅ DONE. `npx tsc --noEmit` clean, `npm run build` sukses, `npm run lint` 0 error (0 warning), `npm test` 19/19 pass.
+1. **Build & TypeScript verification** — ✅ DONE. `npx tsc --noEmit` clean, `npm run build` sukses, `npm run lint` 0 error (0 warning), `npm test` 19/19 pass, `npm ci` + `npm run build` sukses (simulasi Vercel).
 2. **Public assets** — ✅ DONE. Semua PNG dikonversi ke WebP, folder rapih, referensi kode diupdate.
 3. **Product data** — ✅ DONE. Materials di `src/data/products.ts` sudah disesuaikan dengan `docs/ketentuan-produk-bisaprint.docx`.
 4. **Vitest setup** — ✅ DONE. `vitest` diinstall, `npm test` berjalan, unit test untuk `paper-sizes`, `wa`, `midtrans`, `utils` ditambahkan.
