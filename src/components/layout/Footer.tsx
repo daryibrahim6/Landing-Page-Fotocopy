@@ -30,7 +30,7 @@ export function Footer() {
     <>
       <div className="relative h-[60px] w-full overflow-hidden">
         <Image
-          src="/assets/decoratives/wavy-divider.png"
+          src="/assets/decoratives/wavy-divider.webp"
           alt=""
           width={1440}
           height={60}
@@ -53,7 +53,7 @@ export function Footer() {
           <div>
             <div className="mb-4">
               <Image
-                src="/assets/brand/logo-bisaprint.png"
+                src="/assets/brand/logo-bisaprint.webp"
                 alt="BisaPrint"
                 width={100}
                 height={32}

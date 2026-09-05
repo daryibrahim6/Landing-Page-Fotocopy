@@ -1,15 +1,22 @@
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 export function trackEvent(event: string, params?: Record<string, unknown>) {
   if (typeof window === "undefined") return;
 
   try {
-    if (typeof (window as any).gtag === "function") {
-      (window as any).gtag("event", event, params);
+    if (typeof window.gtag === "function") {
+      window.gtag("event", event, params);
     }
   } catch {}
 
   try {
-    if (typeof (window as any).fbq === "function") {
-      (window as any).fbq("track", event, params);
+    if (typeof window.fbq === "function") {
+      window.fbq("track", event, params);
     }
   } catch {}
 }
@@ -23,8 +30,8 @@ export function trackPurchase(
   if (typeof window === "undefined") return;
 
   try {
-    if (typeof (window as any).gtag === "function") {
-      (window as any).gtag("event", "purchase", {
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "purchase", {
         transaction_id: transactionId,
         value,
         currency,
@@ -34,8 +41,8 @@ export function trackPurchase(
   } catch {}
 
   try {
-    if (typeof (window as any).fbq === "function") {
-      (window as any).fbq("track", "Purchase", {
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "Purchase", {
         value,
         currency,
         content_ids: items?.map((i) => i.id),

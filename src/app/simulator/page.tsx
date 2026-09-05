@@ -24,7 +24,7 @@ export default function SimulatorPage() {
               </h1>
             </div>
             <p className="text-xs text-[var(--color-text-secondary)]">
-              Upload design, pilih kertas, lihat hasilnya
+              Kalkulator stiker UMKM: bulat & kotak, kertas A3 BisaPrint
             </p>
           </div>
         </div>

@@ -38,7 +38,7 @@ export function FormKonsultasi() {
   return (
     <SectionWrapper id="form-konsultasi" bgVariant="soft" className="relative overflow-hidden">
       <DecorativeImage
-        src="/assets/decoratives/oval-frame.png"
+        src="/assets/decoratives/squiggle-orange.webp"
         width={100}
         height={80}
         opacity={0.15}

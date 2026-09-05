@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Stage, Layer, Image as KonvaImage, Rect, Transformer, Group } from "react-konva";
 import type Konva from "konva";
 import {
-  type PaperSize,
+  BISA_PRINT_A3,
+  GAP_KISS_CUT_MM,
   MM_TO_PX,
   calculateImposition,
   type ImpositionResult,
@@ -12,16 +13,14 @@ import {
 
 interface DesignCanvasProps {
   imageDataUrl: string;
-  paperSize: PaperSize;
   onImpositionChange: (result: ImpositionResult) => void;
 }
 
+const GAP_MM = GAP_KISS_CUT_MM;
 const PADDING_MM = 10;
-const GAP_MM = 2;
 
 export function DesignCanvas({
   imageDataUrl,
-  paperSize,
   onImpositionChange,
 }: DesignCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,6 +29,8 @@ export function DesignCanvas({
   const [containerSize, setContainerSize] = useState({ width: 500, height: 700 });
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [designMm, setDesignMm] = useState({ width: 100, height: 100 });
+
+  const paperSize = BISA_PRINT_A3;
 
   // Calculate scale to fit paper in container
   const padding = PADDING_MM * MM_TO_PX;
@@ -58,21 +59,20 @@ export function DesignCanvas({
     return () => observer.disconnect();
   }, []);
 
-  // Load image — use useMemo to avoid re-creating Image() on every render
-  const loadedImage = useMemo<HTMLImageElement | undefined>(() => {
-    if (!imageDataUrl) return undefined;
-    const img = new window.Image();
-    img.src = imageDataUrl;
-    return img;
-  }, [imageDataUrl]);
+  // Load image
+  const [loadedImage, setLoadedImage] = useState<HTMLImageElement | undefined>(undefined);
 
   useEffect(() => {
-    const img = loadedImage;
-    if (!img) return;
+    if (!imageDataUrl) return;
+
     let cancelled = false;
-    img.onload = () => {
+    const img = new window.Image();
+    img.src = imageDataUrl;
+
+    const onLoad = () => {
       if (cancelled) return;
       setImageDimensions({ width: img.width, height: img.height });
+      setLoadedImage(img);
       const maxDesignW = paperSize.widthMm - PADDING_MM * 2;
       const maxDesignH = paperSize.heightMm - PADDING_MM * 2;
       const aspect = img.width / img.height;
@@ -84,22 +84,31 @@ export function DesignCanvas({
       }
       setDesignMm({ width: Math.round(designW), height: Math.round(designH) });
     };
-    return () => { cancelled = true; };
-  }, [loadedImage, paperSize]);
+
+    if (img.complete) {
+      onLoad();
+    } else {
+      img.onload = onLoad;
+    }
+
+    return () => {
+      cancelled = true;
+      img.onload = null;
+    };
+  }, [imageDataUrl, paperSize]);
 
   // Update imposition
   useEffect(() => {
     if (designMm.width > 0 && designMm.height > 0) {
       const result = calculateImposition(
-        paperSize.widthMm,
-        paperSize.heightMm,
         designMm.width,
         designMm.height,
-        GAP_MM,
+        "kiss",
+        "square",
       );
       onImpositionChange(result);
     }
-  }, [designMm, paperSize, onImpositionChange]);
+  }, [designMm, onImpositionChange]);
 
   // Handle transformer
   useEffect(() => {
@@ -125,14 +134,13 @@ export function DesignCanvas({
   const designPxW = designMm.width * mmScale;
   const designPxH = designMm.height * mmScale;
 
-  // Ghost copies positions — memoized to avoid recalc on every render
+  // Ghost copies positions
   const { ghostResult, ghosts } = useMemo(() => {
     const result = calculateImposition(
-      paperSize.widthMm,
-      paperSize.heightMm,
       designMm.width,
       designMm.height,
-      GAP_MM,
+      "kiss",
+      "square",
     );
 
     const g: { x: number; y: number; w: number; h: number; rotated: boolean }[] = [];
@@ -157,7 +165,7 @@ export function DesignCanvas({
       }
     }
     return { ghostResult: result, ghosts: g };
-  }, [paperSize.widthMm, paperSize.heightMm, designMm.width, designMm.height, mmScale, paperWidthPx]);
+  }, [designMm.width, designMm.height, mmScale, paperWidthPx, paperHeightPx]);
 
   const designW = ghostResult.rotated ? ghostResult.designHeightMm : ghostResult.designWidthMm;
   const designH = ghostResult.rotated ? ghostResult.designWidthMm : ghostResult.designHeightMm;
@@ -190,7 +198,7 @@ export function DesignCanvas({
             shadowOffsetY={2}
           />
 
-          {/* Grid lines (subtle) */}
+          {/* Grid lines */}
           {ghostResult.cols > 1 &&
             Array.from({ length: ghostResult.cols - 1 }, (_, i) => {
               const x =
@@ -228,7 +236,7 @@ export function DesignCanvas({
               );
             })}
 
-          {/* Ghost copies (semi-transparent) */}
+          {/* Ghost copies */}
           {ghosts.map((ghost, i) => (
             <Rect
               key={`ghost-${i}`}
@@ -242,7 +250,7 @@ export function DesignCanvas({
             />
           ))}
 
-          {/* Main design (draggable + resizable) */}
+          {/* Main design */}
           {imageDimensions.width > 0 && (
             <Group>
               <KonvaImage
@@ -285,7 +293,6 @@ export function DesignCanvas({
         </Layer>
       </Stage>
 
-      {/* Paper size label */}
       <div className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)] shadow-sm backdrop-blur-sm">
         {paperSize.name}
       </div>

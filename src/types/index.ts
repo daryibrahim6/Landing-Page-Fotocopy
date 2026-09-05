@@ -41,3 +41,23 @@ export interface CheckoutPayload {
   notes: string;
   totalAmount: number;
 }
+
+export interface MidtransItem {
+  id: string;
+  price: number;
+  quantity: number;
+  name: string;
+}
+
+export interface MidtransCustomerDetails {
+  name: string;
+  phone: string;
+  email?: string;
+}
+
+export interface MidtransCreateTokenBody {
+  items: MidtransItem[];
+  customerDetails: MidtransCustomerDetails;
+  grossAmount: number;
+}
+

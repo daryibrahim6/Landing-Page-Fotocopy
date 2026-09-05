@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
+import type { MidtransCreateTokenBody, MidtransItem } from "@/types";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as MidtransCreateTokenBody;
     const { items, customerDetails, grossAmount } = body;
 
     if (!items?.length || !customerDetails || !grossAmount) {
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
           order_id: orderId,
           gross_amount: grossAmount,
         },
-        item_details: items.map((item: any) => ({
+        item_details: items.map((item: MidtransItem) => ({
           id: item.id,
           price: item.price,
           quantity: item.quantity,

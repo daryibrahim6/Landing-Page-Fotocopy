@@ -27,7 +27,7 @@ export function ProductCatalog() {
   return (
     <SectionWrapper id="produk" bgVariant="white">
       <DecorativeImage
-        src="/assets/decoratives/badge-scalloped.png"
+        src="/assets/decoratives/badge-scalloped.webp"
         width={56}
         height={56}
         className="-right-4 -top-4 z-10 hidden md:block"

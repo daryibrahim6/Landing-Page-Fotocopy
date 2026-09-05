@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowLeft, ShoppingCart, CreditCard, MessageCircle, Check } from "lucide-react";
 import { products } from "@/data/products";
 import { cn, formatRupiah } from "@/lib/utils";
@@ -148,13 +149,13 @@ export function CheckoutForm() {
         <p className="mt-2 text-[var(--color-text-secondary)]">
           Silakan pilih produk dari halaman utama.
         </p>
-        <a
+        <Link
           href="/#produk"
           className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white transition hover:bg-primary/90"
         >
           <ArrowLeft className="size-4" />
           Lihat Produk
-        </a>
+        </Link>
       </div>
     );
   }
@@ -171,25 +172,25 @@ export function CheckoutForm() {
         <p className="mt-2 text-[var(--color-text-secondary)]">
           Admin kami akan menghubungi kamu melalui WhatsApp untuk konfirmasi.
         </p>
-        <a
+        <Link
           href="/"
           className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white transition hover:bg-primary/90"
         >
           Kembali ke Beranda
-        </a>
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <a
+      <Link
         href="/#produk"
         className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)] transition hover:text-primary"
       >
         <ArrowLeft className="size-4" />
         Kembali ke Produk
-      </a>
+      </Link>
 
       <div className="rounded-2xl border-2 border-[var(--color-border)] bg-white p-6 sm:p-8">
         <div className="mb-8 border-b-2 border-[var(--color-border)] pb-6">

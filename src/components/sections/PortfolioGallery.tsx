@@ -104,14 +104,14 @@ export function PortfolioGallery() {
   return (
     <SectionWrapper id="portfolio" bgVariant="white" className="relative overflow-hidden">
       <DecorativeImage
-        src="/assets/decoratives/torn-paper-corner.png"
+        src="/assets/decoratives/torn-paper-corner.webp"
         width={300}
         height={220}
         opacity={0.55}
         className="-bottom-6 -left-6 z-0 hidden md:block"
       />
       <DecorativeImage
-        src="/assets/decoratives/sparkle-stars.png"
+        src="/assets/decoratives/sparkle-stars.webp"
         width={120}
         height={118}
         opacity={0.6}
@@ -123,7 +123,7 @@ export function PortfolioGallery() {
         <h2 className="inline-flex items-center font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Hasil Cetak Kami
           <Image
-            src="/assets/decoratives/camera-sticker.png"
+            src="/assets/decoratives/camera-sticker.webp"
             alt=""
             width={110}
             height={105}
@@ -134,7 +134,7 @@ export function PortfolioGallery() {
         </h2>
         <div className="relative mt-2 h-7 w-[200px] md:w-[240px] select-none pointer-events-none">
           <Image 
-            src="/assets/decoratives/swoosh-orange.png"
+            src="/assets/decoratives/swoosh-orange.webp"
             alt="" 
             fill
             className="object-contain opacity-80"

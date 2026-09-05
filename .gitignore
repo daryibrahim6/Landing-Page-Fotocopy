@@ -30,8 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (NEVER commit real secrets)
 .env*
+.env*.local
 
 # vercel
 .vercel
@@ -40,21 +41,23 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# PRD / planning markdown files
-PRD_*.md
-*PRD*.md
-
-# dev-only markdown files & configs
-/AGENTS.md
-/ASSET_GUIDE.md
-/PROMPT_AUDIT_FIX.md
-/MIGRATION.md
-/CLAUDE.md
-
-# temp script scratch directories
+# Temporary / local scratch
 /scratch/
 
-# default Next.js template SVGs in public/
+# IDE local settings
+.claude/
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# backups and logs
+*.bak
+*.log
+build.log
+
+# default Next.js template SVGs in public/ (already removed)
 /public/file.svg
 /public/globe.svg
 /public/next.svg

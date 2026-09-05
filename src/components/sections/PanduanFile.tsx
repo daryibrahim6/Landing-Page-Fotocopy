@@ -68,14 +68,14 @@ export function PanduanFile() {
   return (
     <SectionWrapper id="panduan-file" bgVariant="soft" className="relative overflow-hidden">
       <DecorativeImage
-        src="/assets/decoratives/gem-crystal.png"
+        src="/assets/decoratives/gem-crystal.webp"
         width={60}
         height={70}
         opacity={0.3}
         className="-left-4 top-8 z-0 hidden md:block"
       />
       <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.png"
+        src="/assets/decoratives/squiggle-orange.webp"
         width={100}
         height={50}
         opacity={0.2}
@@ -88,7 +88,7 @@ export function PanduanFile() {
         </h2>
         <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.png"
+            src="/assets/decoratives/swoosh-orange.webp"
             alt=""
             fill
             className="object-contain opacity-80"

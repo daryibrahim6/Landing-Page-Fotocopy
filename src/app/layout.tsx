@@ -45,8 +45,8 @@ export const metadata: Metadata = {
     "Bekasi",
   ],
   icons: {
-    icon: "/assets/brand/logo-tab.png",
-    apple: "/assets/brand/logo-tab.png",
+    icon: "/assets/brand/logo-tab.webp",
+    apple: "/assets/brand/logo-tab.webp",
   },
   openGraph: {
     locale: "id_ID",
@@ -56,14 +56,14 @@ export const metadata: Metadata = {
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
     url: "https://bisaprint.com",
-    images: [{ url: "/assets/brand/og-image.png", width: 1200, height: 630 }],
+    images: [{ url: "/assets/brand/og-image.webp", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Bisa Print — Percetakan Digital Bekasi",
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
-    images: ["/assets/brand/og-image.png"],
+    images: ["/assets/brand/og-image.webp"],
   },
   robots: { index: true, follow: true },
   verification: {
@@ -75,7 +75,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: "Bisa Print",
-  image: "https://bisaprint.com/assets/brand/logo-bisaprint.png",
+  image: "https://bisaprint.com/assets/brand/logo-bisaprint.webp",
   telephone: "+6281299435019",
   email: "bisadigitalprint@gmail.com",
   url: "https://bisaprint.com",

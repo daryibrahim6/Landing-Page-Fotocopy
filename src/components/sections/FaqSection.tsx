@@ -62,7 +62,7 @@ export function FaqSection() {
   return (
     <SectionWrapper id="faq" bgVariant="white" className="relative overflow-hidden">
       <DecorativeImage
-        src="/assets/decoratives/pushpin.png"
+        src="/assets/decoratives/pushpin.webp"
         width={24}
         height={30}
         className="-left-2 top-12 z-10 hidden md:block"
@@ -88,7 +88,7 @@ export function FaqSection() {
         </h2>
         <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.png"
+            src="/assets/decoratives/swoosh-orange.webp"
             alt=""
             fill
             className="object-contain opacity-80"
@@ -135,7 +135,7 @@ export function FaqSection() {
                   <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
                     <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
                       <DecorativeImage
-                        src="/assets/decoratives/pushpin.png"
+                        src="/assets/decoratives/pushpin.webp"
                         width={18}
                         height={22}
                         className="!static"

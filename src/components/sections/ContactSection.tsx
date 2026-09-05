@@ -47,21 +47,21 @@ export function ContactSection() {
   return (
     <SectionWrapper id="kontak" bgVariant="soft" className="relative overflow-hidden">
       <DecorativeImage
-        src="/assets/decoratives/torn-paper-tape.png"
+        src="/assets/decoratives/torn-paper-tape.webp"
         width={200}
         height={150}
         opacity={0.45}
         className="-bottom-6 -right-6 z-0 hidden md:block"
       />
       <DecorativeImage
-        src="/assets/decoratives/blob-pink-glossy.png"
+        src="/assets/decoratives/blob-pink-glossy.webp"
         width={240}
         height={240}
         opacity={0.15}
         className="-left-16 top-1/4 z-0 hidden md:block"
       />
       <DecorativeImage
-        src="/assets/decoratives/bow-ribbon.png"
+        src="/assets/decoratives/bow-ribbon.webp"
         width={130}
         height={138}
         opacity={0.4}
@@ -91,7 +91,7 @@ export function ContactSection() {
           </h2>
           <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
             <Image
-              src="/assets/decoratives/swoosh-orange.png"
+              src="/assets/decoratives/swoosh-orange.webp"
               alt=""
               fill
               className="object-contain opacity-80"

@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bisa Print
+
+Landing page + checkout untuk Bisa Print — jasa digital printing di Bekasi. Melayani cetak brosur, flyer, poster, dokumen, stiker, kartu nama, undangan, DTF, dan produk custom. Order via WhatsApp atau checkout langsung dengan Midtrans.
+
+## Tech Stack
+
+- **Framework**: Next.js 16.2.6 + React 19 + TypeScript
+- **Styling**: Tailwind CSS v4 + shadcn/ui pattern
+- **Font**: Poppins (body) + Fredoka (display) via `next/font/google`
+- **Animation**: Framer Motion
+- **Payment**: Midtrans Snap
+- **Image**: `next/image` — semua gambar WebP
+- **Icons**: lucide-react
 
 ## Getting Started
 
-First, run the development server:
+1. Copy environment variables:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   ```bash
+   cp .env.local .env
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm ci
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Jalankan development server:
 
-## Learn More
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+   Buka [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts Penting
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` — development server (Turbopack)
+- `npm run build` — production build
+- `npm run start` — production server
+- `npm run lint` — ESLint
 
-## Deploy on Vercel
+## Dokumentasi & Aturan
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `PROJECT.md` — spesifikasi project dan arsitektur
+- `PRD_BisaPrint_Website.md` — Product Requirement Document
+- `AGENTS.md` — aturan pengembangan dan AI-agent
+- `.devin/rules/` — panduan teknis detail
+- `reports/status.md` — status QA/QC per flow

@@ -59,14 +59,14 @@ export function CaraOrderSection() {
   return (
     <SectionWrapper id="cara-order" bgVariant="soft" className="relative overflow-hidden">
       <DecorativeImage
-        src="/assets/decoratives/squiggle-orange.png"
+        src="/assets/decoratives/squiggle-orange.webp"
         width={120}
         height={60}
         opacity={0.25}
         className="-right-4 top-6 z-0 hidden md:block"
       />
       <DecorativeImage
-        src="/assets/decoratives/sparkle-stars.png"
+        src="/assets/decoratives/sparkle-stars.webp"
         width={80}
         height={78}
         opacity={0.35}
@@ -79,7 +79,7 @@ export function CaraOrderSection() {
         </h2>
         <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.png"
+            src="/assets/decoratives/swoosh-orange.webp"
             alt=""
             fill
             className="object-contain opacity-80"

@@ -170,7 +170,7 @@ export function Testimonials() {
   return (
     <SectionWrapper id="testimoni" bgVariant="soft" className="relative">
       <DecorativeImage
-        src="/assets/decoratives/bow-ribbon.png"
+        src="/assets/decoratives/bow-ribbon.webp"
         width={52}
         height={52}
         className="-right-1 -top-1 z-10 hidden md:block"
@@ -184,7 +184,7 @@ export function Testimonials() {
         </h2>
         <div className="relative mt-2 h-7 w-[200px] select-none md:w-[240px]">
           <Image
-            src="/assets/decoratives/swoosh-orange.png"
+            src="/assets/decoratives/swoosh-orange.webp"
             alt=""
             fill
             className="object-contain opacity-80"

@@ -132,7 +132,7 @@ export function HeroSection() {
         aria-hidden="true"
       >
         <Image
-          src="/assets/decoratives/blob-pink-glossy.png"
+          src="/assets/decoratives/blob-pink-glossy.webp"
           alt=""
           width={200}
           height={200}
@@ -149,7 +149,7 @@ export function HeroSection() {
         aria-hidden="true"
       >
         <Image
-          src="/assets/decoratives/sparkle-stars.png"
+          src="/assets/decoratives/sparkle-stars.webp"
           alt=""
           width={72}
           height={72}
@@ -161,7 +161,7 @@ export function HeroSection() {
       </div>
 
       <DecorativeImage
-        src="/assets/decoratives/tape-strip.png"
+        src="/assets/decoratives/tape-strip.webp"
         width={100}
         height={43}
         className="-top-3 left-1/2 z-20 hidden -translate-x-1/2 md:block"

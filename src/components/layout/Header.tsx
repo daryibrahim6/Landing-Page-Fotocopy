@@ -124,7 +124,7 @@ export function Header() {
           className="shrink-0 font-display text-xl font-black tracking-tight md:text-2xl"
         >
           <Image
-            src="/assets/brand/logo-bisaprint.png"
+            src="/assets/brand/logo-bisaprint.webp"
             alt="BisaPrint"
             width={110}
             height={35}
