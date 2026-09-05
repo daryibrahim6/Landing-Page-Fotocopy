@@ -27,6 +27,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bisaprint.com"),
   title: "Bisa Print — Percetakan Digital Bekasi, Stiker, DTF, Kartu Nama & Lebih",
   description:
     "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp. 10.000+ customer. Cepat, custom, harga terjangkau.",
