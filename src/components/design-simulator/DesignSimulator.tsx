@@ -161,6 +161,7 @@ export function DesignSimulator() {
       const oy = (BISA_PRINT_A3_HEIGHT - totalH) / 2;
 
       interface PDFWithGState {
+        setGState(gState: unknown): void;
         GState: new (opts: { opacity: number }) => unknown;
       }
       const pdfWithGState = pdf as unknown as PDFWithGState;
@@ -173,13 +174,13 @@ export function DesignSimulator() {
           const y = oy + r * (cellH + gap);
           const isFirst = r === 0 && c === 0;
           pdf.setFillColor(222, 18, 122);
-          pdf.setGState(new pdfWithGState.GState({ opacity: isFirst ? 0.6 : 0.12 }));
+          pdfWithGState.setGState(new pdfWithGState.GState({ opacity: isFirst ? 0.6 : 0.12 }));
           if (shape === "round") {
             pdf.circle(x + cellW / 2, y + cellH / 2, cellW / 2, "F");
           } else {
             pdf.rect(x, y, cellW, cellH, "F");
           }
-          pdf.setGState(new pdfWithGState.GState({ opacity: 1 }));
+          pdfWithGState.setGState(new pdfWithGState.GState({ opacity: 1 }));
           if (shape === "round") {
             pdf.circle(x + cellW / 2, y + cellH / 2, cellW / 2, "S");
           } else {
