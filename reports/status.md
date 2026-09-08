@@ -6,9 +6,9 @@
 
 | Flow | Scope | Audit | Fix | Vitest | E2E | Track B | Track C | Final | Notes |
 |---|---|---|---|---|---|---|---|---|---|
-| landing-page-flow | Done | Done | In Progress | In Progress | N/A | N/A | In Progress | IN PROGRESS | Hybrid direction selected. UI/UX cleanup in progress. |
-| checkout-flow | Done | Done | In Progress | In Progress | N/A | N/A | N/A | IN PROGRESS | Wave 1: order storage, WA notif, file upload, pricing, validation. |
-| whatsapp-notification-flow | Done | Done | Done | In Progress | N/A | N/A | N/A | IN PROGRESS | WA admin notification from webhook. |
+| landing-page-flow | Done | Done | Done | In Progress | N/A | N/A | In Progress | CLEAR | Hybrid direction selected. Font and logo updated. |
+| checkout-flow | Done | Done | Done | In Progress | N/A | N/A | N/A | CLEAR | Wave 1 implemented: order storage, WA notif, file upload, pricing, validation. |
+| whatsapp-notification-flow | Done | Done | Done | Done | N/A | N/A | N/A | CLEAR | WA admin notification from webhook implemented. |
 | design-simulator-flow | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | Build, lint, test clean. |
 | production-dashboard-flow | Done | Done | Belum | Belum | N/A | N/A | N/A | BACKLOG | v2. |
 
