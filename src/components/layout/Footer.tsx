@@ -53,10 +53,10 @@ export function Footer() {
           <div>
             <div className="mb-4">
               <Image
-                src="/assets/brand/logo-bisaprint.svg"
+                src="/assets/brand/logo-bisaprint.webp"
                 alt="BisaPrint"
                 width={140}
-                height={40}
+                height={50}
                 className="h-8 w-auto"
               />
             </div>
