@@ -22,7 +22,7 @@ export function SectionWrapper({
 }: SectionWrapperProps) {
   return (
     <section id={id} className={cn(bgVariantStyles[bgVariant], className)}>
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 md:py-24 lg:px-10 xl:px-14">
         {children}
       </div>
     </section>

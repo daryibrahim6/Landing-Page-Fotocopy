@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Packaging dan box BisaPrint">
+  <rect width="400" height="300" fill="#F8FAFC" rx="16"/>
+  <rect x="110" y="90" width="140" height="140" rx="8" fill="#ffffff" stroke="#E2E8F0" stroke-width="2" transform="rotate(-3 180 160)"/>
+  <rect x="110" y="90" width="140" height="30" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2" transform="rotate(-3 180 160)"/>
+  <path d="M180 90v-20l25 20h-50l25 20" stroke="#E2E8F0" stroke-width="2" fill="none" transform="rotate(-3 180 160)"/>
+  <circle cx="160" cy="160" r="25" fill="#DE127A" opacity="0.15" stroke="#DE127A" stroke-width="2" transform="rotate(-3 180 160)"/>
+  <path d="M150 160l7 7 13-13" stroke="#DE127A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-3 180 160)"/>
+  <rect x="280" y="110" width="90" height="90" rx="8" fill="#ffffff" stroke="#E2E8F0" stroke-width="2" transform="rotate(6 325 155)"/>
+  <rect x="290" y="130" width="70" height="50" rx="4" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2" transform="rotate(6 325 155)"/>
+  <circle cx="325" cy="155" r="12" fill="#E87817" opacity="0.2" transform="rotate(6 325 155)"/>
+</svg>

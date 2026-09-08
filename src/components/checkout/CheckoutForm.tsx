@@ -267,7 +267,7 @@ export function CheckoutForm() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <Link
         href="/#produk"
         className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)] transition hover:text-primary"
@@ -286,7 +286,7 @@ export function CheckoutForm() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
           <div className="space-y-6">
             <fieldset>
               <legend className="mb-3 font-display text-base font-bold text-[var(--color-text-primary)]">
