@@ -87,15 +87,6 @@ export function PortfolioGallery() {
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Hasil Cetak Kami
         </h2>
-        <div className="relative mt-2 h-3.5 w-[200px] md:w-[240px] select-none pointer-events-none">
-          <Image
-            src="/assets/illustrations/underline-accent.svg"
-            alt=""
-            fill
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Ribuan produk sudah keluar dari mesin kami. Ini sebagian hasilnya.
         </p>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Star, Building2, BookOpen, Landmark, ShoppingBag } from "lucide-react";
@@ -172,15 +171,6 @@ export function Testimonials() {
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Klien & Testimoni
         </h2>
-        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
-          <Image
-            src="/assets/illustrations/underline-accent.svg"
-            alt=""
-            fill
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Bukan kami yang bilang. Mereka yang membuktikan.
         </p>

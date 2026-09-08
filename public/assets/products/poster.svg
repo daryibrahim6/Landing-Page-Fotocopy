@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Poster BisaPrint">
+  <rect width="400" height="300" fill="#F8FAFC" rx="16"/>
+  <rect x="110" y="50" width="180" height="200" rx="12" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="130" y="80" width="140" height="90" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
+  <circle cx="200" cy="125" r="30" fill="#DE127A" opacity="0.1" stroke="#DE127A" stroke-width="2"/>
+  <path d="M185 125l10 10 20-20" stroke="#DE127A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="130" y="185" width="140" height="8" rx="4" fill="#E2E8F0"/>
+  <rect x="130" y="200" width="110" height="8" rx="4" fill="#E2E8F0"/>
+  <rect x="130" y="215" width="120" height="8" rx="4" fill="#E2E8F0"/>
+</svg>

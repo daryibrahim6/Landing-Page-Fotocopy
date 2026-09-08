@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { FileText, Image as ImageIcon, Ruler, Droplet, Crop, Type, AlertTriangle } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
@@ -70,15 +69,6 @@ export function PanduanFile() {
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Panduan File Siap Cetak
         </h2>
-        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
-          <Image
-            src="/assets/illustrations/underline-accent.svg"
-            alt=""
-            fill
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Biar hasil cetaknya maksimal, pastikan file desain kamu sesuai panduan ini.
         </p>
