@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Fredoka, Poppins } from "next/font/google";
+import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 
 import { Footer } from "@/components/layout/Footer";
@@ -12,9 +12,9 @@ import { GoogleAnalytics } from "@/components/tracking/GoogleAnalytics";
 import { getMidtransClientKey, getMidtransBaseUrl } from "@/lib/midtrans";
 import "./globals.css";
 
-const fredoka = Fredoka({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: "variable",
+  weight: ["500", "600", "700", "800"],
   variable: "--font-display",
   display: "swap",
 });
@@ -115,7 +115,7 @@ export default function RootLayout({
     : null;
 
   return (
-    <html lang="id" className={`scroll-smooth ${fredoka.variable} ${poppins.variable}`}>
+    <html lang="id" className={`scroll-smooth ${plusJakartaSans.variable} ${poppins.variable}`}>
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <link rel="preconnect" href="https://connect.facebook.net" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -130,6 +130,7 @@ export default function RootLayout({
         />
         {midtransSnapUrl && (
           <Script
+            id="midtrans-snap"
             src={midtransSnapUrl}
             strategy="afterInteractive"
           />

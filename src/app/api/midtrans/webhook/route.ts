@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { updateOrderStatus } from "@/lib/order-storage";
+import { buildAdminWAUrl } from "@/lib/wa";
+import { formatRupiah } from "@/lib/utils";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +23,7 @@ export async function POST(request: Request) {
       }
     }
 
-    let orderStatus = "pending";
+    let orderStatus: "pending" | "paid" | "cancelled" | "expired" = "pending";
     switch (transaction_status) {
       case "capture":
       case "settlement":
@@ -31,12 +34,24 @@ export async function POST(request: Request) {
         break;
       case "deny":
       case "cancel":
-      case "expire":
         orderStatus = "cancelled";
+        break;
+      case "expire":
+        orderStatus = "expired";
         break;
     }
 
-    console.log(`[Midtrans Webhook] Order ${order_id}: ${transaction_status} → ${orderStatus}`);
+    const order = await updateOrderStatus(order_id, orderStatus);
+
+    if (order) {
+      if (orderStatus === "paid") {
+        console.log(`[Midtrans Webhook] Order ${order_id} PAID. Admin WA: ${buildAdminWAUrl("adminPaidOrder", order.id, order.productName, order.customer.name, order.customer.phone, formatRupiah(order.pricing.total))}`);
+      } else if (orderStatus === "pending") {
+        console.log(`[Midtrans Webhook] Order ${order_id} PENDING. Admin WA: ${buildAdminWAUrl("adminNewOrder", order.id, order.productName, order.customer.name, order.customer.phone, formatRupiah(order.pricing.total), order.customer.notes ?? "-")}`);
+      }
+    } else {
+      console.log(`[Midtrans Webhook] Order ${order_id}: ${transaction_status} → ${orderStatus}`);
+    }
 
     return NextResponse.json({ success: true, orderId: order_id, status: orderStatus });
   } catch (error) {

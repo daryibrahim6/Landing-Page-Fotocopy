@@ -159,7 +159,7 @@ export const products: Product[] = [
     estimasi: "1-2 hari kerja",
     fileSpecs: "PDF/PNG/PSD 300dpi CMYK",
     images: ["/assets/hero/custom-produk.webp"],
-    isCheckoutEnabled: false,
+    isCheckoutEnabled: true,
     whatsappTemplate: "fromProduct",
   },
   {

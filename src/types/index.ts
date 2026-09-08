@@ -59,5 +59,11 @@ export interface MidtransCreateTokenBody {
   items: MidtransItem[];
   customerDetails: MidtransCustomerDetails;
   grossAmount: number;
+  specs?: Record<string, string>;
+  customerExtra?: {
+    pickup?: "ambil" | "kirim";
+    address?: string;
+    notes?: string;
+  };
 }
 

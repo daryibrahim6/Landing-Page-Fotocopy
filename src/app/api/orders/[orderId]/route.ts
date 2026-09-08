@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getOrder } from "@/lib/order-storage";
 
 export async function GET(
   _request: Request,
@@ -10,9 +11,11 @@ export async function GET(
     return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
   }
 
-  return NextResponse.json({
-    orderId,
-    status: "pending",
-    message: "Order status endpoint ready. Integrate with database for production.",
-  });
+  const order = await getOrder(orderId);
+
+  if (!order) {
+    return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(order);
 }

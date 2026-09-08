@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
+import { saveOrder, type StoredOrder } from "@/lib/order-storage";
 import type { MidtransCreateTokenBody, MidtransItem } from "@/types";
 
 export async function POST(request: Request) {
@@ -14,6 +15,41 @@ export async function POST(request: Request) {
     const orderId = generateOrderId();
     const serverKey = getMidtransServerKey();
     const baseUrl = getMidtransBaseUrl();
+
+    const item = items[0];
+    const extra = body.customerExtra;
+
+    const order: StoredOrder = {
+      id: orderId,
+      productId: item.id,
+      productName: item.name,
+      specs: body.specs ?? {
+        ukuran: "-",
+        bahan: "-",
+        finishing: "-",
+        jumlah: String(item.quantity),
+      },
+      customer: {
+        name: customerDetails.name,
+        phone: customerDetails.phone,
+        email: customerDetails.email ?? "",
+        pickup: extra?.pickup ?? "ambil",
+        address: extra?.address,
+        notes: extra?.notes,
+      },
+      pricing: {
+        subtotal: grossAmount,
+        total: grossAmount,
+      },
+      payment: {
+        status: "pending",
+        midtransOrderId: orderId,
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await saveOrder(order);
 
     if (!serverKey) {
       return NextResponse.json({

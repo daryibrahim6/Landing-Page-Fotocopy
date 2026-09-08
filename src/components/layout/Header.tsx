@@ -124,11 +124,11 @@ export function Header() {
           className="shrink-0 font-display text-xl font-black tracking-tight md:text-2xl"
         >
           <Image
-            src="/assets/brand/logo-bisaprint.webp"
+            src="/assets/brand/logo-bisaprint.svg"
             alt="BisaPrint"
-            width={110}
-            height={35}
-            className="h-auto w-auto"
+            width={140}
+            height={40}
+            className="h-8 w-auto md:h-10"
             priority
           />
         </Link>

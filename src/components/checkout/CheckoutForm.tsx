@@ -3,12 +3,13 @@
 import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShoppingCart, CreditCard, MessageCircle, Check } from "lucide-react";
+import { ArrowLeft, ShoppingCart, CreditCard, MessageCircle, Check, Upload, FileText, X } from "lucide-react";
 import { products } from "@/data/products";
 import { cn, formatRupiah } from "@/lib/utils";
 import { buildWAUrl } from "@/lib/wa";
 import { isMidtransConfigured } from "@/lib/midtrans";
 import { trackPurchase, trackEvent } from "@/lib/tracking";
+import { calculatePrice } from "@/lib/pricing";
 
 interface FormData {
   name: string;
@@ -22,6 +23,8 @@ interface FormData {
   size: string;
   finishing: string;
 }
+
+const PHONE_REGEX = /^[0-9]{9,15}$/;
 
 export function CheckoutForm() {
   const searchParams = useSearchParams();
@@ -46,25 +49,91 @@ export function CheckoutForm() {
     finishing: product?.finishings[0] ?? "",
   });
 
+  const [file, setFile] = useState<File | null>(null);
+  const [fileUrl, setFileUrl] = useState<string>("");
+  const [fileUploading, setFileUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData | "file", string>>>({});
   const [error, setError] = useState("");
+
+  const pricing = useMemo(() => {
+    if (!product) return { subtotal: 0, total: 0, breakdown: "" };
+    return calculatePrice(product.id, form.size, form.material, form.finishing, form.quantity);
+  }, [product, form.size, form.material, form.finishing, form.quantity]);
 
   const update = useCallback(
     <K extends keyof FormData>(key: K, value: FormData[K]) => {
       setForm((prev) => ({ ...prev, [key]: value }));
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
       setError("");
     },
     [],
   );
 
-  const total = useMemo(() => {
-    if (!product) return 0;
-    return product.priceFrom * form.quantity;
-  }, [product, form.quantity]);
+  const validate = useCallback((): boolean => {
+    const next: Partial<Record<keyof FormData | "file", string>> = {};
+
+    if (!form.name.trim()) next.name = "Nama wajib diisi";
+    if (!form.phone.trim()) {
+      next.phone = "No. WhatsApp wajib diisi";
+    } else if (!PHONE_REGEX.test(form.phone.replace(/\D/g, ""))) {
+      next.phone = "No. WhatsApp tidak valid";
+    }
+    if (form.pickup === "kirim" && !form.address.trim()) {
+      next.address = "Alamat wajib diisi untuk pengiriman";
+    }
+    if (form.quantity < 1) next.quantity = "Jumlah minimal 1";
+
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }, [form]);
+
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!allowedTypes.includes(selected.type)) {
+      setErrors((prev) => ({ ...prev, file: "Hanya PDF, PNG, JPG, WEBP" }));
+      return;
+    }
+
+    if (selected.size > 10 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, file: "Maksimal 10MB" }));
+      return;
+    }
+
+    setFile(selected);
+    setErrors((prev) => ({ ...prev, file: undefined }));
+    setFileUploading(true);
+
+    try {
+      const data = new FormData();
+      data.append("file", selected);
+      const res = await fetch("/api/upload", { method: "POST", body: data });
+      const result = await res.json();
+      if (result.url) {
+        setFileUrl(result.url);
+      } else {
+        setErrors((prev) => ({ ...prev, file: result.error ?? "Gagal upload file" }));
+        setFile(null);
+      }
+    } catch {
+      setErrors((prev) => ({ ...prev, file: "Gagal upload file" }));
+      setFile(null);
+    } finally {
+      setFileUploading(false);
+    }
+  }, []);
+
+  const clearFile = useCallback(() => {
+    setFile(null);
+    setFileUrl("");
+  }, []);
 
   const handleMidtrans = useCallback(async () => {
-    if (!product) return;
+    if (!product || !validate()) return;
     setSubmitting(true);
     setError("");
 
@@ -76,8 +145,8 @@ export function CheckoutForm() {
           items: [
             {
               id: product.id,
-              name: `${product.name} (${form.size} - ${form.material})`,
-              price: product.priceFrom,
+              name: `${product.name} (${form.size} - ${form.material} - ${form.finishing})`,
+              price: pricing.total / form.quantity,
               quantity: form.quantity,
             },
           ],
@@ -86,7 +155,19 @@ export function CheckoutForm() {
             phone: form.phone,
             email: form.email || `${form.phone}@user.bisaprint.com`,
           },
-          grossAmount: total,
+          grossAmount: pricing.total,
+          specs: {
+            ukuran: form.size,
+            bahan: form.material,
+            finishing: form.finishing,
+            jumlah: String(form.quantity),
+            file: fileUrl || "Belum upload",
+          },
+          customerExtra: {
+            pickup: form.pickup,
+            address: form.address,
+            notes: form.notes,
+          },
         }),
       });
 
@@ -100,10 +181,12 @@ export function CheckoutForm() {
         return;
       }
 
-      if (data.token && window.snap) {
-        window.snap.pay(data.token, {
+      if (data.token && typeof window !== "undefined" && "snap" in window) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const snap = (window as any).snap;
+        snap.pay(data.token, {
           onSuccess: () => {
-            trackPurchase(data.orderId, total, "IDR", [{ id: product.id, quantity: form.quantity, price: product.priceFrom }]);
+            trackPurchase(data.orderId, pricing.total, "IDR", [{ id: product.id, quantity: form.quantity, price: pricing.total / form.quantity }]);
             setSubmitted(true);
             setSubmitting(false);
             router.push(`/checkout/success?orderId=${data.orderId}`);
@@ -129,15 +212,16 @@ export function CheckoutForm() {
       window.open(waLink, "_blank");
       setSubmitting(false);
     }
-  }, [product, form, total, router]);
+  }, [product, form, pricing, fileUrl, router, validate]);
 
   const handleWaOnly = useCallback(() => {
-    if (!product) return;
+    if (!product || !validate()) return;
     trackEvent("Lead", { source: "checkout-wa", product: product.id });
-    const msg = `Halo Admin Bisa Print, saya mau order.\nProduk: ${product.name}\nUkuran: ${form.size}\nBahan: ${form.material}\nFinishing: ${form.finishing}\nJumlah: ${form.quantity}\nNama: ${form.name}\nNo. WA: ${form.phone}\nCatatan: ${form.notes}`;
+    const fileInfo = fileUrl ? `\nFile: ${fileUrl}` : "";
+    const msg = `Halo Admin Bisa Print, saya mau order.\nProduk: ${product.name}\nUkuran: ${form.size}\nBahan: ${form.material}\nFinishing: ${form.finishing}\nJumlah: ${form.quantity}\nNama: ${form.name}\nNo. WA: ${form.phone}\nPengambilan: ${form.pickup}${form.pickup === "kirim" ? `\nAlamat: ${form.address}` : ""}\nCatatan: ${form.notes}${fileInfo}`;
     window.open(buildWAUrl("general").split("?text=")[0] + "?text=" + encodeURIComponent(msg), "_blank");
     setSubmitted(true);
-  }, [product, form]);
+  }, [product, form, fileUrl, validate]);
 
   if (!product) {
     return (
@@ -209,75 +293,24 @@ export function CheckoutForm() {
                 Spesifikasi Produk
               </legend>
               <div className="space-y-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
-                    Ukuran
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {product.sizes.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => update("size", s)}
-                        aria-pressed={form.size === s}
-                        className={cn(
-                          "rounded-full border-2 px-4 py-2 text-sm font-semibold transition",
-                          form.size === s
-                            ? "border-primary bg-primary text-white"
-                            : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
-                        )}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
-                    Bahan
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {product.materials.map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => update("material", m)}
-                        aria-pressed={form.material === m}
-                        className={cn(
-                          "rounded-full border-2 px-4 py-2 text-sm font-semibold transition",
-                          form.material === m
-                            ? "border-primary bg-primary text-white"
-                            : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
-                        )}
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
-                    Finishing
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {product.finishings.map((f) => (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() => update("finishing", f)}
-                        aria-pressed={form.finishing === f}
-                        className={cn(
-                          "rounded-full border-2 px-4 py-2 text-sm font-semibold transition",
-                          form.finishing === f
-                            ? "border-primary bg-primary text-white"
-                            : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
-                        )}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <OptionGroup
+                  label="Ukuran"
+                  options={product.sizes}
+                  selected={form.size}
+                  onSelect={(value) => update("size", value)}
+                />
+                <OptionGroup
+                  label="Bahan"
+                  options={product.materials}
+                  selected={form.material}
+                  onSelect={(value) => update("material", value)}
+                />
+                <OptionGroup
+                  label="Finishing"
+                  options={product.finishings}
+                  selected={form.finishing}
+                  onSelect={(value) => update("finishing", value)}
+                />
                 <div>
                   <label htmlFor="qty" className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
                     Jumlah
@@ -289,9 +322,50 @@ export function CheckoutForm() {
                     max={9999}
                     value={form.quantity}
                     onChange={(e) => update("quantity", Math.max(1, Number(e.target.value)))}
-                    className="w-32 rounded-xl border-2 border-[var(--color-border)] px-4 py-2 text-sm font-semibold outline-none transition focus:border-primary"
+                    className={cn(
+                      "w-32 rounded-xl border-2 px-4 py-2 text-sm font-semibold outline-none transition focus:border-primary",
+                      errors.quantity ? "border-red-400" : "border-[var(--color-border)]",
+                    )}
                   />
+                  {errors.quantity && <p className="mt-1 text-xs text-red-500">{errors.quantity}</p>}
                 </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="mb-3 font-display text-base font-bold text-[var(--color-text-primary)]">
+                File Desain
+              </legend>
+              <div className="rounded-xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-bg-soft)] p-5 text-center">
+                <input
+                  id="file"
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.webp"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                {!file ? (
+                  <label htmlFor="file" className="flex cursor-pointer flex-col items-center gap-2">
+                    <Upload className="size-8 text-[var(--color-text-muted)]" />
+                    <span className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                      Upload file desain (PDF/PNG/JPG, max 10MB)
+                    </span>
+                    <span className="text-xs text-[var(--color-text-muted)]">Opsional — bisa dikirim via WhatsApp nanti</span>
+                  </label>
+                ) : (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="size-5 text-primary" />
+                      <span className="text-sm font-medium text-[var(--color-text-primary)]">{file.name}</span>
+                    </div>
+                    <button type="button" onClick={clearFile} className="rounded-full p-1 hover:bg-red-50">
+                      <X className="size-4 text-red-500" />
+                    </button>
+                  </div>
+                )}
+                {fileUploading && <p className="mt-2 text-xs text-[var(--color-text-muted)]">Mengupload...</p>}
+                {errors.file && <p className="mt-2 text-xs text-red-500">{errors.file}</p>}
+                {fileUrl && <p className="mt-2 text-xs text-green-600">File siap</p>}
               </div>
             </fieldset>
 
@@ -300,47 +374,35 @@ export function CheckoutForm() {
                 Data Pemesan
               </legend>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="name" className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
-                    Nama Lengkap
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    value={form.name}
-                    onChange={(e) => update("name", e.target.value)}
-                    className="w-full rounded-xl border-2 border-[var(--color-border)] px-4 py-2.5 text-sm outline-none transition focus:border-primary"
-                    placeholder="Nama kamu"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
-                    No. WhatsApp
-                  </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    required
-                    value={form.phone}
-                    onChange={(e) => update("phone", e.target.value)}
-                    className="w-full rounded-xl border-2 border-[var(--color-border)] px-4 py-2.5 text-sm outline-none transition focus:border-primary"
-                    placeholder="0812xxxxxxx"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
-                    Email (opsional)
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => update("email", e.target.value)}
-                    className="w-full rounded-xl border-2 border-[var(--color-border)] px-4 py-2.5 text-sm outline-none transition focus:border-primary"
-                    placeholder="email@kamu.com"
-                  />
-                </div>
+                <Field
+                  id="name"
+                  label="Nama Lengkap"
+                  type="text"
+                  value={form.name}
+                  onChange={(value) => update("name", value)}
+                  error={errors.name}
+                  placeholder="Nama kamu"
+                  required
+                />
+                <Field
+                  id="phone"
+                  label="No. WhatsApp"
+                  type="tel"
+                  value={form.phone}
+                  onChange={(value) => update("phone", value.replace(/\D/g, ""))}
+                  error={errors.phone}
+                  placeholder="0812xxxxxxx"
+                  required
+                />
+                <Field
+                  id="email"
+                  label="Email (opsional)"
+                  type="email"
+                  value={form.email}
+                  onChange={(value) => update("email", value)}
+                  error={errors.email}
+                  placeholder="email@kamu.com"
+                />
                 <div>
                   <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
                     Pengambilan
@@ -384,9 +446,13 @@ export function CheckoutForm() {
                       rows={2}
                       value={form.address}
                       onChange={(e) => update("address", e.target.value)}
-                      className="w-full rounded-xl border-2 border-[var(--color-border)] px-4 py-2.5 text-sm outline-none transition focus:border-primary"
+                      className={cn(
+                        "w-full rounded-xl border-2 px-4 py-2.5 text-sm outline-none transition focus:border-primary",
+                        errors.address ? "border-red-400" : "border-[var(--color-border)]",
+                      )}
                       placeholder="Jl. ..."
                     />
+                    {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address}</p>}
                   </div>
                 )}
                 <div className="sm:col-span-2">
@@ -426,19 +492,26 @@ export function CheckoutForm() {
                   <span className="font-semibold text-[var(--color-text-primary)]">{form.material}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-[var(--color-text-secondary)]">Finishing</span>
+                  <span className="font-semibold text-[var(--color-text-primary)]">{form.finishing}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-[var(--color-text-secondary)]">Jumlah</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">{form.quantity} {product.unit}</span>
                 </div>
+                {pricing.breakdown && (
+                  <p className="text-xs text-[var(--color-text-muted)]">{pricing.breakdown}</p>
+                )}
                 <div className="flex justify-between border-t border-[var(--color-border)] pt-2">
                   <span className="font-bold text-[var(--color-text-primary)]">Estimasi Total</span>
                   <span className="font-display text-lg font-black text-accent">
-                    {formatRupiah(total)}
+                    {formatRupiah(pricing.total)}
                   </span>
                 </div>
               </div>
 
               <div className="pt-2 text-[11px] text-[var(--color-text-muted)]">
-                * Estimasi harga belum termasuk ongkir
+                * Estimasi harga belum termasuk ongkir. Admin akan konfirmasi final.
               </div>
 
               {error && (
@@ -474,6 +547,85 @@ export function CheckoutForm() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function OptionGroup({
+  label,
+  options,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  options: string[];
+  selected: string;
+  onSelect: (value: string) => void;
+}) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
+        {label}
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onSelect(opt)}
+            aria-pressed={selected === opt}
+            className={cn(
+              "rounded-full border-2 px-4 py-2 text-sm font-semibold transition",
+              selected === opt
+                ? "border-primary bg-primary text-white"
+                : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
+            )}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Field({
+  id,
+  label,
+  type,
+  value,
+  onChange,
+  error,
+  placeholder,
+  required,
+}: {
+  id: string;
+  label: string;
+  type: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        className={cn(
+          "w-full rounded-xl border-2 px-4 py-2.5 text-sm outline-none transition focus:border-primary",
+          error ? "border-red-400" : "border-[var(--color-border)]",
+        )}
+        placeholder={placeholder}
+      />
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );
 }

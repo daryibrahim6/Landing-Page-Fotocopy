@@ -53,11 +53,11 @@ export function Footer() {
           <div>
             <div className="mb-4">
               <Image
-                src="/assets/brand/logo-bisaprint.webp"
+                src="/assets/brand/logo-bisaprint.svg"
                 alt="BisaPrint"
-                width={100}
-                height={32}
-                className="h-auto w-auto"
+                width={140}
+                height={40}
+                className="h-8 w-auto"
               />
             </div>
             <p className="mt-3 font-display text-lg font-bold text-slate-200">
