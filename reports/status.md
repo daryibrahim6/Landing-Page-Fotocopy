@@ -6,9 +6,9 @@
 
 | Flow | Scope | Audit | Fix | Vitest | E2E | Track B | Track C | Final | Notes |
 |---|---|---|---|---|---|---|---|---|---|
-| landing-page-flow | Done | Done | Done | In Progress | N/A | N/A | In Progress | CLEAR | Hybrid direction selected. Font and logo updated. |
-| checkout-flow | Done | Done | Done | Done | N/A | N/A | N/A | CLEAR | Deep recheck: price rounding, email sanitization, admin notif, storage. |
-| whatsapp-notification-flow | Done | Done | Done | Done | N/A | N/A | N/A | CLEAR | Structured admin WA notification, logged on create + paid. |
+| landing-page-flow | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | UI/UX overhaul: logo, navbar, hero, product images, layout. |
+| checkout-flow | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | 12 product SVGs, all products enabled, layout widened. |
+| whatsapp-notification-flow | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | Notification helper + unit tests. |
 | design-simulator-flow | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | Build, lint, test clean. |
 | production-dashboard-flow | Done | Done | Belum | Belum | N/A | N/A | N/A | BACKLOG | v2. |
 
