@@ -62,21 +62,22 @@ export function WhyBisaPrint() {
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Kenapa Bisa Print?
         </h2>
-        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
-          <Image
-            src="/assets/illustrations/underline-accent.svg"
-            alt=""
-            fill
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
         <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Kenapa harus pilih Bisa Print? Ini alasannya.
         </p>
       </ScrollReveal>
 
-      <div className="mt-12 rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6 sm:p-8 md:p-10">
+      <div className="mt-12 grid items-center gap-10 lg:grid-cols-2">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white">
+          <Image
+            src="/assets/illustrations/why-bisaprint.svg"
+            alt="Ilustrasi keunggulan BisaPrint"
+            fill
+            className="object-contain p-4"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
+        </div>
+        <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6 sm:p-8">
         <motion.div
           className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           variants={containerVariants}
@@ -105,6 +106,7 @@ export function WhyBisaPrint() {
             );
           })}
         </motion.div>
+        </div>
       </div>
     </SectionWrapper>
   );

@@ -61,19 +61,22 @@ export function CaraOrderSection() {
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Cara Order via WhatsApp
         </h2>
-        <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
-          <Image
-            src="/assets/illustrations/underline-accent.svg"
-            alt=""
-            fill
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
         <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg">
           Gampang banget! Ikuti 7 langkah simpel ini.
         </p>
       </ScrollReveal>
+
+      <div className="mx-auto mt-10 max-w-2xl">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white">
+          <Image
+            src="/assets/illustrations/cara-order.svg"
+            alt="Ilustrasi cara order BisaPrint"
+            fill
+            className="object-contain p-4"
+            sizes="(max-width: 768px) 100vw, 672px"
+          />
+        </div>
+      </div>
 
       <div className="relative mt-14">
         <div

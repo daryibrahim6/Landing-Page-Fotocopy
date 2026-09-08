@@ -48,15 +48,6 @@ export function ContactSection() {
           <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
             Hubungi Kami
           </h2>
-          <div className="relative mt-2 h-3.5 w-[200px] select-none md:w-[240px]">
-            <Image
-              src="/assets/illustrations/underline-accent.svg"
-              alt=""
-              fill
-              className="object-contain"
-              aria-hidden="true"
-            />
-          </div>
           <p className="mt-4 max-w-md text-base text-[var(--color-text-secondary)]">
             Mampir langsung atau chat kami dulu &mdash; kami siap bantu.
           </p>
@@ -114,18 +105,20 @@ export function ContactSection() {
           </div>
         </div>
 
-        <div>
-          <div
-            className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white shadow-md p-8"
-          >
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[0.03]"
-              aria-hidden="true"
-              style={{
-                backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
-                backgroundSize: "16px 16px",
-              }}
+        <div className="flex flex-col gap-8">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white p-4">
+            <Image
+              src="/assets/illustrations/print-delivery.svg"
+              alt="Ilustrasi cetak dan pengiriman BisaPrint"
+              fill
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, 50vw"
             />
+          </div>
+
+          <div
+            className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white p-8 shadow-md"
+          >
 
             <div className="relative z-10 flex flex-col items-center text-center">
               <div className="flex size-16 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/25">

@@ -20,13 +20,13 @@ export default function HomePage() {
       <WavyDivider color="#FFFFFF" flip={false} />
 
       <KategoriProduk />
-      <WavyDivider color="#FFEAF4" flip />
+      <WavyDivider color="#F8FAFC" flip />
 
       <ProductCatalog />
-      <WavyDivider color="#FFEAF4" flip />
+      <WavyDivider color="#F8FAFC" flip />
 
       <WhyBisaPrint />
-      <WavyDivider color="#FFEAF4" flip />
+      <WavyDivider color="#F8FAFC" flip />
 
       <CaraOrderSection />
       <WavyDivider color="#FFFFFF" flip={false} />
@@ -35,7 +35,7 @@ export default function HomePage() {
       <WavyDivider color="#FFFFFF" flip={false} />
 
       <PortfolioGallery />
-      <WavyDivider color="#FFEAF4" flip />
+      <WavyDivider color="#F8FAFC" flip />
 
       <Testimonials />
       <WavyDivider color="#FFFFFF" flip={false} />

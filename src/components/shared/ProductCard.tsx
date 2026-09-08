@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { cn, formatRupiah } from "@/lib/utils";
 import { buildWAUrl } from "@/lib/wa";
@@ -101,7 +102,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
         <div className="mt-auto flex flex-col gap-2 pt-4">
           {product.isCheckoutEnabled ? (
-            <a
+            <Link
               href={`/checkout?product=${product.id}`}
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-[var(--color-primary-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
             >
@@ -109,7 +110,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
               Pesan Sekarang
-            </a>
+            </Link>
           ) : (
             <a
               href={waHref}
