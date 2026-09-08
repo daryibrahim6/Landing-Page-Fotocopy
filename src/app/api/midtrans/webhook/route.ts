@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { updateOrderStatus } from "@/lib/order-storage";
-import { buildAdminWAUrl } from "@/lib/wa";
-import { formatRupiah } from "@/lib/utils";
+import { notifyAdminNewOrder, notifyAdminPaidOrder, logNotification } from "@/lib/notification";
 
 export async function POST(request: Request) {
   try {
@@ -44,11 +43,8 @@ export async function POST(request: Request) {
     const order = await updateOrderStatus(order_id, orderStatus);
 
     if (order) {
-      if (orderStatus === "paid") {
-        console.log(`[Midtrans Webhook] Order ${order_id} PAID. Admin WA: ${buildAdminWAUrl("adminPaidOrder", order.id, order.productName, order.customer.name, order.customer.phone, formatRupiah(order.pricing.total))}`);
-      } else if (orderStatus === "pending") {
-        console.log(`[Midtrans Webhook] Order ${order_id} PENDING. Admin WA: ${buildAdminWAUrl("adminNewOrder", order.id, order.productName, order.customer.name, order.customer.phone, formatRupiah(order.pricing.total), order.customer.notes ?? "-")}`);
-      }
+      const notification = orderStatus === "paid" ? notifyAdminPaidOrder(order) : notifyAdminNewOrder(order);
+      logNotification(notification);
     } else {
       console.log(`[Midtrans Webhook] Order ${order_id}: ${transaction_status} → ${orderStatus}`);
     }

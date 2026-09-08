@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
 import { saveOrder, type StoredOrder } from "@/lib/order-storage";
+import { notifyAdminNewOrder, logNotification } from "@/lib/notification";
 import type { MidtransCreateTokenBody, MidtransItem } from "@/types";
 
 export async function POST(request: Request) {
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
     };
 
     await saveOrder(order);
+    logNotification(notifyAdminNewOrder(order));
 
     if (!serverKey) {
       return NextResponse.json({

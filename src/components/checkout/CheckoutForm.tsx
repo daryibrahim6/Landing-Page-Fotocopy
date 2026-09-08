@@ -146,14 +146,14 @@ export function CheckoutForm() {
             {
               id: product.id,
               name: `${product.name} (${form.size} - ${form.material} - ${form.finishing})`,
-              price: pricing.total / form.quantity,
+              price: Math.round(pricing.total / form.quantity),
               quantity: form.quantity,
             },
           ],
           customerDetails: {
             name: form.name,
             phone: form.phone,
-            email: form.email || `${form.phone}@user.bisaprint.com`,
+            email: form.email || `customer-${form.phone.replace(/\D/g, "")}@bisaprint.com`,
           },
           grossAmount: pricing.total,
           specs: {
