@@ -67,7 +67,7 @@ Setiap fitur/domain baru minimal punya 1 baris komentar di file utamanya yang me
 | Pattern | Kapan dipakai | Contoh |
 |---------|--------------|--------|
 | Server Component + static data | Public read-only pages, data dari `src/data/` | Home, katalog, FAQ |
-| API Route + client fetch | Checkout, payment token, order lookup | `/api/midtrans/create-token`, `/api/orders/[orderId]` |
+| API Route + client fetch | Checkout, payment token, file upload | `/api/midtrans/create-token`, `/api/upload` |
 | Route Handlers | Webhooks external | `/api/midtrans/webhook` |
 
 ### Aturan Data Fetching

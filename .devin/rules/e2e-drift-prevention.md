@@ -12,7 +12,7 @@ Gunakan aturan ini untuk **SEMUA** task E2E/Playwright atau audit flow yang meny
 1. **Baca audit + scenario** — `reports/audit/[flow].md` dan `reports/test-scenarios/[flow].md`. Catat scope yang di-freeze dan temuan yang sudah fixed/deferred.
 2. **Baca komponen/service yang relevan** — Jangan assume text label atau class masih benar. Minimal baca:
    - Komponen utama yang di-test (contoh `src/components/checkout/CheckoutForm.tsx`, `src/components/sections/ProductCatalog.tsx`, `src/components/design-simulator/DesignSimulator.tsx`).
-   - API route yang dipakai (contoh `src/app/api/midtrans/create-token/route.ts`, `src/app/api/orders/[orderId]/route.ts`, `src/app/api/upload/route.ts`).
+   - API route yang dipakai (contoh `src/app/api/midtrans/create-token/route.ts`, `src/app/api/midtrans/webhook/route.ts`, `src/app/api/upload/route.ts`).
    - `e2e/helpers.ts` atau shared helper yang dipakai test.
 3. **Cross-check `data-testid` / `role` / `aria-label`** — pastikan setiap `data-testid` yang dipakai test masih ada di komponen. Jangan pakai CSS class yang bergantung warna/state (`.bg-white`, `.text-primary`) — pakai `data-testid` atau `getByRole`/`getByLabel`.
 4. **Cek data fixture** — produk di `src/data/products.ts` adalah satu-satunya "seed". Kalau test butuh produk `isCheckoutEnabled: true`, verifikasi produk itu masih ada dan flag-nya masih true. Jangan hardcode nama produk kalau katalog bisa berubah — pilih berdasarkan `data-testid` atau kriteria (kategori, flag checkout).

@@ -22,51 +22,5 @@ export interface Product {
   whatsappTemplate: string;
 }
 
-export interface CheckoutItem {
-  productId: string;
-  productName: string;
-  materialId: string;
-  materialName: string;
-  sizeId: string;
-  sizeName: string;
-  quantity: number;
-  pricePerUnit: number;
-  totalPrice: number;
-}
 
-export interface CheckoutPayload {
-  customerName: string;
-  customerPhone: string;
-  items: CheckoutItem[];
-  notes: string;
-  totalAmount: number;
-}
-
-export interface MidtransItem {
-  id: string;
-  price: number;
-  quantity: number;
-  name: string;
-}
-
-export interface MidtransCustomerDetails {
-  name: string;
-  phone: string;
-  email?: string;
-}
-
-export interface MidtransCreateTokenBody {
-  productId: string;
-  size: string;
-  material: string;
-  finishing: string;
-  quantity: number;
-  fileUrl?: string;
-  customerDetails: MidtransCustomerDetails;
-  customerExtra?: {
-    pickup?: "ambil" | "kirim";
-    address?: string;
-    notes?: string;
-  };
-}
 

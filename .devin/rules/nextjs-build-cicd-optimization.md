@@ -22,7 +22,7 @@ Panduan pemilihan strategi:
 - **Static (SSG) murni** — hanya untuk data yang benar-benar tidak pernah berubah tanpa deployment baru (contoh: halaman legal/terms yang di-hardcode di code).
 - **ISR + on-demand revalidation** (`revalidatePath` / `revalidateTag`) — pilihan untuk data yang bisa berubah tanpa deploy tapi tidak per-detik (kalau nanti katalog pindah dari `src/data/` ke CMS/DB).
 - **ISR interval-based** (`revalidate: <detik>`) — untuk data yang berubah dari luar sistem, seperti sitemap.
-- **Dynamic rendering** (`force-dynamic`) — hanya untuk data yang benar-benar harus per-request (contoh: `GET /api/orders/[orderId]` yang baca status order real-time dari Upstash).
+- **Dynamic rendering** (`force-dynamic`) — hanya untuk data yang benar-benar harus per-request (contoh: `/checkout/success` yang baca status order real-time dari Upstash).
 
 > **Konteks BisaPrint:** data katalog produk/FAQ/portfolio = static di `src/data/` → halaman publik idealnya **full SSG**. Yang dynamic hanya API routes (Midtrans, orders, upload) — itu memang dynamic by nature, bukan halaman.
 
@@ -38,7 +38,7 @@ Panduan pemilihan strategi:
 ### Pattern yang benar per jenis halaman (BisaPrint):
 - **Public pages (landing `/`, `/simulator`)**: fully static — data dari `src/data/` di-bundle saat build, zero network. Jangan fetch apa pun di server component halaman ini.
 - **`/checkout`**: boleh client component yang fetch API route saat runtime (harga, token). Shell statis, interaksi di client.
-- **API routes** (`/api/midtrans/*`, `/api/orders/*`, `/api/upload`): dynamic by default — boleh akses Upstash/Blob/Midtrans karena jalan per-request.
+- **API routes** (`/api/midtrans/*`, `/api/upload`): dynamic by default — boleh akses Upstash/Blob/Midtrans karena jalan per-request.
 - **Sitemap**: static atau `force-dynamic` — jangan query external service di dalamnya.
 
 ## 3. Data & External Call Performance

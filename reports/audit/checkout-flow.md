@@ -1,7 +1,7 @@
 # Audit — checkout-flow
 
 **Tier:** Core | **Prefix ID:** `CF`
-**Scope IN:** `src/app/checkout/*` (page + success), `CheckoutForm`, `/api/midtrans/create-token`, `/api/midtrans/webhook`, `/api/orders/[orderId]`, `/api/upload`, `src/lib/order-storage.ts`, `src/lib/pricing.ts`, `src/lib/midtrans.ts`, `src/lib/schemas.ts`, `src/lib/notification.ts`, `src/lib/wa.ts`, `src/data/products.ts` (shared read: harga/opsi), `src/types/index.ts` (order/midtrans types)
+**Scope IN:** `src/app/checkout/*` (page + success), `CheckoutForm`, `/api/midtrans/create-token`, `/api/midtrans/webhook`, `/api/upload`, `src/lib/order-storage.ts`, `src/lib/pricing.ts`, `src/lib/midtrans.ts`, `src/lib/schemas.ts`, `src/lib/redis.ts` (shared client), `src/lib/notification.ts`, `src/lib/wa.ts`, `src/data/products.ts` (shared read: harga/opsi), `src/types/index.ts` (order/midtrans types). ~~`/api/orders/[orderId]`~~ dihapus di Tahap 2 (CF-A-18).
 **Scope OUT:** konten landing page, simulator canvas, dashboard admin
 **Last audit:** 2026-09-08 (gabungan) → di-split ke file ini 2026-09-12 → **re-audit v2 (Tahap 0+1) 2026-09-12.**
 
@@ -16,7 +16,7 @@
 
 ### Boundary IN
 - Pages: `/checkout`, `/checkout/success`
-- API: `POST /api/midtrans/create-token`, `POST /api/midtrans/webhook`, `GET /api/orders/[orderId]`, `POST /api/upload`
+- API: `POST /api/midtrans/create-token`, `POST /api/midtrans/webhook`, `POST /api/upload` (~~`GET /api/orders/[orderId]`~~ — dihapus Tahap 2)
 - Lib: `order-storage`, `pricing`, `midtrans`, `schemas`, `notification`, `wa`
 - Trigger: Snap callbacks (onSuccess/onPending/onError/onClose), Midtrans HTTP notification, file upload
 
@@ -223,7 +223,7 @@
 | Order lookup API | Publik, PII penuh, no callers | OWASP BOLA/IDOR: endpoint objek butuh auth atau minimal response | Ya (CF-A-18) | Hapus (YAGNI) sampai tracking dibutuhkan |
 | Upload endpoint | Publik, allowlist MIME+10MB | OWASP Unrestricted File Upload + rate limiting untuk resource publik | Ya (CF-A-19) | Rate limit IP / accept+monitor (MVP) |
 | Order ID entropy | `Math.random` base36 | CWE-338: identifier unguessable pakai CSPRNG | Minor (CF-A-28) | `crypto.randomBytes` |
-| Env gating client | `isMidtransConfigured` baca non-public env di client | Next.js docs: hanya `NEXT_PUBLIC_*` ke browser | Ya (CF-A-12) | Flag `NEXT_PUBLIC_MIDTRANS_ENABLED` |
+| Env gating client | `isMidtransConfigured` baca non-public env di client | Next.js docs: hanya `NEXT_PUBLIC_*` ke browser | Ya (CF-A-12) | **Diimplementasi:** cek `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` saja — flag env ekstra tidak perlu karena server-key absent sudah punya simulation fallback server-side |
 | Storage fallback | Silent in-memory saat Upstash kosong | Twelve-factor: fail loud pada missing backing service di prod | Minor (CF-A-24) | Warn-once / fail prod |
 | Notification admin | `console.log` URL WA | Produksi butuh channel real (WA Business API/email) — diketahui, backlog | Diketahui | Tetap — terdokumentasi di Open Items |
 | Idempotency webhook | `order_id` key, update idempotent | Midtrans: notif bisa duplikat — idempotent OK | Tidak | Sudah sesuai docs |

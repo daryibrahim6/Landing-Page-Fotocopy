@@ -91,7 +91,7 @@ src/
     api/
       midtrans/create-token/route.ts  # Create Midtrans snap token
       midtrans/webhook/route.ts       # Midtrans payment notification
-      orders/[orderId]/route.ts       # Order detail lookup
+      upload/route.ts                 # File upload (Vercel Blob)
     error.tsx, not-found.tsx, loading.tsx
 
   components/

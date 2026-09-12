@@ -515,7 +515,7 @@ Kalau quick scan pass, lanjut deep scan:
 
 ### Data Fetching
 - **Public read-only:** Server Component + import langsung dari `src/data/` (products, faq, portfolio, testimonials)
-- **Mutations/checkout:** API Route + client fetch — `/api/midtrans/create-token`, `/api/upload`, `/api/orders/[id]`
+- **Mutations/checkout:** API Route + client fetch — `/api/midtrans/create-token`, `/api/upload`
 - **Webhooks:** Route Handler + WAJIB signature verification — `/api/midtrans/webhook`
 - **Storage:** `src/lib/order-storage.ts` — Upstash Redis kalau env ada, fallback in-memory (dev only)
 - **Post-mutation:** update state / `router.refresh()` / redirect (bukan `window.location.reload()`)

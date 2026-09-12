@@ -86,7 +86,7 @@ Flow BisaPrint (5). Detail status: `reports/status.md`. Audit per-flow: `reports
 | # | Flow | Tier | Fokus |
 |---|------|------|-------|
 | 1 | `landing-page-flow` | Core | Homepage: hero, kategori, katalog, USP, cara order, konsultasi WA, portfolio, testimoni, panduan file, FAQ, kontak, footer, floating buttons |
-| 2 | `checkout-flow` | Core | `/checkout` → Midtrans Snap → `/checkout/success`; API `create-token`, `webhook`, `orders/[orderId]`; upload file |
+| 2 | `checkout-flow` | Core | `/checkout` → Midtrans Snap → `/checkout/success`; API `create-token`, `webhook`; upload file |
 | 3 | `whatsapp-notification-flow` | Core | WA deep-link builder, notifikasi admin pasca-order/webhook |
 | 4 | `design-simulator-flow` | Core | Simulator layout A3 (`/simulator` + floating panel), imposition math `paper-sizes.ts`, export PNG/PDF |
 | 5 | `production-dashboard-flow` | Supporting | Admin dashboard produksi — BACKLOG v2, belum dibangun |
