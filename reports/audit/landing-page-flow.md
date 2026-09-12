@@ -27,7 +27,7 @@
 | Page + shell | `src/app/page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `globals.css` (relevan) |
 | Sections | semua `src/components/sections/*` (11 file) |
 | Layout comps | `Header.tsx`, `Footer.tsx` |
-| Shared comps | `ProductCard`, `WhatsAppButton`, `ScrollReveal`, `SectionWrapper`, `WavyDivider`, `DecorativeImage`, `BlobDecoration` |
+| Shared comps | `ProductCard`, `WhatsAppButton`, `ScrollReveal`, `SectionWrapper`, `WavyDivider` (~~`DecorativeImage`, `BlobDecoration`~~ dihapus LP-A-18) |
 | UI/tracking | `src/components/ui/*`, `src/components/tracking/*` |
 | Data | `src/data/products.ts`, `portfolio.ts`, `testimonials.ts`, `faq.ts` |
 | Shared lib (read-path) | `src/lib/constants.ts`, `wa.ts`, `tracking.ts`, `utils.ts`, `pricing.ts` (dipakai ProductCard via `formatRupiah`) |
