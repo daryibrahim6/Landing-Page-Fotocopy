@@ -27,7 +27,7 @@
 | Order storage | ✅ Done | `src/lib/order-storage.ts` — Upstash Redis + in-memory fallback |
 | File upload | ✅ Done | `/api/upload` (Vercel Blob, max 10MB, PDF/PNG/JPG/WEBP) + input di CheckoutForm |
 | Admin notification | ✅ Done | `src/lib/notification.ts` — `notifyAdminNewOrder`/`notifyAdminPaidOrder` (WA URL) |
-| Order lookup | ✅ Done | `/api/orders/[orderId]` + halaman `checkout/success` |
+| Order lookup | ✅ Done | Halaman `checkout/success` baca `getOrder` langsung (server-side; endpoint `/api/orders/[orderId]` dihapus — CF-A-18) |
 
 ---
 
@@ -60,19 +60,30 @@
 | Restore docs BisaPrint | ✅ Done | PROJECT.md, README.md, rules `src/`-based kembali dari HEAD + sync env/structure (`8492f1e`) |
 | Archive konten project lain | ✅ Done | `_archive/` — e2e, blueprint, documents, reports stale, memories, docs asing, coverage (`e7717ca`) |
 | Adapt rules `.devin/` | ✅ Done | quality-radar, qa-qc, e2e-*, build-cicd, flow-*, AGENTS, workflows — de-referensi project lama |
-| Rebuild `reports/` + `milestones/` | 🔄 In Progress | status.md, master-reference.md, readme, milestones (file ini) |
+| Rebuild `reports/` + `milestones/` | ✅ Done | status.md, master-reference.md, readme, milestones — semua ter-sync 12 Sep |
 | Playwright setup | 🔄 In Progress | Config terpasang, spec belum ditulis — eksekusi E2E di sesi tersendiri |
 
 ---
+
+## Milestone 6 — Ops Hardening (Sep 2026) ✅ DONE
+
+| Task | Status | Deskripsi |
+|------|--------|-----------|
+| Order retention fix | ✅ Done | TTL 30d hanya untuk `pending`; terminal (paid/cancelled/expired) permanen — rekam bisnis tidak hilang |
+| Production storage guard | ✅ Done | `saveOrder` fail-fast saat `NODE_ENV=production` tanpa Upstash; banner warning di `/admin/orders` saat in-memory |
+| Rate limit create-token | ✅ Done | `Ratelimit.slidingWindow(10, "10 m")` per IP — blokir order-spam |
+| Export CSV admin | ✅ Done | `GET /api/admin/orders/export` + tombol di `/admin/orders` — rekap Excel-friendly |
+| Cleanup | ✅ Done | `@vercel/kv` dihapus (dead dep); env mati dikomentari; `ADMIN_*` lokal diisi; docs sync |
 
 ## Backlog — v2 Candidates
 
 | Task | Status | Deskripsi |
 |------|--------|-----------|
-| Production dashboard | ⬜ Backlog | Admin lihat/manage order — `production-dashboard-flow` |
 | Pricing matrix | ⬜ Backlog | Harga per material/ukuran/finishing (sekarang `priceFrom * quantity` + admin konfirmasi via WA) |
 | WA Business API | ⬜ Backlog | Notifikasi otomatis ke customer (sekarang WA URL ke admin via `logNotification`) |
-| E2E suite per flow | ⬜ Backlog | Spec Playwright untuk 4 flow core |
+| E2E suite per flow | ⬜ Backlog | Spec Playwright untuk 5 flow |
+| Backup order → Google Sheets | ⬜ Backlog | `ADMIN_NOTIFY_WEBHOOK_URL` → n8n/Make → Sheets (env sudah ada, butuh setup external) |
+| Migrasi DB relasional (Supabase) | ⬜ Backlog | Re-evaluasi saat butuh order history permanen multi-tahun / customer account / CMS produk |
 
 ---
 

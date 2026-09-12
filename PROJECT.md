@@ -8,15 +8,14 @@ Landing page + checkout untuk Bisa Print, percetakan digital di Bekasi yang mela
 - **Language**: TypeScript (strict)
 - **Styling**: Tailwind CSS v4 (`@import "tailwindcss"`, `@theme inline` for custom colors)
 - **UI Pattern**: shadcn/ui-style components + Radix UI primitives (`@radix-ui/react-slot`)
-- **Font**: Poppins (body) + Fredoka (display) via `next/font/google`
+- **Font**: Poppins (body) + Plus Jakarta Sans (display) via `next/font/google`
 - **Animation**: Framer Motion
-- **Validation**: Zod v4 (bila diperlukan untuk form/checkout)
-- **Forms**: React Hook Form + `@hookform/resolvers` (bila diperlukan)
-- **Payment**: Midtrans Snap (Snap.js + `midtrans-client`)
-- **File Upload**: Local `/tmp` atau Vercel Blob di MVP
+- **Validation**: Zod v4 (semua API routes — `src/lib/schemas.ts`)
+- **Payment**: Midtrans Snap (Snap.js di `checkout/layout.tsx` + REST `/v1/transactions` via fetch)
+- **File Upload**: Vercel Blob di production; data-URL fallback di dev
 - **Image**: `next/image` wajib, output WebP
 - **Icons**: lucide-react
-- **Testing**: Vitest (unit, `src/lib/*.test.ts`) + Playwright (E2E — config terpasang, spec belum ditulis)
+- **Testing**: Vitest (unit, `src/lib/*.test.ts` + route tests) + Playwright (E2E — config + smoke spec, spec per-flow belum ditulis)
 
 ## Theme / Color Palette
 Brand token diambil dari moodboard Bisa Print (pink/magenta hangat + orange accent):
@@ -88,11 +87,17 @@ src/
     checkout/page.tsx       # Checkout flow
     checkout/success/       # Payment success page
     simulator/page.tsx      # Full-page design simulator
+    admin/page.tsx              # Redirect ke /admin/orders
+    admin/orders/page.tsx       # Dashboard order (Basic Auth, force-dynamic)
     api/
-      midtrans/create-token/route.ts  # Create Midtrans snap token
+      midtrans/create-token/route.ts  # Create Midtrans snap token (rate-limited)
       midtrans/webhook/route.ts       # Midtrans payment notification
-      upload/route.ts                 # File upload (Vercel Blob)
+      upload/route.ts                 # File upload (Vercel Blob, rate-limited)
+      admin/orders/route.ts           # GET list order (paginated)
+      admin/orders/[id]/route.ts      # PATCH status produksi
+      admin/orders/export/route.ts    # GET export CSV semua order
     error.tsx, not-found.tsx, loading.tsx
+  proxy.ts                    # Next 16 middleware — Basic Auth gate /admin + /api/admin
 
   components/
     sections/               # Hero, Kategori, Produk, USP, Cara Order, dll
@@ -101,6 +106,7 @@ src/
     layout/                 # Header, Footer
     design-simulator/       # DesignSimulator, DesignCanvas, UploadZone, FloatingSimulator
     checkout/               # Komponen checkout
+    admin/                  # OrderTable (status produksi + paginasi)
     tracking/               # MetaPixel, GoogleAnalytics
 
   data/
@@ -112,12 +118,15 @@ src/
   lib/
     utils.ts                # cn, formatPrice, helpers murni
     constants.ts            # WA number, IG/Shopee/email links, maps embed
-    midtrans.ts             # Midtrans client helper
+    midtrans.ts             # Midtrans helper (base URL, keys, order ID)
     wa.ts                   # WhatsApp URL builder
     paper-sizes.ts          # Ukuran kertas + imposition math
     pricing.ts              # Kalkulasi harga produk
-    order-storage.ts        # Persistensi order (Upstash Redis, fallback in-memory)
+    order-storage.ts        # Persistensi order (Upstash Redis; pending TTL 30d, terminal permanen; fallback in-memory dev-only)
     notification.ts         # Notifikasi WA admin pasca-order
+    admin-auth.ts           # Basic Auth admin (fail-closed)
+    redis.ts                # Shared Upstash client (null saat env kosong)
+    schemas.ts              # Zod schemas semua API routes
     tracking.ts             # Meta Pixel / GA helpers
 ```
 
@@ -132,6 +141,13 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 # Notifikasi admin (WA click-to-chat)
 ADMIN_WHATSAPP_NUMBER=6281299435019
+
+# Opsional: webhook outbound untuk alert real-time (n8n/Make/Telegram/Sheets)
+ADMIN_NOTIFY_WEBHOOK_URL=""
+
+# Admin dashboard (Basic Auth — fail-closed kalau kosong)
+ADMIN_USERNAME=""
+ADMIN_PASSWORD=""
 
 # Midtrans
 MIDTRANS_SERVER_KEY=""
@@ -149,8 +165,8 @@ BLOB_READ_WRITE_TOKEN=""
 META_PIXEL_ID=""
 GOOGLE_ANALYTICS_ID=""
 
-# Google Maps embed
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
+# Google Search Console (opsional)
+GOOGLE_SITE_VERIFICATION=""
 ```
 
 ## Running
@@ -194,8 +210,9 @@ Katalog awal di `docs/ketentuan-produk-bisaprint.docx` akan dimigrasikan ke `src
 ## Payment & Checkout
 - Midtrans Snap untuk checkout produk yang `isCheckoutEnabled: true`.
 - Webhook Midtrans untuk update status pembayaran dan notifikasi WhatsApp admin.
-- File desain max 10MB, format PDF/PNG/JPG.
-- Order data tersimpan sementara di memory/store sederhana di MVP (bisa dipindah ke DB v2).
+- File desain max 10MB, format PDF/PNG/JPG/WEBP.
+- Order tersimpan di Upstash Redis (persistent): status `pending` TTL 30 hari (auto-clean abandoned), status terminal permanen. Dev tanpa env = in-memory; production tanpa env = write ditolak (fail-closed).
+- Admin dashboard `/admin/orders` (Basic Auth): list order, update status produksi, export CSV.
 
 ## Milestones
 
@@ -205,15 +222,15 @@ Katalog awal di `docs/ketentuan-produk-bisaprint.docx` akan dimigrasikan ke `src
 - WhatsApp integration
 - Branding & styling
 
-### Milestone 2 — IN PROGRESS 🚧
+### Milestone 2 — DONE ✅
 - Checkout flow via Midtrans
 - Upload file design
 - Order confirmation page
 - Webhook notifikasi admin
+- Admin dashboard `/admin/orders` (Basic Auth, status produksi, export CSV)
 
 ### Milestone 3 — BACKLOG 📝
-- Admin dashboard / production
-- Order history
+- Order history (customer-facing)
 - User account
 - CMS untuk produk
 - Shipping cost integration

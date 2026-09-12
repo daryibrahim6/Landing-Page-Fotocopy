@@ -6,11 +6,16 @@ import { redis } from "@/lib/redis";
 
 if (!redis) {
   console.warn(
-    "[order-storage] UPSTASH_REDIS_* not set — orders stored in-memory (non-persistent, per-instance). Set env vars for production.",
+    "[order-storage] UPSTASH_REDIS_* not set — orders stored in-memory (non-persistent, per-instance). " +
+      "In production, order writes are refused; set env vars.",
   );
 }
 
-const ORDER_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days — covers production window, auto-cleans abandoned orders
+// TTL applies only while an order is `pending`: abandoned checkouts auto-clean
+// when the Midtrans expire webhook never arrives (e.g. simulation orders).
+// Terminal orders (paid/cancelled/expired) are written WITHOUT TTL — they are
+// business records and must persist for rekap/reporting.
+const PENDING_ORDER_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
 // Terminal statuses: once reached, webhook notifications must not regress the order.
 // paid/expired/cancelled are final; only "pending" may transition.
@@ -66,19 +71,31 @@ export interface StoredOrder {
 
 const memoryStore = new Map<string, StoredOrder>();
 
+// True when orders persist (Upstash). The admin dashboard surfaces a warning
+// when this is false so an in-memory deployment never looks "empty but fine".
+export function isPersistentStorage(): boolean {
+  return redis !== null;
+}
+
 export async function saveOrder(order: StoredOrder): Promise<void> {
-  if (redis) {
-    await redis.set(`order:${order.id}`, JSON.stringify(order), { ex: ORDER_TTL_SECONDS });
-    await redis.set(`order:midtrans:${order.payment.midtransOrderId}`, order.id, {
-      ex: ORDER_TTL_SECONDS,
-    });
-    await redis.zadd(ORDER_INDEX_KEY, {
-      score: Date.parse(order.createdAt),
-      member: order.id,
-    });
-  } else {
+  if (!redis) {
+    if (process.env.NODE_ENV === "production") {
+      // Fail loud: in-memory orders are per-instance on serverless — a webhook
+      // hitting another instance would never find them. Better to error the
+      // checkout (client falls back to WA) than to silently lose paid orders.
+      throw new Error("[order-storage] UPSTASH_REDIS_* not configured — refusing order write in production");
+    }
     memoryStore.set(order.id, order);
+    return;
   }
+  const pendingTtl =
+    order.payment.status === "pending" ? { ex: PENDING_ORDER_TTL_SECONDS } : undefined;
+  await redis.set(`order:${order.id}`, JSON.stringify(order), pendingTtl);
+  await redis.set(`order:midtrans:${order.payment.midtransOrderId}`, order.id, pendingTtl);
+  await redis.zadd(ORDER_INDEX_KEY, {
+    score: Date.parse(order.createdAt),
+    member: order.id,
+  });
 }
 
 export async function getOrder(id: string): Promise<StoredOrder | null> {

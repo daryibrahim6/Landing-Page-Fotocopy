@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   saveOrder,
   getOrder,
@@ -131,6 +131,22 @@ describe("listOrders — newest-first pagination", () => {
     const res = await listOrders(1, 1_000_000);
     expect(res.orders).toHaveLength(0);
     expect(res.nextCursor).toBeNull();
+  });
+});
+
+describe("saveOrder — production guard", () => {
+  it("refuses writes when Redis is unconfigured in production", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    try {
+      await expect(saveOrder(makeOrder("BSP-PROD-1"))).rejects.toThrow(/UPSTASH/);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("still writes to memory store outside production", async () => {
+    await saveOrder(makeOrder("BSP-DEV-1"));
+    expect(await getOrder("BSP-DEV-1")).toMatchObject({ id: "BSP-DEV-1" });
   });
 });
 

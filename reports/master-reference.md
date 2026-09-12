@@ -29,7 +29,8 @@
 - Framer Motion
 - Midtrans Snap
 - `next/image` wajib, WebP preferred
-- `next/font` (Fredoka display, Poppins body)
+- `next/font` (Plus Jakarta Sans display, Poppins body)
+- Upstash Redis (order persistence; pending TTL 30d, terminal permanen) + Vercel Blob (file upload)
 
 ## Folder Conventions
 
@@ -55,7 +56,10 @@
 - `src/app/api/midtrans/webhook/route.ts` — Payment notification
 - `src/data/products.ts` — Product catalog
 - `src/lib/wa.ts` — WhatsApp URL builder
-- `src/lib/schemas.ts` — Zod schemas validasi API routes (create-token, webhook, orderId)
+- `src/lib/schemas.ts` — Zod schemas validasi API routes (create-token, webhook, orderId, admin)
+- `src/lib/order-storage.ts` — Order persistence + `listOrders` + `production.status`
+- `src/lib/admin-auth.ts` + `src/proxy.ts` — Basic Auth gate `/admin` + `/api/admin` (fail-closed)
+- `src/app/api/admin/orders/export/route.ts` — Export CSV semua order (rekap)
 - `.env.local.example` — Environment template (tracked; isi placeholder)
 
 ## Design Tokens
@@ -89,7 +93,7 @@ Flow BisaPrint (5). Detail status: `reports/status.md`. Audit per-flow: `reports
 | 2 | `checkout-flow` | Core | `/checkout` → Midtrans Snap → `/checkout/success`; API `create-token`, `webhook`; upload file |
 | 3 | `whatsapp-notification-flow` | Core | WA deep-link builder, notifikasi admin pasca-order/webhook |
 | 4 | `design-simulator-flow` | Core | Simulator layout A3 (`/simulator` + floating panel), imposition math `paper-sizes.ts`, export PNG/PDF |
-| 5 | `production-dashboard-flow` | Supporting | Admin dashboard produksi — BACKLOG v2, belum dibangun |
+| 5 | `production-dashboard-flow` | Supporting | Admin dashboard produksi — dibangun: `/admin/orders` + `/api/admin/orders` (list, status produksi, export CSV; Basic Auth) |
 
 ## Rules Reference
 

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "@/lib/redis";
 import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
 import { saveOrder, type StoredOrder } from "@/lib/order-storage";
 import { notifyAdminNewOrder, dispatchAdminNotification } from "@/lib/notification";
@@ -6,8 +8,29 @@ import { createTokenBodySchema } from "@/lib/schemas";
 import { calculatePrice } from "@/lib/pricing";
 import { products } from "@/data/products";
 
+// Rate limit token creation per IP when Redis is configured (same policy as
+// /api/upload): blocks order-spam that would mint junk Midtrans transactions.
+// Local dev without UPSTASH_* falls through unlimited.
+const ratelimit = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "10 m") })
+  : null;
+
 export async function POST(request: Request) {
   try {
+    if (ratelimit) {
+      const ip =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+        request.headers.get("x-real-ip") ??
+        "anonymous";
+      const { success } = await ratelimit.limit(`create-token:${ip}`);
+      if (!success) {
+        return NextResponse.json(
+          { error: "Terlalu banyak percobaan. Coba lagi nanti, atau order via WhatsApp." },
+          { status: 429 },
+        );
+      }
+    }
+
     const parsed = createTokenBodySchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(

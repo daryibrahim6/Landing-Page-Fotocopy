@@ -33,15 +33,18 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 
 ## Recently Completed
 
+- **12 Sep 2026 (sore)** — Ops hardening pass: order TTL hanya `pending` (terminal permanen — fix data-loss CF-A-32), `saveOrder` fail-fast di production tanpa Upstash (CF-A-24 upgraded), rate limit `create-token` 10/10m per IP (CF-A-33), export CSV `GET /api/admin/orders/export` + tombol admin (PD-A-06), banner in-memory di dashboard, `@vercel/kv` dihapus, env admin lokal diisi, docs sync (PROJECT/master-reference/milestones). 148/148 tests.
 - **12 Sep 2026** — Migrasi workflow infra dari project lain: rules `.devin/` di-sync, `reports/` di-rebuild untuk flow BisaPrint, Playwright config terpasang (spec belum ada), konten referensi project lama diarsipkan ke `_archive/`. Audit di-split per-flow (5 file). **CF-A-10 FIXED**: Zod schemas di semua API routes (`src/lib/schemas.ts`). Coverage: `@vitest/coverage-v8` + config — `src/lib` 88.19% (46 tests pass).
 - Audit per-flow di `reports/audit/` (5 file). Audit gabungan historis di `reports/archive/`.
 
 ## Open Items
 
 1. **E2E Playwright** — infra ter-setup (`@playwright/test`, `playwright.config.ts`, `e2e/smoke.spec.ts`, chromium terinstall). Spec per-flow ditulis di sesi E2E tersendiri — **belum pernah di-run**.
-2. **Production dashboard** — backlog v2 (`PD-A-01`).
-3. **Pricing matrix depth** — multipliers ada (`src/lib/pricing.ts`), tapi belum per-produk granular untuk semua finishing; admin konfirmasi via WA tetap jalur final.
-4. **WA Business API** — notifikasi otomatis ke customer (sekarang WA click-to-chat URL ke admin via `logNotification`).
-5. **Design simulator ekspansi** — preflight/print layout untuk produk non-stiker (`DS-A-01`, RESOLVED-BY-DESIGN untuk MVP).
-6. **Consent banner + privacy page** (LP-A-23, DEFERRED) — Pixel/GA fire tanpa opt-in; implement saat scale/mulai ads.
-7. **Foto portfolio asli** (LP-A-09, ACK) — section tetap tampil dengan placeholder; user supply foto nanti.
+2. **Pricing matrix depth** — multipliers ada (`src/lib/pricing.ts`), tapi belum per-produk granular untuk semua finishing; admin konfirmasi via WA tetap jalur final.
+3. **WA Business API** — notifikasi otomatis ke customer (sekarang WA click-to-chat URL ke admin via `logNotification`).
+4. **Design simulator ekspansi** — preflight/print layout untuk produk non-stiker (`DS-A-01`, RESOLVED-BY-DESIGN untuk MVP).
+5. **Consent banner + privacy page** (LP-A-23, DEFERRED) — Pixel/GA fire tanpa opt-in; implement saat scale/mulai ads.
+6. **Foto portfolio asli** (LP-A-09, ACK) — section tetap tampil dengan placeholder; user supply foto nanti.
+7. **Env produksi** — `UPSTASH_REDIS_*`, `BLOB_READ_WRITE_TOKEN`, `MIDTRANS_*`, `ADMIN_*` wajib diisi di environment deploy; lokal sudah ada kredensial admin dev.
+8. **Backup order → Google Sheets** (opsional) — `ADMIN_NOTIFY_WEBHOOK_URL` → n8n/Make → Sheets; env ada, butuh setup external.
+9. **Migrasi DB relasional** (Supabase/dsb) — ditunda; re-evaluasi saat butuh order history multi-tahun / customer account / CMS produk.

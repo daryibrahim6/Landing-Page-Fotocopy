@@ -300,3 +300,27 @@ Keputusan user (all recommended): scope semua 19 · CF-A-11 server recompute · 
 | Test terlihat shallow/lemah? | **Tidak** — route-level tests ada untuk money path; assertion verify state & side-effect (fetch body, stored order), bukan sekadar exercise |
 | Temuan UI/UX belum fix? | **Tidak** — CF-A-29 (status label) FIXED di Tahap 2; sisa UX review = Track C terpisah |
 | Fix berdampak ke flow lain? | **Ya → cross-flow: `whatsapp-notification-flow`** — signature `adminNewOrder` +1 arg (`file`), diverifikasi: `notification.test.ts` pass + build hijau. Tidak ada consumer lain (grep `buildAdminWAUrl` hanya `notification.ts`). |
+
+---
+
+## Hardening Pass (2026-09-12 sore — post-CLEAR ops review)
+
+### CF-A-32 — P1 — TTL 30 hari menghapus order terminal (data loss bisnis)
+
+- **Skenario:** `ORDER_TTL_SECONDS = 30d` dipasang di **semua** write `saveOrder` (order + midtrans index key). Order `paid`/`cancelled`/`expired` ikut terhapus 30 hari setelah write terakhir → tidak ada arsip order, rekap bulanan, atau bukti dispute. CF-A-26 menambahkan TTL untuk auto-clean order `pending` yang di-abandon — benar untuk pending, salah untuk terminal.
+- **Bukti:** `order-storage.ts` — `redis.set(..., { ex: ORDER_TTL_SECONDS })` unconditional.
+- **Risiko:** rekam bisnis hilang by-design; admin tidak bisa rekap order >30 hari.
+- **Solusi diterapkan:** TTL hanya saat `payment.status === "pending"`; write status terminal tanpa `ex` → permanen. `order:index` (zset) memang tidak pernah di-TTL.
+- **Status:** FIXED (12 Sep sore).
+
+### CF-A-33 — P2 — `create-token` tanpa rate limit
+
+- **Skenario:** siapapun bisa POST berulang → minta transaksi Midtrans + order pending + notif admin tanpa batas. `/api/upload` sudah di-rate-limit (CF-A-19), endpoint uangnya belum.
+- **Bukti:** `create-token/route.ts` — tidak ada guard.
+- **Solusi diterapkan:** `Ratelimit.slidingWindow(10, "10 m")` per IP saat Redis dikonfigurasi (pola sama dengan upload); 429 + pesan WA fallback.
+- **Status:** FIXED (12 Sep sore). Rate limit tidak di-unit-test (butuh Redis mock) — perilaku diverifikasi manual di code, sama seperti upload.
+
+### CF-A-24 — upgraded (P3 → guard penuh)
+
+- Status lama: warn-once saja. **Sekarang:** `saveOrder` throw saat `NODE_ENV === "production" && !redis` — order tidak bisa "sukses tapi hilang"; CheckoutForm menangkap error → pesan inline + WA fallback tetap jalan. Read paths (`getOrder`, `listOrders`) tetap graceful (null/empty). Banner peringatan in-memory ditambahkan di `/admin/orders`.
+- **Status:** FIXED upgraded (12 Sep sore) — test `refuses writes when Redis is unconfigured in production` + `still writes to memory store outside production`.

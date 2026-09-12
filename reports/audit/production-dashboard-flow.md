@@ -178,10 +178,24 @@
 | Temuan UI/UX sisa? | Tidak — Track C opsional kalau mau polish |
 | Dampak ke flow lain? | Ya — `order-storage.ts` shared dengan checkout-flow; `saveOrder` kini juga `zadd` index → **cross-flow verified: webhook + create-token tests tetap hijau (143/143)** |
 
+## Hardening Pass (2026-09-12 sore)
+
+#### PD-A-06 — Admin tidak bisa ekspor/rekap data order
+
+- **Severity:** P2
+- **Skenario:** Dashboard menampilkan order tapi tidak ada cara membawa data keluar (rekap Excel, laporan, arsip). Sebelumnya diperparah TTL 30 hari (CF-A-32) yang menghapus order terminal — kombinasi = tidak ada arsip sama sekali.
+- **Bukti:** `src/app/admin/orders/page.tsx` — hanya list + status.
+- **Solusi:** `GET /api/admin/orders/export` — CSV semua order (loop cursor `listOrders`, BOM UTF-8 untuk Excel, `Content-Disposition` attachment, `no-store`) + tombol "Export CSV" di halaman. Auth: `isAdminRequest` sama seperti route admin lain.
+- **Status:** FIXED — `src/app/api/admin/orders/export/route.ts` + `export/route.test.ts` (3 tests: 401, CSV shape, escaping koma/kutip).
+
+#### Catatan cross-flow
+
+- `order-storage.ts` (shared dengan checkout-flow): `isPersistentStorage()` baru → banner peringatan di `/admin/orders` saat mode in-memory. TTL sekarang hanya untuk `pending` (CF-A-32) — order terminal permanen, jadi export CSV mencakup seluruh riwayat.
+
 ## Rekap
 
 | Severity | Count | IDs |
 |---|---|---|
 | P0 | 1 | PD-A-01 (FIXED — dashboard built) |
-| P2 | 2 | PD-A-03 (FIXED — visibility via dashboard; push-alert env tetap opsional), PD-A-04 (FIXED — contract fulfilled) |
+| P2 | 3 | PD-A-03 (FIXED — visibility via dashboard; push-alert env tetap opsional), PD-A-04 (FIXED — contract fulfilled), PD-A-06 (FIXED — export CSV) |
 | P4 | 2 | PD-A-02 (FIXED — dead dir dihapus), PD-A-05 (ACK — accepted surface) |
