@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
 import { saveOrder, type StoredOrder } from "@/lib/order-storage";
-import { notifyAdminNewOrder, logNotification } from "@/lib/notification";
+import { notifyAdminNewOrder, dispatchAdminNotification } from "@/lib/notification";
 import { createTokenBodySchema } from "@/lib/schemas";
 import { calculatePrice } from "@/lib/pricing";
 import { products } from "@/data/products";
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     };
 
     await saveOrder(order);
-    logNotification(notifyAdminNewOrder(order));
+    await dispatchAdminNotification(() => notifyAdminNewOrder(order));
 
     if (!serverKey) {
       return NextResponse.json({

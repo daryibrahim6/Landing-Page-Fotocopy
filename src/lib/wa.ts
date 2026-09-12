@@ -1,5 +1,7 @@
-const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281299435019";
-const ADMIN_WA_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || WA_NUMBER;
+import { WA_NUMBER } from "@/lib/constants";
+
+// Admin recipient: dedicated env, falls back to the public business number.
+export const ADMIN_WA_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || WA_NUMBER;
 
 export type WATemplate = "general" | "fromProduct" | "postCheckout" | "adminNewOrder" | "adminPaidOrder";
 
@@ -20,7 +22,13 @@ export function buildWAUrl(template: WATemplate, ...args: string[]): string {
   const tpl = templates[template];
   const text =
     typeof tpl === "function" ? (tpl as (...a: string[]) => string)(...args) : tpl;
-  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+  // Invalid/unknown template key must never emit "undefined" as the message —
+  // fall back to the general template instead.
+  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text ?? templates.general)}`;
+}
+
+export function waCustomUrl(message: string): string {
+  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
 export function isConsultationFormComplete(fields: {

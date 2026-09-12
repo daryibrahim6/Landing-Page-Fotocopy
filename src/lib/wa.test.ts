@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildWAUrl, buildWAFormUrl, isConsultationFormComplete, templates } from "./wa";
+import { buildWAUrl, buildWAFormUrl, waCustomUrl, isConsultationFormComplete, templates } from "./wa";
 
 describe("buildWAUrl", () => {
   it("builds general template URL", () => {
@@ -16,6 +16,21 @@ describe("buildWAUrl", () => {
   it("builds postCheckout URL with order id", () => {
     const url = buildWAUrl("postCheckout", "BSP-123");
     expect(url).toContain("BSP-123");
+  });
+
+  it("falls back to general template for unknown template key", () => {
+    // @ts-expect-error — deliberately pass an invalid key
+    const url = buildWAUrl("bogusTemplate");
+    expect(url).not.toContain("undefined");
+    expect(url).toContain(encodeURIComponent(templates.general as string));
+  });
+});
+
+describe("waCustomUrl", () => {
+  it("encodes a custom message", () => {
+    const url = waCustomUrl("Halo, order saya: BSP-9");
+    expect(url).toMatch(/^https:\/\/wa\.me\/\d+\?text=/);
+    expect(url).toContain(encodeURIComponent("Halo, order saya: BSP-9"));
   });
 });
 

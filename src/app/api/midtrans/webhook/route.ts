@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getOrderByMidtransOrderId, saveOrder, updateOrderStatus } from "@/lib/order-storage";
-import { notifyAdminPaidOrder, logNotification } from "@/lib/notification";
+import { notifyAdminPaidOrder, dispatchAdminNotification } from "@/lib/notification";
 import { midtransWebhookBodySchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     const applied =
       order && order.payment.status === orderStatus && prevStatus !== orderStatus;
     if (applied && orderStatus === "paid") {
-      logNotification(notifyAdminPaidOrder(order));
+      await dispatchAdminNotification(() => notifyAdminPaidOrder(order));
     } else if (applied) {
       console.log(`[Midtrans Webhook] Order ${order_id}: status changed to ${orderStatus}`);
     } else if (!order) {

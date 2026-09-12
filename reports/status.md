@@ -25,7 +25,7 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | landing-page-flow | Core | Done (v2) | Done (v2) | Done | Done | N/A | Track B (opsional: component test jsdom) | Track C (opsional: polish) | CLEAR | 2026-09-12 | Track A v2 Tahap 0-3 lengkap: 16 temuan (14 FIXED, 1 ACK, 1 DEFERRED, 0 OPEN) + 100 unit tests (sitemap/robots/data-integrity/validation). Track Gate: E2E=Nanti, cross-flow checkout verified. |
 | checkout-flow | Core | Done | Done (v2) | Done | Done | N/A | Track B (opsional: component test) | N/A | CLEAR | 2026-09-12 | Track A v2 lengkap (Tahap 0-3): 19 temuan FIXED + route-level unit tests (72 pass total). Track Gate: E2E=Nanti (money path, kandidat #1), Track C tidak perlu, cross-flow whatsapp-notification diverifikasi. |
-| whatsapp-notification-flow | Core | Done (v2) | Done (v2) | Belum | Done | N/A | Track B (opsional) | N/A | ADA ISU | 2026-09-12 | Track A v2 Tahap 0+1: scope frozen + 6 temuan (WA-A-03 dua sumber WA_NUMBER, WA-A-04 notif admin console-only — keputusan channel, WA-A-05..08). Menunggu approval Tahap 2. |
+| whatsapp-notification-flow | Core | Done (v2) | Done (v2) | Done | Done | N/A | Track B (opsional) | N/A | ADA ISU | 2026-09-12 | Track A v2 Tahap 0–2: 6 temuan semua FIXED (WA-A-04 → webhook env `ADMIN_NOTIFY_WEBHOOK_URL`, user approved). 107/107 tests. Menunggu Tahap 3 track gate. |
 | design-simulator-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Build, lint, test clean (`paper-sizes.test.ts`). Re-audit v2 pending. |
 | production-dashboard-flow | Supporting | Done | Done | Belum | Belum | N/A | N/A | N/A | BACKLOG | 2026-09-08 | v2 — belum dibangun. |
 

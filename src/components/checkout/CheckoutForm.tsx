@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ShoppingCart, CreditCard, MessageCircle, Check, Upload, FileText, X } from "lucide-react";
 import { products } from "@/data/products";
 import { cn, formatRupiah } from "@/lib/utils";
-import { buildWAUrl } from "@/lib/wa";
+import { buildWAUrl, waCustomUrl } from "@/lib/wa";
 import { isMidtransConfigured } from "@/lib/midtrans";
 import { trackPurchase, trackEvent } from "@/lib/tracking";
 import { calculatePrice } from "@/lib/pricing";
@@ -219,7 +219,7 @@ export function CheckoutForm() {
     trackEvent("Lead", { source: "checkout-wa", product: product.id });
     const fileInfo = fileUrl ? `\nFile: ${fileUrl}` : "";
     const msg = `Halo Admin Bisa Print, saya mau order.\nProduk: ${product.name}\nUkuran: ${form.size}\nBahan: ${form.material}\nFinishing: ${form.finishing}\nJumlah: ${form.quantity}\nNama: ${form.name}\nNo. WA: ${form.phone}\nPengambilan: ${form.pickup}${form.pickup === "kirim" ? `\nAlamat: ${form.address}` : ""}\nCatatan: ${form.notes}${fileInfo}`;
-    window.open(buildWAUrl("general").split("?text=")[0] + "?text=" + encodeURIComponent(msg), "_blank");
+    window.open(waCustomUrl(msg), "_blank");
     setSubmitted(true);
   }, [product, form, fileUrl, validate]);
 

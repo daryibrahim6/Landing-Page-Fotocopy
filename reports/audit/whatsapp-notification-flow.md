@@ -1,9 +1,10 @@
 # Audit — whatsapp-notification-flow
 
 **Tier:** Core | **Prefix ID:** `WA`
-**Status:** Track A Tahap 0+1 selesai (re-audit v2) — **6 temuan** (5 OPEN, 1 butuh keputusan produk).
+**Status:** Track A Tahap 2 selesai — **6 temuan** (6 FIXED, 0 OPEN).
 
 **Tanggal re-audit:** sesi terbaru — audit formal v2 pertama (carry-over WA-A-01/02 diverifikasi ulang).
+**Tanggal fix:** sesi terbaru — semua temuan difix, WA-A-04 diputuskan opsi A (webhook outbound env) oleh user delegation.
 
 ---
 
@@ -75,7 +76,7 @@
   - (b) Hapus env support di wa.ts (selalu constants) — mundur, env-override hilang.
 - **Rekomendasi Devin:** (a) — `constants.ts` jadi satu-satunya sumber + baca env; `wa.ts` dan `buildAdminWAUrl` (`ADMIN_WA_NUMBER` env → fallback `WA_NUMBER`) tetap di wa.ts tapi import nomor dari constants.
 - **Future gap tag:** cross-flow, security (misconfig)
-- **Status:** OPEN
+- **Status:** FIXED — `constants.ts` WA_NUMBER kini `process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "6281299435019"`; `wa.ts` import dari constants (single source, env-overridable).
 
 ---
 
@@ -92,7 +93,7 @@
   - (d) WA Business API via BSP resmi (Qiscus dsb) — proper tapi ~Rp750rb+/bln + template approval — berat untuk skala ini.
 - **Rekomendasi Devin:** **(b)** — webhook outbound opsional = delivery nyata hari ini, zero dependency, upgradeable ke WA API nanti. (c) aktif tidak disarankan (risiko ban + keamanan). **Butuh keputusan user.**
 - **Future gap tag:** monitoring, infra
-- **Status:** OPEN — keputusan produk
+- **Status:** FIXED — user memilih opsi (b). `dispatchAdminNotification(build)` baru di `notification.ts`: selalu log + POST payload ke `ADMIN_NOTIFY_WEBHOOK_URL` (opsional, timeout 5s) bila diset. Awaited tapi never-throws → aman untuk serverless dan tidak bisa gagalkan request. Call sites: `create-token/route.ts:82`, `webhook/route.ts:100`. Env didokumentasikan di `.env.local.example`.
 
 ---
 
@@ -105,7 +106,7 @@
 - **Opsi:** (a) resolve recipient dari sumber yang sama dengan URL builder (export `ADMIN_WA_NUMBER` resolve). (b) Biarkan.
 - **Rekomendasi Devin:** (a) — konsistensi payload.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — `wa.ts` kini export `ADMIN_WA_NUMBER` (env → fallback WA_NUMBER); `recipient` di kedua notify builder pakai itu → recipient selalu match nomor di URL.
 
 ---
 
@@ -118,7 +119,7 @@
 - **Opsi:** (a) Tambah `waCustomUrl(message)` di `wa.ts` — satu helper untuk pesan kustom. (b) Biarkan.
 - **Rekomendasi Devin:** (a) — 5 baris, hilangkan duplikasi encode logic.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — `waCustomUrl(message)` helper baru di `wa.ts`; `CheckoutForm.tsx:222` pakai helper, split-hack dihapus.
 
 ---
 
@@ -131,7 +132,7 @@
 - **Opsi:** (a) Type `templates: Record<WATemplate, ...>` + runtime guard `if (!tpl) return waUrl()`. (b) Biarkan (TS melindungi caller internal).
 - **Rekomendasi Devin:** (a) — 2 baris guard, murah.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — `buildWAUrl` kini `encodeURIComponent(text ?? templates.general)` — template invalid jatuh ke general, tidak pernah emit "undefined". Regression test `wa.test.ts` (key bogus → general fallback).
 
 ---
 
@@ -144,7 +145,7 @@
 - **Opsi:** (a) Bungkus emit notif dalam try/catch sendiri (fire-and-forget). (b) Biarkan.
 - **Rekomendasi Devin:** (a) — sesuai business rule scope ("kegagalan notifikasi tidak boleh gagalkan request").
 - **Future gap tag:** infra
-- **Status:** OPEN
+- **Status:** FIXED — `dispatchAdminNotification` menerima lazy builder `() => AdminNotification` di dalam try/catch → builder throw ATAU webhook fetch throw keduanya tertangkap, request tidak terpengaruh. Tested: builder-throw dan fetch-fail keduanya resolve tanpa melempar.
 
 ---
 
@@ -179,11 +180,26 @@
 
 ## Rekap
 
-| Severity | Count | IDs |
-|---|---|---|
-| P1 | 1 | WA-A-04 (keputusan produk) |
-| P2 | 1 | WA-A-03 |
-| P3 | 1 | WA-A-05 |
-| P4 | 3 | WA-A-06, WA-A-07, WA-A-08 |
+| Severity | Count | IDs | Status |
+|---|---|---|---|
+| P1 | 1 | WA-A-04 | FIXED (opsi webhook env — user approved) |
+| P2 | 1 | WA-A-03 | FIXED |
+| P3 | 1 | WA-A-05 | FIXED |
+| P4 | 3 | WA-A-06, WA-A-07, WA-A-08 | FIXED |
 
-**Total OPEN: 6** — 1 butuh keputusan (WA-A-04 opsi channel notif), 5 fixable langsung.
+**Total: 6 FIXED, 0 OPEN.**
+
+## Tahap 2 Fix Log
+
+| File | Perubahan |
+|---|---|
+| `src/lib/constants.ts` | `WA_NUMBER` env-driven (`NEXT_PUBLIC_WHATSAPP_NUMBER` fallback) — single source |
+| `src/lib/wa.ts` | Import `WA_NUMBER` dari constants · export `ADMIN_WA_NUMBER` · `waCustomUrl()` helper · guard template invalid → general |
+| `src/lib/notification.ts` | `recipient` = `ADMIN_WA_NUMBER` resolved · `dispatchAdminNotification(build)` baru: log + optional `ADMIN_NOTIFY_WEBHOOK_URL` POST (5s timeout), never-throws |
+| `src/app/api/midtrans/create-token/route.ts` | `logNotification(notify…)` → `await dispatchAdminNotification(() => notify…)` |
+| `src/app/api/midtrans/webhook/route.ts` | Sama — notify lewat dispatch guarded |
+| `src/components/checkout/CheckoutForm.tsx` | Split-hack → `waCustomUrl(msg)` |
+| `.env.local.example` | + `ADMIN_NOTIFY_WEBHOOK_URL` |
+| Tests | +7 (dispatch webhook POST/skip/never-throws, recipient match, waCustomUrl, template guard); webhook route tests diupdate mock `dispatchAdminNotification` |
+
+**Verifikasi Tahap 2:** `tsc` clean · `eslint` 0 problems · `vitest` **107/107** (100→107) · webhook route tests disesuaikan (mock `dispatchAdminNotification`, assertion count sama).

@@ -1,6 +1,7 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://bisaprint.com";
-export const WA_NUMBER = "6281299435019";
+export const WA_NUMBER =
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "6281299435019";
 export const IG_URL = "https://instagram.com/bisaprintshop";
 export const SHOPEE_URL = "https://shopee.co.id/bisaprintshop";
 export const EMAIL_URL = "mailto:bisadigitalprint@gmail.com";

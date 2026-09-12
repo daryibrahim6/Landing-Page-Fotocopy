@@ -11,11 +11,11 @@ vi.hoisted(() => {
 
 vi.mock("@/lib/notification", async (importOriginal) => {
   const mod = await importOriginal<typeof import("@/lib/notification")>();
-  return { ...mod, logNotification: vi.fn() };
+  return { ...mod, dispatchAdminNotification: vi.fn() };
 });
 
 import { POST } from "./route";
-import { logNotification } from "@/lib/notification";
+import { dispatchAdminNotification } from "@/lib/notification";
 import { saveOrder, getOrderByMidtransOrderId } from "@/lib/order-storage";
 
 const SERVER_KEY = "test-server-key";
@@ -133,30 +133,30 @@ describe("POST /api/midtrans/webhook", () => {
   });
 
   it("does not re-notify admin when a webhook carries the same status twice", async () => {
-    vi.mocked(logNotification).mockClear();
+    vi.mocked(dispatchAdminNotification).mockClear();
     await saveOrder(makeOrder("BSP-W8-HHH"));
     await postJson(signedPayload("BSP-W8-HHH", "settlement"));
     await postJson(signedPayload("BSP-W8-HHH", "settlement"));
-    expect(vi.mocked(logNotification).mock.calls.length).toBe(1);
+    expect(vi.mocked(dispatchAdminNotification).mock.calls.length).toBe(1);
   });
 
   it("does not notify when a regression is blocked", async () => {
-    vi.mocked(logNotification).mockClear();
+    vi.mocked(dispatchAdminNotification).mockClear();
     await saveOrder(makeOrder("BSP-W9-III"));
     await postJson(signedPayload("BSP-W9-III", "settlement"));
     await postJson(signedPayload("BSP-W9-III", "expire"));
     // settlement notifies once; the blocked expire must not fire another notification
-    expect(vi.mocked(logNotification).mock.calls.length).toBe(1);
+    expect(vi.mocked(dispatchAdminNotification).mock.calls.length).toBe(1);
   });
 
   it("does not send a 'new order' notification for expire transitions", async () => {
-    vi.mocked(logNotification).mockClear();
+    vi.mocked(dispatchAdminNotification).mockClear();
     await saveOrder(makeOrder("BSP-W10-JJJ"));
     const res = await postJson(signedPayload("BSP-W10-JJJ", "expire"));
     expect(res.status).toBe(200);
     expect((await getOrderByMidtransOrderId("BSP-W10-JJJ"))?.payment.status).toBe("expired");
     // expire is logged server-side, but admin gets no notification (new-order
     // was already sent at create-token; there is no expire template)
-    expect(vi.mocked(logNotification).mock.calls.length).toBe(0);
+    expect(vi.mocked(dispatchAdminNotification).mock.calls.length).toBe(0);
   });
 });
