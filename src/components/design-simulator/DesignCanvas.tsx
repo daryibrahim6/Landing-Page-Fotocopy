@@ -241,32 +241,51 @@ export function DesignCanvas({
               );
             })}
 
-          {/* Ghost copies */}
-          {ghosts.map((ghost, i) => (
-            <Rect
-              key={`ghost-${i}`}
-              x={(containerSize.width - paperWidthPx) / 2 + ghost.x}
-              y={(containerSize.height - paperHeightPx) / 2 + ghost.y}
-              width={ghost.w}
-              height={ghost.h}
-              fill="#DE127A"
-              opacity={i === 0 ? 0 : 0.08}
-              cornerRadius={2}
-            />
-          ))}
+          {/* Design tiled into every imposition cell — preview shows the
+              real uploaded design repeated across the sheet, not ghost
+              placeholders. Cell 0 stays transformable; the rest are static
+              copies following the same size. */}
+          {loadedImage &&
+            (ghosts.length > 0
+              ? ghosts.map((ghost, i) => (
+                  <Group
+                    key={`cell-${i}`}
+                    x={(containerSize.width - paperWidthPx) / 2 + ghost.x + ghost.w / 2}
+                    y={(containerSize.height - paperHeightPx) / 2 + ghost.y + ghost.h / 2}
+                    rotation={ghost.rotated ? 90 : 0}
+                    listening={i === 0}
+                  >
+                    <KonvaImage
+                      ref={i === 0 ? imageRef : undefined}
+                      image={loadedImage}
+                      width={designPxW}
+                      height={designPxH}
+                      offsetX={designPxW / 2}
+                      offsetY={designPxH / 2}
+                      onTransformEnd={i === 0 ? handleTransformEnd : undefined}
+                    />
+                  </Group>
+                ))
+              : (
+                  <Group
+                    x={containerSize.width / 2}
+                    y={containerSize.height / 2}
+                  >
+                    <KonvaImage
+                      ref={imageRef}
+                      image={loadedImage}
+                      width={designPxW}
+                      height={designPxH}
+                      offsetX={designPxW / 2}
+                      offsetY={designPxH / 2}
+                      onTransformEnd={handleTransformEnd}
+                    />
+                  </Group>
+                ))}
 
-          {/* Main design */}
-          {imageDimensions.width > 0 && (
+          {/* Main design transformer (attached to cell 0) */}
+          {imageDimensions.width > 0 && loadedImage && (
             <Group>
-              <KonvaImage
-                ref={imageRef}
-                x={(containerSize.width - paperWidthPx) / 2 + (paperWidthPx - designPxW) / 2}
-                y={(containerSize.height - paperHeightPx) / 2 + (paperHeightPx - designPxH) / 2}
-                image={loadedImage}
-                width={designPxW}
-                height={designPxH}
-                onTransformEnd={handleTransformEnd}
-              />
               <Transformer
                 ref={transformerRef}
                 rotateEnabled={false}

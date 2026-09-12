@@ -54,10 +54,10 @@ describe("POST /api/midtrans/create-token", () => {
   it("rejects products with isCheckoutEnabled=false", async () => {
     const res = await postJson({
       ...VALID_BODY,
-      productId: "poster", // isCheckoutEnabled: false in products.ts
-      size: "A3",
-      material: "Art Paper 120gsm",
-      finishing: "Glossy",
+      productId: "packaging", // isCheckoutEnabled: false in products.ts
+      size: "Custom",
+      material: "Art Carton 250gsm",
+      finishing: "Laminasi",
     });
     expect(res.status).toBe(400);
     expect((await res.json()).error).toContain("WhatsApp");

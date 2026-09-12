@@ -2,7 +2,6 @@ export type ProductCategory =
   | "digital-printing"
   | "print-dokumen"
   | "stiker-label"
-  | "dtf-apparel"
   | "produk-custom";
 
 export interface Product {

@@ -85,13 +85,16 @@ export function calculateImposition(
     };
   }
 
-  // For round stickers, the design is a circle; use diameter as the cell size.
-  const cellW = shape === "round" ? designW + gap : designW + gap;
-  const cellH = shape === "round" ? designH + gap : designH + gap;
+  // N copies need N-1 gaps between them — the old formula floor(W/(d+gap))
+  // charged a phantom trailing gap and undercounted boundary sizes
+  // (e.g. a 305mm design scored 0 on a 305mm area; 100mm scored 2 not 3).
+  // Correct: cols = floor((W + gap) / (d + gap)).
+  const cellW = designW + gap;
+  const cellH = designH + gap;
 
   // Normal orientation
-  const cols = Math.floor(printableW / cellW);
-  const rows = Math.floor(printableH / cellH);
+  const cols = Math.floor((printableW + gap) / cellW);
+  const rows = Math.floor((printableH + gap) / cellH);
   const normal = cols * rows;
 
   // Rotated orientation (only meaningful for non-square designs)
@@ -103,8 +106,8 @@ export function calculateImposition(
   if (designW !== designH && shape === "square") {
     const cellWR = designH + gap;
     const cellHR = designW + gap;
-    const colsR = Math.floor(printableW / cellWR);
-    const rowsR = Math.floor(printableH / cellHR);
+    const colsR = Math.floor((printableW + gap) / cellWR);
+    const rowsR = Math.floor((printableH + gap) / cellHR);
     const rotatedTotal = colsR * rowsR;
 
     if (rotatedTotal > normal && colsR > 0 && rowsR > 0) {

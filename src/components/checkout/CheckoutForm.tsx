@@ -217,8 +217,11 @@ export function CheckoutForm() {
   const handleWaOnly = useCallback(() => {
     if (!product || !validate()) return;
     trackEvent("Lead", { source: "checkout-wa", product: product.id });
+    // Kode order unik — admin mencocokkan mutasi transfer manual dengan kode
+    // ini (zero-cost alternative sampai cek-mutasi otomatis dipasang).
+    const orderCode = `BSP-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     const fileInfo = fileUrl ? `\nFile: ${fileUrl}` : "";
-    const msg = `Halo Admin Bisa Print, saya mau order.\nProduk: ${product.name}\nUkuran: ${form.size}\nBahan: ${form.material}\nFinishing: ${form.finishing}\nJumlah: ${form.quantity}\nNama: ${form.name}\nNo. WA: ${form.phone}\nPengambilan: ${form.pickup}${form.pickup === "kirim" ? `\nAlamat: ${form.address}` : ""}\nCatatan: ${form.notes}${fileInfo}`;
+    const msg = `Halo Admin Bisa Print, saya mau order.\nKode Order: ${orderCode}\nProduk: ${product.name}\nUkuran: ${form.size}\nBahan: ${form.material}\nFinishing: ${form.finishing}\nJumlah: ${form.quantity}\nNama: ${form.name}\nNo. WA: ${form.phone}\nPengambilan: ${form.pickup}${form.pickup === "kirim" ? `\nAlamat: ${form.address}` : ""}\nCatatan: ${form.notes}${fileInfo}`;
     window.open(waCustomUrl(msg), "_blank");
     setSubmitted(true);
   }, [product, form, fileUrl, validate]);

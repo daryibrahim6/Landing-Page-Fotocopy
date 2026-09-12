@@ -75,6 +75,23 @@
 | Export CSV admin | ✅ Done | `GET /api/admin/orders/export` + tombol di `/admin/orders` — rekap Excel-friendly |
 | Cleanup | ✅ Done | `@vercel/kv` dihapus (dead dep); env mati dikomentari; `ADMIN_*` lokal diisi; docs sync |
 
+## Milestone 7 — Client Feedback Batch (Sep 2026) ✅ DONE
+
+Feedback dari owner via WA → dieksekusi:
+
+| Task | Status | Deskripsi |
+|------|--------|-----------|
+| Etalase dipangkas | ✅ Done | 12 produk → 7 (brosur&flyer, poster, print dokumen merge, cetak stiker, kartu nama, undangan, packaging) + card "Produk Lainnya" → WA admin. Kategori DTF/banner keluar etalase |
+| Upload preview tiling | ✅ Done | `DesignCanvas` — design upload ke-render di SEMUA cell imposition (bukan ghost pink), cell-0 tetap resizable |
+| Fix imposition math | ✅ Done | `paper-sizes.ts` — gap hanya di ANTAR cell (N cell = N-1 gap); boundary size seperti 305mm kini benar (dulu 0 pcs) |
+| Kalkulator per-lembar tier | ✅ Done | `STICKER_SHEET_TIERS` di `pricing.ts` — model kompetitor (harga/lembar turun per tier qty). PLACEHOLDER, ganti saat owner kirim price list |
+| AI designer MVP | ✅ Done | Panel "Coba AI" di upload mode — Pollinations.ai gratis tanpa API key; draft → langsung masuk canvas |
+| Kode order WA | ✅ Done | `BSP-XXXX` unik di pesan checkout WA — matching mutasi transfer manual (zero-cost) |
+| Guide text kalkulator | ✅ Done | Intro singkat di atas preset: "berapa pcs dalam 1 lembar A3" |
+| Pembayaran | ✅ Done | Konfirmasi: checkout WA-only selama env Midtrans kosong — sesuai request "sementara gausah bayar di web" |
+
+**Payment roadmap (disepakati)**: sekarang WA + kode order (zero cost) → nanti kalau mau auto-acc tanpa gateway: jasa cek-mutasi (Moota/Mutasiku ~Rp100-300rb/bln) → atau aktifkan Midtrans (QRIS/VA) kapanpun via env.
+
 ## Backlog — v2 Candidates
 
 | Task | Status | Deskripsi |

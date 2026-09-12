@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 import {
   Calculator, Upload, RotateCcw, ZoomIn, ZoomOut,
   FileText, ImageIcon, Maximize, Printer, Circle, Square,
+  Sparkles, Loader2,
 } from "lucide-react";
+import { sheetTotalPrice, sheetUnitPrice } from "@/lib/pricing";
 import { UploadZone } from "./UploadZone";
 import { DesignCanvas } from "./DesignCanvas";
 import {
@@ -39,9 +41,6 @@ const PRESETS: Preset[] = [
   { name: "Label 6 × 4 cm", w: 60, h: 40, shape: "square" },
 ];
 
-// Default price per A3 sheet for UMKM sticker (placeholder – admin can adjust)
-const BASE_SHEET_PRICE = 15000;
-
 export function DesignSimulator() {
   const [mode, setMode] = useState<"calculator" | "upload">("calculator");
 
@@ -60,6 +59,12 @@ export function DesignSimulator() {
   // Upload state
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [uploadImposition, setUploadImposition] = useState<ImpositionResult | null>(null);
+
+  // AI draft generation (Pollinations — gratis, tanpa API key)
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
 
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -89,9 +94,8 @@ export function DesignSimulator() {
     return estimateSheets(Number(quantity) || 0, result.total);
   }, [quantity, result]);
 
-  const estimatedPrice = useMemo(() => {
-    return sheets * BASE_SHEET_PRICE;
-  }, [sheets]);
+  const sheetPrice = useMemo(() => sheetUnitPrice(sheets), [sheets]);
+  const estimatedPrice = useMemo(() => sheetTotalPrice(sheets), [sheets]);
 
   const applyPreset = useCallback((preset: Preset) => {
     setDesignW(String(preset.w));
@@ -100,9 +104,44 @@ export function DesignSimulator() {
     setOrientation("portrait");
   }, []);
 
-  const handleFileUpload = useCallback((_file: File, dataUrl: string) => {
-    setImageDataUrl(dataUrl);
+  const applyImageSource = useCallback((src: string) => {
+    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    blobUrlRef.current = src.startsWith("blob:") ? src : null;
+    setImageDataUrl(src);
   }, []);
+
+  const clearImage = useCallback(() => {
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    setImageDataUrl(null);
+  }, []);
+
+  const handleFileUpload = useCallback((_file: File, dataUrl: string) => {
+    applyImageSource(dataUrl);
+  }, [applyImageSource]);
+
+  // Draft AI via Pollinations — anonymous tier, no key. ~1 req/15s limit;
+  // error path memberi pesan retry, bukan alert blocking.
+  const handleAiGenerate = useCallback(async () => {
+    const prompt = aiPrompt.trim();
+    if (!prompt || aiLoading) return;
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&model=flux&seed=${Math.floor(Math.random() * 1e6)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      if (!blob.type.startsWith("image/")) throw new Error("not an image");
+      applyImageSource(URL.createObjectURL(blob));
+    } catch {
+      setAiError("AI lagi sibuk atau koneksi bermasalah. Tunggu ±15 detik lalu coba lagi ya.");
+    } finally {
+      setAiLoading(false);
+    }
+  }, [aiPrompt, aiLoading, applyImageSource]);
 
   const resetCalculator = useCallback(() => {
     setDesignW("50");
@@ -266,6 +305,10 @@ export function DesignSimulator() {
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
           {/* Calculator main */}
           <div className="flex flex-col gap-5">
+            <p className="rounded-2xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+              Hitung dulu: design kamu muat <span className="font-semibold text-[var(--color-text-primary)]">berapa pcs dalam 1 lembar A3</span> — lengkap dengan estimasi harga.
+            </p>
+
             {/* Presets */}
             <div className="rounded-2xl border-2 border-[var(--color-border)] bg-white p-4">
               <p className="mb-3 text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
@@ -661,6 +704,12 @@ export function DesignSimulator() {
                       {sheets} lembar
                     </span>
                   </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-[var(--color-text-secondary)]">Harga per lembar*</span>
+                    <span className="font-semibold text-[var(--color-text-primary)]">
+                      Rp {sheetPrice.toLocaleString("id-ID")}
+                    </span>
+                  </div>
                   <div className="flex justify-between border-t border-[var(--color-border)] pt-2">
                     <span className="font-bold text-[var(--color-text-primary)]">
                       Total per lembar
@@ -753,6 +802,46 @@ export function DesignSimulator() {
               </p>
             </div>
 
+            {/* AI draft designer — Pollinations, gratis tanpa key */}
+            <div className="rounded-2xl border-2 border-[var(--color-border)] bg-white p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Sparkles className="size-4 text-accent" />
+                <label htmlFor="ai-prompt" className="text-sm font-bold text-[var(--color-text-primary)]">
+                  Belum punya design? Coba AI
+                </label>
+              </div>
+              <input
+                id="ai-prompt"
+                type="text"
+                value={aiPrompt}
+                maxLength={300}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                placeholder="cth: stiker logo kopi bulat, gaya minimalis"
+                className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
+              />
+              <button
+                type="button"
+                onClick={handleAiGenerate}
+                disabled={aiLoading || !aiPrompt.trim()}
+                className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border-2 border-accent bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {aiLoading ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Sparkles className="size-4" aria-hidden="true" />
+                )}
+                {aiLoading ? "Generating…" : "Generate Draft"}
+              </button>
+              {aiError && (
+                <p role="alert" className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
+                  {aiError}
+                </p>
+              )}
+              <p className="mt-2 text-[11px] italic text-[var(--color-text-muted)]">
+                Draft AI untuk referensi — hasil dicek & disesuaikan tim sebelum cetak.
+              </p>
+            </div>
+
             {uploadImposition && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -801,7 +890,7 @@ export function DesignSimulator() {
             {imageDataUrl && (
               <button
                 type="button"
-                onClick={() => setImageDataUrl(null)}
+                onClick={clearImage}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-[var(--color-border)] bg-white px-4 py-2.5 text-sm font-semibold text-[var(--color-text-secondary)] transition hover:border-primary hover:text-primary"
               >
                 <RotateCcw className="size-4" />

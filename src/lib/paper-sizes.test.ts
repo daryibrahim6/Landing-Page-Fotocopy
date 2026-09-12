@@ -74,10 +74,16 @@ describe("calculateImposition", () => {
     expect(result.total).toBe(1);
   });
 
-  it("returns zero when design exceeds printable area by gap", () => {
-    // 305×460 design + 2mm gap > printable → 0
-    const result = calculateImposition(305, 460, "kiss", "square");
+  it("returns zero when design exceeds printable area", () => {
+    // 306×461 design > 305×460 printable → 0
+    const result = calculateImposition(306, 461, "kiss", "square");
     expect(result.total).toBe(0);
+  });
+
+  it("a design exactly equal to the printable area fits once (no trailing gap)", () => {
+    // 305×460 design on 305×460 area → 1 copy; gaps only exist BETWEEN cells
+    const result = calculateImposition(305, 460, "kiss", "square");
+    expect(result.total).toBe(1);
   });
 });
 

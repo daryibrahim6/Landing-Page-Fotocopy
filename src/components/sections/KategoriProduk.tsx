@@ -1,7 +1,7 @@
 "use client";
 
 
-import { FileText, Gift, Printer, Shirt, Tag, type LucideIcon } from "lucide-react";
+import { FileText, Gift, Printer, Tag, type LucideIcon } from "lucide-react";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { categories } from "@/data/products";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,6 @@ const categoryIcons: Record<ProductCategory, LucideIcon> = {
   "digital-printing": Printer,
   "print-dokumen": FileText,
   "stiker-label": Tag,
-  "dtf-apparel": Shirt,
   "produk-custom": Gift,
 };
 

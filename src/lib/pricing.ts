@@ -55,6 +55,32 @@ const FINISHING_MULTIPLIERS: Record<string, number> = {
   "Press + Cutting": 1,
 };
 
+// Sticker sheet pricing — model per-LEMBAR A3+ mengikuti pola kompetitor
+// (Xpress/PrimaGraphia): harga per lembar turun sesuai tier jumlah lembar.
+// PLACEHOLDER: angka di bawah estimasi pasar — ganti dengan price list asli
+// owner begitu tersedia. Unit ekonomi cetak = per lembar kertas, bukan per pcs.
+export const STICKER_SHEET_TIERS: { minSheets: number; pricePerSheet: number }[] = [
+  { minSheets: 1, pricePerSheet: 12000 },
+  { minSheets: 11, pricePerSheet: 8000 },
+  { minSheets: 51, pricePerSheet: 6500 },
+  { minSheets: 101, pricePerSheet: 5500 },
+  { minSheets: 501, pricePerSheet: 4500 },
+];
+
+/** Harga per lembar untuk `sheets` lembar — tier tertinggi yang memenuhi. */
+export function sheetUnitPrice(sheets: number): number {
+  let price = 0;
+  for (const tier of STICKER_SHEET_TIERS) {
+    if (sheets >= tier.minSheets) price = tier.pricePerSheet;
+  }
+  return price;
+}
+
+/** Total estimasi untuk `sheets` lembar stiker. */
+export function sheetTotalPrice(sheets: number): number {
+  return sheets * sheetUnitPrice(sheets);
+}
+
 export function calculatePrice(productId: string, size: string, material: string, finishing: string, quantity: number): PricingResult {
   const product = products.find((p) => p.id === productId);
   if (!product) return { subtotal: 0, total: 0, breakdown: "" };

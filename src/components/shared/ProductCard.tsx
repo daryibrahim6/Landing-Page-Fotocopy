@@ -16,7 +16,6 @@ const CATEGORY_LABELS: Record<Product["category"], string> = {
   "digital-printing": "Digital Print",
   "print-dokumen": "Dokumen",
   "stiker-label": "Stiker & Label",
-  "dtf-apparel": "DTF & Apparel",
   "produk-custom": "Custom",
 };
 
