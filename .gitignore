@@ -44,6 +44,14 @@ next-env.d.ts
 # Temporary / local scratch
 /scratch/
 
+# Archived reference material from other projects (kept locally, not committed)
+/_archive/
+
+# Playwright artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+
 # IDE local settings
 .claude/
 .vscode/*
