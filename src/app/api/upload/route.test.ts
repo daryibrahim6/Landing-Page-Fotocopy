@@ -4,6 +4,7 @@ vi.hoisted(() => {
   delete process.env.UPSTASH_REDIS_REST_URL;
   delete process.env.UPSTASH_REDIS_REST_TOKEN;
   delete process.env.BLOB_READ_WRITE_TOKEN;
+  delete process.env.UPSTASH_BLOB_TOKEN;
 });
 
 import { POST } from "./route";

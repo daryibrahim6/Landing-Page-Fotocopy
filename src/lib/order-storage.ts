@@ -1,4 +1,5 @@
 import { redis } from "@/lib/redis";
+import type { ProductionStatus } from "@/types";
 
 // Order storage abstraction.
 // Uses Upstash Redis if env vars are set, otherwise falls back to in-memory Map.
@@ -28,8 +29,8 @@ const TERMINAL_STATUSES = new Set<StoredOrder["payment"]["status"]>([
 // Production pipeline status — deliberately separate from payment.status so the
 // admin workflow never collides with the Midtrans webhook state machine.
 // Missing `production` on legacy orders = "baru".
-export const PRODUCTION_STATUSES = ["baru", "diproses", "selesai", "diambil"] as const;
-export type ProductionStatus = (typeof PRODUCTION_STATUSES)[number];
+// Canonical home is @/types (client-safe); re-exported here for server callers.
+export { PRODUCTION_STATUSES, type ProductionStatus } from "@/types";
 
 // Sorted-set index of order ids scored by createdAt — enables newest-first
 // paginated listing in Redis mode. (Memory mode scans the Map instead.)
@@ -90,7 +91,8 @@ export async function saveOrder(order: StoredOrder): Promise<void> {
   }
   const pendingTtl =
     order.payment.status === "pending" ? { ex: PENDING_ORDER_TTL_SECONDS } : undefined;
-  await redis.set(`order:${order.id}`, JSON.stringify(order), pendingTtl);
+  // @upstash/redis handles JSON serde itself — pass the object, not a string.
+  await redis.set(`order:${order.id}`, order, pendingTtl);
   await redis.set(`order:midtrans:${order.payment.midtransOrderId}`, order.id, pendingTtl);
   await redis.zadd(ORDER_INDEX_KEY, {
     score: Date.parse(order.createdAt),
@@ -100,8 +102,9 @@ export async function saveOrder(order: StoredOrder): Promise<void> {
 
 export async function getOrder(id: string): Promise<StoredOrder | null> {
   if (redis) {
-    const data = await redis.get<string>(`order:${id}`);
-    return data ? (JSON.parse(data) as StoredOrder) : null;
+    // @upstash/redis auto-deserializes JSON values — get() already returns
+    // the StoredOrder object (calling JSON.parse here crashes).
+    return redis.get<StoredOrder>(`order:${id}`);
   }
   return memoryStore.get(id) ?? null;
 }
@@ -137,8 +140,10 @@ export async function listOrders(limit = 20, cursor = 0): Promise<ListOrdersResu
       rev: true,
     });
     total = await redis.zcard(ORDER_INDEX_KEY);
-    const rows = ids.length ? await redis.mget<(string | null)[]>(ids.map((id) => `order:${id}`)) : [];
-    page = rows.filter((r): r is string => typeof r === "string").map((r) => JSON.parse(r) as StoredOrder);
+    const rows = ids.length
+      ? await redis.mget<(StoredOrder | null)[]>(ids.map((id) => `order:${id}`))
+      : [];
+    page = rows.filter((r): r is StoredOrder => r !== null);
   } else {
     const all = [...memoryStore.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     total = all.length;

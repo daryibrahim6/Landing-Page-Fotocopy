@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import { formatRupiah } from "@/lib/utils";
-import {
-  PRODUCTION_STATUSES,
-  type ProductionStatus,
-  type StoredOrder,
-} from "@/lib/order-storage";
+import { PRODUCTION_STATUSES, type ProductionStatus } from "@/types";
+import type { StoredOrder } from "@/lib/order-storage";
 
 // Admin order table — server-rendered first page, client-side pagination and
 // production-status mutations via /api/admin/orders. Basic Auth credentials are
@@ -120,7 +117,13 @@ export default function OrderTable({
                     )}
                     {o.fileUrl && (
                       <a
-                        href={o.fileUrl}
+                        // blob: keys resolve through the admin signed-URL redirect;
+                        // http(s) URLs (Vercel Blob) are opened directly.
+                        href={
+                          o.fileUrl.startsWith("blob:")
+                            ? `/api/admin/files?key=${encodeURIComponent(o.fileUrl.slice(5))}`
+                            : o.fileUrl
+                        }
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-1 inline-block text-sm text-blue-600 underline"
