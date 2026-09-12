@@ -55,7 +55,8 @@
 - `src/app/api/midtrans/webhook/route.ts` — Payment notification
 - `src/data/products.ts` — Product catalog
 - `src/lib/wa.ts` — WhatsApp URL builder
-- `.env.local` — Environment template
+- `src/lib/schemas.ts` — Zod schemas validasi API routes (create-token, webhook, orderId)
+- `.env.local.example` — Environment template (tracked; isi placeholder)
 
 ## Design Tokens
 
@@ -119,7 +120,7 @@ Flow BisaPrint (5). Detail status: `reports/status.md`. Audit per-flow: `reports
 | `reports/audit/` | Audit per flow — kontrak coverage (5 file = 5 flow) |
 | `reports/test-scenarios/` | Skenario test per flow (dibuat saat flow masuk sesi testing) |
 | `reports/test-results/` | Hasil eksekusi test per flow |
-| `reports/cross-audits/` | Audit lintas-flow (dibuat saat sweep) |
+| `reports/cross-audits/` | Audit lintas-flow — isi: `page-flow-matrix.md` (patokan UX-0.75); sweep output dibuat saat sweep |
 | `reports/screenshots/` | Evidence UI/UX manual — **gitignored** |
 | `reports/workflow/` | Execution guides: Track A, E2E playbook, Track B/C, appendix |
 | `_archive/` | Konten referensi dari project lain — **gitignored**, bukan patokan aktif |

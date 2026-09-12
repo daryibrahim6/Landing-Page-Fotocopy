@@ -18,7 +18,7 @@ Single source of truth untuk status, audit, test, dan dokumentasi pendukung proj
 | `page-audits/` | Audit UI/UX per halaman/surface spesifik. |
 | `test-scenarios/` | Skenario E2E / Vitest per flow. |
 | `test-results/` | Hasil eksekusi test per flow. |
-| `coverage/` | Laporan pure-logic coverage per flow. |
+| `coverage/` | Laporan coverage per flow (dokumen analisis). Catatan: output `vitest --coverage` ditulis ke `./coverage/` di root (gitignored), bukan di sini. |
 | `screenshots/` | Evidence UI/UX walkthrough (gitignored, jangan commit). |
 | `mutation/` | Output mutation testing (gitignored, jangan commit). |
 | `archive/` | Riwayat lama / artifact flow yang sudah tidak aktif. |

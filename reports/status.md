@@ -13,8 +13,9 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 - **Audit / Fix / Vitest** — Track A.
 - **E2E** — Playwright integration testing. `N/A` = spec belum ditulis (Playwright ter-setup, suite belum ada).
 - **Track B / Track C** — Vitest deep dive / UI-UX walkthrough, opsional per Track Gate.
-- **Final**: `AMAN` / `CLEAR` / `IN PROGRESS` / `ADA ISU` / `BELUM` / `BACKLOG` / `DISTRIBUTED (...)`.
+- **Final**: `AMAN` / `CLEAR` / `IN PROGRESS` / `ADA ISU` / `BELUM` / `BACKLOG` / `LEGACY` / `DISTRIBUTED (...)`.
 - Klaim `AMAN`/`CLEAR` wajib didukung bukti di audit file — bukan label mentah.
+- **`LEGACY`** = flow jalan & terverifikasi (tests/build/runtime hijau), tapi auditnya predates workflow v2 (re-audit Track A diperlukan untuk naik ke `CLEAR`/`AMAN`). Bukan berarti rusak — ini titik awal yang jujur.
 
 ---
 
@@ -22,10 +23,10 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 
 | Flow | Tier | Scope | Audit | Fix | Vitest | E2E | Track B | Track C | Final | Last Update | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| landing-page-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | 2026-09-08 | UI/UX overhaul: logo, navbar, hero, product images, layout. |
-| checkout-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | 2026-09-08 | 12 product SVGs, all products enabled, layout widened. |
-| whatsapp-notification-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | 2026-09-08 | Notification helper + unit tests (`src/lib/notification.test.ts`, `wa.test.ts`). |
-| design-simulator-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | 2026-09-08 | Build, lint, test clean (`paper-sizes.test.ts`). |
+| landing-page-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | UI/UX overhaul: logo, navbar, hero, product images, layout. Audit pre-v2 — Track A v2 upgrade ke CLEAR. |
+| checkout-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | 12 product SVGs, all products enabled, layout widened. CF-A-10 FIXED (Zod, 12 Sep). Re-audit v2 pending. |
+| whatsapp-notification-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Notification helper + unit tests (`notification.test.ts`, `wa.test.ts`). Re-audit v2 pending. |
+| design-simulator-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Build, lint, test clean (`paper-sizes.test.ts`). Re-audit v2 pending. |
 | production-dashboard-flow | Supporting | Done | Done | Belum | Belum | N/A | N/A | N/A | BACKLOG | 2026-09-08 | v2 — belum dibangun. |
 
 **Kontrak coverage:** jumlah file di `reports/audit/*.md` = jumlah flow terdaftar. Saat ini 5 file = 5 flow (sudah di-split per-flow 12 Sep). Audit gabungan historis: `reports/archive/full-project-audit-2026-09-08.md`.

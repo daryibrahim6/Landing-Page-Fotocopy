@@ -24,8 +24,9 @@ reports/
 ├── page-audits/                 ← UX per halaman
 ├── test-scenarios/[flow].md     ← skenario test
 ├── test-results/[flow].md       ← hasil eksekusi
-├── coverage/                    ← pure-logic coverage
-└── screenshots/[flow]/          ← bukti visual
+├── screenshots/[flow]/          ← bukti visual
+
+# Catatan: output `npx vitest run --coverage` ditulis ke ./coverage/ di root (gitignored), bukan reports/.
 ```
 
 ---
@@ -136,7 +137,7 @@ Simpan di `reports/screenshots/[flow]/` dan referensikan di audit.
 
 ## E2E Cepat
 
-- Default **headless**: `--project=chromium --workers=1`.
+- Default **headless**: `--project=chromium`.
 - `workers=1` hanya untuk skenario serial/shared-state (order yang sama lintas test); default parallel dari config.
 - `--headed` hanya untuk debug UI/layout/selector.
 - Verifikasi target pakai `--grep`.
@@ -173,7 +174,7 @@ LANGKAH SELANJUTNYA: [apa yang user lakukan sekarang]
 
 ## Git & Branch (Ringkasan)
 
-- Branch: `feat/<nama-task>`.
-- Jangan push ke `main`/`dev`.
+- Branch utama: `master` (GitHub — `daryibrahim6/Landing-Page-Fotocopy`).
+- Jangan push langsung ke `master` tanpa verifikasi lengkap.
 - Commit: `feat: ...` / `fix: ...`.
-- Push, lalu buat MR di GitLab.
+- Push, lalu buat PR di GitHub.

@@ -122,7 +122,7 @@ Tujuan: cari gap functional, logic bug, missing edge case, incomplete flow — B
    - Time-Based State Transition
    - Partial Failure di Multi-Step Process
    - Cross-User Cache/State Staleness
-4. Cek Quality Radar K1-K24 untuk bagian yang terlihat off.
+4. Cek Quality Radar K1-K27 untuk bagian yang terlihat off.
 5. Identifikasi UI/UX gap yang relevant — JANGAN fix di sini, catat aja. Track C yang tangani.
 6. Identifikasi apakah test yang ada (Vitest/E2E) cukup — JANGAN deep-dive test quality di sini, catat aja. Track B yang tangani.
 7. **Future gap check** — untuk tiap bagian flow, tanyakan:

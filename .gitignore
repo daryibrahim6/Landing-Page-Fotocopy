@@ -32,7 +32,7 @@ yarn-error.log*
 
 # env files (NEVER commit real secrets)
 .env*
-.env*.local
+!.env*.example
 
 # vercel
 .vercel
@@ -74,3 +74,4 @@ build.log
 
 # QA screenshot evidence (binary artifacts, large)
 /reports/screenshots/
+/reports/mutation/

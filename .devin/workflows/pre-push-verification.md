@@ -1,8 +1,8 @@
 ---
-description: Workflow pre-push verifikasi sebelum commit/push/MR untuk menghindari regresi build, test, dan CI/CD
+description: Workflow pre-push verifikasi sebelum commit/push/PR untuk menghindari regresi build, test, dan CI/CD
 ---
 
-# Pre-push verifikasi (wajib sebelum commit/push/MR)
+# Pre-push verifikasi (wajib sebelum commit/push/PR)
 
 Ikuti: `.devin/rules/nextjs-build-cicd-optimization.md`
 Tujuan: pastiin **tidak ada regresi** dari kategori masalah yang pernah kejadian (env missing saat runtime, rendering strategy salah, warning build yang diabaikan).
@@ -101,7 +101,7 @@ git diff
 git status
 ```
 
-- Pastikan branch aktif adalah feature branch (`feat/<nama>`), bukan `main`/`master`.
+- Repo ini kerja langsung di `master` (branch utama). Untuk perubahan besar boleh pakai `feat/<nama>`; yang WAJIB: semua step di atas hijau sebelum push.
 - Pastikan semua perubahan yang dimaksud sudah ke-include (nggak ada yang ketinggalan / ke-stash).
 - Pastikan `.env*` / file dengan secret TIDAK ter-stage.
 - Working tree bersih sebelum push.

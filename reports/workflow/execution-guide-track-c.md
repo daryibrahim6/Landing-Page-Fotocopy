@@ -286,11 +286,12 @@ Kerjain Page-Level UI/UX/SEO Sweep untuk halaman [ROUTE] (flow [NAMA_FLOW]):
      dropdown direction, touch target, text overflow, keyboard navigation,
      mobile sidebar/drawer, navbar behavior.
 
-3. Terapkan 24 Kekuatan Kekuatan dari `.devin/rules/quality-radar.md`:
+3. Terapkan 27 Tipe Kejanggalan dari `.devin/rules/quality-radar.md`:
    - K1-K12: UI layer (size, centering, spacing, color, radius, typography,
      loading, button, empty, status, interaction, a11y).
-   - K13-K21: code/arch layer (error handling, validation, data, race,
-     naming, dead code, feature folder, data fetching, import direction).
+   - K13-K27: code/arch layer (error handling, validation, data, race,
+     naming, dead code, folder structure, data fetching, import direction,
+     dst — lihat daftar lengkap di quality-radar).
 
 4. SEO & Mobile (wajib):
    - Metadata title/description, OG tags, canonical, JSON-LD (public page).
@@ -302,7 +303,7 @@ Kerjain Page-Level UI/UX/SEO Sweep untuk halaman [ROUTE] (flow [NAMA_FLOW]):
      `reports/screenshots/[NAMA_FLOW]/before-[deskripsi]-[viewport]-[tanggal].png`.
    - Tulis temuan di section "Page-Level UX Findings" di
      `reports/audit/[NAMA_FLOW].md` dengan format:
-     ID, Kategori (K1-K24 atau SEO/Mobile), Bukti (file + screenshot),
+     ID, Kategori (K1-K27 atau SEO/Mobile), Bukti (file + screenshot),
      Risiko, Opsi Solusi (minimal 2 kalau butuh keputusan produk).
    - Status OPEN.
 
