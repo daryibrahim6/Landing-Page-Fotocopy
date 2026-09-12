@@ -1,7 +1,7 @@
 # Audit — whatsapp-notification-flow
 
 **Tier:** Core | **Prefix ID:** `WA`
-**Status:** Track A Tahap 2 selesai — **6 temuan** (6 FIXED, 0 OPEN).
+**Status:** Track A lengkap (Tahap 0–3) — **CLEAR**. 6 temuan FIXED, 0 OPEN, 111/111 tests.
 
 **Tanggal re-audit:** sesi terbaru — audit formal v2 pertama (carry-over WA-A-01/02 diverifikasi ulang).
 **Tanggal fix:** sesi terbaru — semua temuan difix, WA-A-04 diputuskan opsi A (webhook outbound env) oleh user delegation.
@@ -169,12 +169,27 @@
 | Partial Failure multi-step | **WA-A-08** (notify bisa gagalkan request post-save), **WA-A-04** (delivery = silent fail by design) |
 | Cross-User Cache/State | Env module-level di-bake saat build — expected; note saja |
 
-## Test Coverage (catatan Tahap 1)
+## Unit Test Coverage (Tahap 3)
 
-- `wa.test.ts` — buildWAUrl/buildWAFormUrl/isConsultationFormComplete ✓ (10 tests)
-- `notification.test.ts` — notifyAdmin* payload ✓
-- Gap: `buildAdminWAUrl` belum ditest langsung; WA-A-03 fix akan butuh test konsistensi nomor — Track B/Tahap 3.
-- E2E: skipped per keputusan user.
+- `buildWAUrl` → `wa.test.ts` → general/fromProduct/postCheckout templates, invalid key → general fallback (never "undefined")
+- `buildWAFormUrl` → `wa.test.ts` → field interpolation + encoding
+- `waCustomUrl` → `wa.test.ts` → custom message encoding
+- `isConsultationFormComplete` → `wa.test.ts` → nama whitespace, produk kosong, jumlah "0"/negatif/non-numeric/kosong ditolak, positif diterima
+- `buildAdminWAUrl` → `wa.test.ts` → adminNewOrder/adminPaidOrder ke `ADMIN_WA_NUMBER` resolved, fallback ke `WA_NUMBER` saat env kosong
+- **Single-source guard** → `wa.test.ts` → semua builder target `constants.WA_NUMBER` (regression guard WA-A-03)
+- `notifyAdminNewOrder`/`notifyAdminPaidOrder` → `notification.test.ts` → channel/label/url/message/recipient non-empty & match URL
+- `dispatchAdminNotification` → `notification.test.ts` → POST ke `ADMIN_NOTIFY_WEBHOOK_URL` saat set, skip saat kosong, never-throws saat builder throw / fetch fail
+- `logNotification` → covered via dispatch (console.log side-effect, trivial)
+- Webhook notify gating → `route.test.ts` → settlement notify once, duplicate webhook no re-notify, blocked regression no notify, expire no notify
+
+## Track Gate
+
+| Pertanyaan | Keputusan |
+|---|---|
+| E2E? | **Nanti** — CTA→WA app adalah device-level, bukan web-assertable; webhook→WA journey = kandidat E2E kalau dashboard ada. Skip per keputusan user |
+| Test shallow? | **Tidak** — single-source guard + never-throws + gating assertions verify behavior, bukan exercise |
+| UI/UX sisa? | Tidak — flow ini logic-only (CTA UI sudah di landing/checkout flow) |
+| Cross-flow? | **Ya — checkout-flow** (emit sites create-token + webhook) — verified: 111/111 tests hijau termasuk webhook route tests |
 
 ---
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildWAUrl, buildWAFormUrl, waCustomUrl, isConsultationFormComplete, templates } from "./wa";
+import { buildWAUrl, buildWAFormUrl, buildAdminWAUrl, waCustomUrl, isConsultationFormComplete, templates, ADMIN_WA_NUMBER } from "./wa";
+import { WA_NUMBER } from "@/lib/constants";
 
 describe("buildWAUrl", () => {
   it("builds general template URL", () => {
@@ -23,6 +24,37 @@ describe("buildWAUrl", () => {
     const url = buildWAUrl("bogusTemplate");
     expect(url).not.toContain("undefined");
     expect(url).toContain(encodeURIComponent(templates.general as string));
+  });
+
+  it("uses the same WA_NUMBER as constants (single source of truth)", () => {
+    // WA-A-03 regression guard: every builder must target constants.WA_NUMBER.
+    for (const url of [
+      buildWAUrl("general"),
+      buildWAFormUrl({ nama: "a", produk: "b", jumlah: "1", ukuran: "", bahan: "", catatan: "" }),
+      waCustomUrl("x"),
+    ]) {
+      expect(url).toContain(`wa.me/${WA_NUMBER}`);
+    }
+  });
+});
+
+describe("buildAdminWAUrl", () => {
+  it("builds adminNewOrder URL targeting the resolved admin number", () => {
+    const url = buildAdminWAUrl("adminNewOrder", "BSP-1", "Stiker", "Budi", "628111", "Rp10.000", "-", "-");
+    expect(url).toContain(`wa.me/${ADMIN_WA_NUMBER}`);
+    expect(url).toContain(encodeURIComponent("BSP-1"));
+    expect(url).toContain(encodeURIComponent("Budi"));
+  });
+
+  it("builds adminPaidOrder URL", () => {
+    const url = buildAdminWAUrl("adminPaidOrder", "BSP-2", "Banner", "Sari", "628222", "Rp50.000");
+    expect(url).toContain(`wa.me/${ADMIN_WA_NUMBER}`);
+    expect(url).toContain(encodeURIComponent("BSP-2"));
+  });
+
+  it("admin number falls back to WA_NUMBER when env unset", () => {
+    // Test env has no ADMIN_WHATSAPP_NUMBER → resolved fallback
+    expect(ADMIN_WA_NUMBER).toBe(process.env.ADMIN_WHATSAPP_NUMBER || WA_NUMBER);
   });
 });
 
