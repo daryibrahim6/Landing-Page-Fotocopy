@@ -16,7 +16,7 @@ Landing page + checkout untuk Bisa Print, percetakan digital di Bekasi yang mela
 - **File Upload**: Local `/tmp` atau Vercel Blob di MVP
 - **Image**: `next/image` wajib, output WebP
 - **Icons**: lucide-react
-- **Testing**: Vitest (unit/integration) + Playwright (E2E) — belum dikonfigurasi penuh
+- **Testing**: Vitest (unit, `src/lib/*.test.ts`) + Playwright (E2E — config terpasang, spec belum ditulis)
 
 ## Theme / Color Palette
 Brand token diambil dari moodboard Bisa Print (pink/magenta hangat + orange accent):
@@ -111,38 +111,45 @@ src/
 
   lib/
     utils.ts                # cn, formatPrice, helpers murni
-    constants.ts            # APP_NAME, WA number, site URL
+    constants.ts            # WA number, IG/Shopee/email links, maps embed
     midtrans.ts             # Midtrans client helper
     wa.ts                   # WhatsApp URL builder
     paper-sizes.ts          # Ukuran kertas + imposition math
+    pricing.ts              # Kalkulasi harga produk
+    order-storage.ts        # Persistensi order (Upstash Redis, fallback in-memory)
+    notification.ts         # Notifikasi WA admin pasca-order
     tracking.ts             # Meta Pixel / GA helpers
 ```
 
 ## Environment Variables
-Required (lihat `.env.local` untuk template):
+Required (lihat `.env.local.example` untuk template):
 
 ```
-NEXT_PUBLIC_SITE_NAME="Bisa Print"
+NEXT_PUBLIC_SITE_NAME="BisaPrint"
 NEXT_PUBLIC_WHATSAPP_NUMBER=6281299435019
-NEXT_PUBLIC_WHATSAPP_MESSAGE="Halo Admin Bisa Print, saya mau order."
+NEXT_PUBLIC_WHATSAPP_MESSAGE="Halo BisaPrint, saya ingin pesan cetak."
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Email (Resend atau Nodemailer)
-EMAIL_FROM=""
-EMAIL_TO=""
-RESEND_API_KEY=""
+# Notifikasi admin (WA click-to-chat)
+ADMIN_WHATSAPP_NUMBER=6281299435019
 
 # Midtrans
 MIDTRANS_SERVER_KEY=""
-MIDTRANS_CLIENT_KEY=""
 NEXT_PUBLIC_MIDTRANS_CLIENT_KEY=""
 MIDTRANS_IS_PRODUCTION=false
+
+# Order persistence (wajib di production — Upstash Redis)
+UPSTASH_REDIS_REST_URL=""
+UPSTASH_REDIS_REST_TOKEN=""
+
+# File upload (wajib di production — Vercel Blob)
+BLOB_READ_WRITE_TOKEN=""
 
 # Tracking
 META_PIXEL_ID=""
 GOOGLE_ANALYTICS_ID=""
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Google Maps
+# Google Maps embed
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 ```
 
@@ -158,9 +165,11 @@ npm ci
 # 3. Jalankan development server
 npm run dev        # next dev (Turbopack)
 
-# 4. Build & lint
+# 4. Build, lint, test
 npm run build      # next build
 npm run lint       # eslint
+npm test           # vitest run (unit tests di src/lib/*.test.ts)
+# npx playwright test  # E2E (belum ada spec — setup only)
 ```
 
 ## Product Catalog
@@ -230,9 +239,14 @@ Lihat `reports/status.md` untuk status terkini.
   - `lib-architecture.md` — Aturan `src/lib`
   - `design-taste.md` — Frontend design guidelines
   - `quality-radar.md` — Defect detection checklist
-  - `qa-qc-workflow-and-status-tracking.md` — QA/QC workflow
+  - `qa-qc-workflow-and-status-tracking.md` — QA/QC workflow (Track A/B/C, assertion strength, blind spots)
+  - `flow-registry-and-status.md` — Flow registry + status vocabulary + auto-sync reports
+  - `flow-coverage-tracking.md` — Coverage gate & micro-UX sweep
+  - `ui-ux-deep-audit.md` — Track C pattern coverage matrix
   - `nextjs-build-cicd-optimization.md` — Build & CI/CD rules
   - `e2e-investigation-no-loop.md` — E2E flaky debugging
+  - `e2e-drift-prevention.md` — Pre-flight drift scan sebelum run Playwright
+  - `git-auto-commit-strategy.md` — Kapan & bagaimana auto-commit
   - `ponytail.md` — Lazy senior dev mode
   - `pre-flight-checklist.md` — Pre-flight task checklist
 - `.devin/workflows/` — Execution guides

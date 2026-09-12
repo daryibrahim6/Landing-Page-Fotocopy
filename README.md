@@ -40,6 +40,8 @@ Landing page + checkout untuk Bisa Print — jasa digital printing di Bekasi. Me
 - `npm run build` — production build
 - `npm run start` — production server
 - `npm run lint` — ESLint
+- `npm test` — Vitest unit tests
+- `npx playwright test` — E2E (setup terpasang, spec belum ditulis)
 
 ## Dokumentasi & Aturan
 
