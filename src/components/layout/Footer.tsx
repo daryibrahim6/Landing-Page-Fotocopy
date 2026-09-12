@@ -6,17 +6,9 @@ import { useRouter } from "next/navigation";
 import { WA_NUMBER, waUrl, IG_URL, SHOPEE_URL } from "@/lib/constants";
 import { formatWaDisplay } from "@/lib/utils";
 import { BrandLogo } from "@/components/shared/BrandLogo";
-
-const waIconPath =
-  "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347";
+import { WHATSAPP_ICON_PATH, INSTAGRAM_ICON_PATH, SHOPEE_ICON_PATH } from "@/lib/brand-icons";
 
 // Ikon brand resmi (Simple Icons, CC0) — Lucide tidak punya brand icons.
-const shopeeIconPath =
-  "M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z";
-
-const instagramIconPath =
-  "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z";
-
 export function Footer() {
   const router = useRouter();
   const waDisplay = formatWaDisplay(WA_NUMBER);
@@ -76,7 +68,7 @@ export function Footer() {
               className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-600 text-slate-300 transition hover:border-slate-300 hover:text-white"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">
-                <path d={instagramIconPath} />
+                <path d={INSTAGRAM_ICON_PATH} />
               </svg>
             </a>
             <a
@@ -87,7 +79,7 @@ export function Footer() {
               className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-600 text-slate-300 transition hover:border-slate-300 hover:text-white"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">
-                <path d={waIconPath} />
+                <path d={WHATSAPP_ICON_PATH} />
               </svg>
             </a>
             <a
@@ -98,7 +90,7 @@ export function Footer() {
               className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-600 text-slate-300 transition hover:border-slate-300 hover:text-white"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">
-                <path d={shopeeIconPath} />
+                <path d={SHOPEE_ICON_PATH} />
               </svg>
             </a>
           </div>
@@ -139,7 +131,7 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm text-slate-400">
             <li className="flex items-start gap-2">
               <svg viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 size-4 shrink-0 text-[#25D366]" aria-hidden="true">
-                <path d={waIconPath} />
+                <path d={WHATSAPP_ICON_PATH} />
               </svg>
               <a
                 href={waUrl()}

@@ -458,3 +458,13 @@ Feedback user dari screenshot round 1 → fix:
 **Cleanup:** 17 file orphan diarsip ke `_archive/` — hero/*.webp (6), machines/*.webp (2), icon/instagram.webp, products orphan (5: banner-spanduk, dtf-kaos, jilid-skripsi, print-dokumen-warna, totebag), brand/logo-bisaprint.svg + -light.svg, illustrations/underline-accent.svg. `public/` tersisa 21 file, semua tereferensi.
 
 **Verifikasi:** tsc clean, eslint clean, vitest 161/161, build hijau. Screenshot verified: navbar logo (mark asli transparan di pill putih), portfolio grid 4×2 tanpa bolong + tile CTA, kontak WA card dengan chat preview, footer logo light + ikon Shopee proper, mobile 375px 1 kolom.
+
+## UX Walkthrough — Round 3 (favicon + WhatsApp icon, Sesi 12 Sep 2026)
+
+| Temuan | Root cause | Fix |
+|---|---|---|
+| Favicon tab masih Vercel | `src/app/favicon.ico` default Next tidak pernah diganti; metadata `icons` menunjuk `logo-tab.webp` (file conventions `favicon.ico` menang) | Generate `favicon.ico` (16/32/48) + `icon.png` (512) + `apple-icon.png` (180) dari `logo-bisaprint-mark.png`; hapus metadata `icons` manual — file conventions yang handle |
+| Ikon WA = handset polos, bukan logo WhatsApp | `waIconPath` di Footer/ContactSection **ter-truncate** — cuma subpath handset, ring speech-bubble hilang. 6 file punya copy masing-masing (2 file ternyata punya versi lengkap beda digit) | `src/lib/brand-icons.ts` — `WHATSAPP_ICON_PATH` (Simple Icons resmi, lengkap) + `INSTAGRAM_ICON_PATH` + `SHOPEE_ICON_PATH` single source; semua 6 file import konstanta |
+
+**Cleanup:** `logo-tab.webp` orphan → `_archive/assets/brand/`.
+**Verifikasi:** `<link rel=icon>` DOM serve `/favicon.ico` + `/icon.png` + `/apple-icon.png` baru; footer icon WA render bubble+handset lengkap (screenshot mobile 375px); tsc + eslint clean, vitest 161/161, build hijau (route icon terdaftar static).

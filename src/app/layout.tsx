@@ -36,10 +36,6 @@ export const metadata: Metadata = {
     "percetakan",
     "Bekasi",
   ],
-  icons: {
-    icon: "/assets/brand/logo-tab.webp",
-    apple: "/assets/brand/logo-tab.webp",
-  },
   openGraph: {
     locale: "id_ID",
     type: "website",
