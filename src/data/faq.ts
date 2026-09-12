@@ -65,4 +65,16 @@ export const faqItems: FaqItem[] = [
     answer:
       "Tentu! Admin kami siap bantu pilihkan bahan yang paling cocok untuk kebutuhan cetak kamu. Konsultasi gratis via WhatsApp.",
   },
+  {
+    id: "faq-011",
+    question: "Bagaimana kalau hasil cetak tidak sesuai?",
+    answer:
+      "Semua file dicek dan dikonfirmasi dulu sebelum naik cetak. Kalau ada kesalahan produksi dari sisi kami, kami cetak ulang tanpa biaya tambahan.",
+  },
+  {
+    id: "faq-012",
+    question: "Apakah bisa revisi desain setelah order?",
+    answer:
+      "Bisa, selama file belum naik cetak. Revisi kecil seperti typo atau ukuran gratis – revisi besar mungkin dikenakan biaya desain tambahan.",
+  },
 ];

@@ -46,3 +46,17 @@ Ringkasan perubahan yang menyentuh lebih dari satu flow. Update setiap ada perub
 | AI draft (Pollinations, tanpa key) + kode order `BSP-XXXX` di WA checkout | design-simulator (panel Coba AI), checkout-flow + whatsapp-flow (pesan wa-only ada kode matching mutasi) | manual verify; error path `role=alert` |
 
 **Cross-check:** vitest 157/157 · tsc clean · eslint clean · build hijau · live routes 200 · link `?product=` lama → fallback graceful.
+
+## 2026-09-12 — UX-0.5 sweep + order persistence fix
+
+**Shared file:** `src/lib/order-storage.ts` (StoredOrder.payment — field `method` + `midtransOrderId` optional) dipakai checkout-flow (create-token, webhook, success) + production-dashboard (list, PATCH, export). `src/lib/orders.ts` BARU — `generateOrderId` + `buildStoredOrder` shared oleh create-token dan `/api/orders`.
+
+| Perubahan | Dampak ke flow | Bukti/test |
+|---|---|---|
+| `POST /api/orders` — order WA-only kini tersimpan (`method: "whatsapp"`) | checkout-flow (FC-01: BSP code tidak lagi yatim), production-dashboard (order WA terlihat + badge), whatsapp-flow (pesan membawa orderId server) | route.test.ts 4 tests; live: `BSP-MTYBZ09V-FA014BA3` FOUND di `/api/admin/orders`, success page 200 |
+| `payment.method` + `midtransOrderId` optional | webhook lookup tidak terpengaruh (WA order tak punya midtransOrderId → tidak match webhook — benar) | order-storage.test.ts hijau |
+| `PRODUCTION_STATUSES` + "batal" | production-dashboard (admin bisa tandai order gagal/phantom WA) | PATCH schema pakai enum shared |
+| FAQ +2 (garansi, revisi) + trust line checkout | landing-page (trust), checkout-flow (reassurance pre-submit) | integrity.test hijau |
+| AI panel: timeout 120s + retry×1 + referrer/private | design-simulator (error palsu saat antrean 30-60s berkurang) | manual: endpoint verified live 200 |
+
+**Cross-check:** vitest 161/161 · tsc clean · eslint clean · live POST→dashboard→success verified.

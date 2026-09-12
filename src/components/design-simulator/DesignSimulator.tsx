@@ -123,8 +123,11 @@ export function DesignSimulator() {
     applyImageSource(dataUrl);
   }, [applyImageSource]);
 
-  // Draft AI via Pollinations — anonymous tier, no key. ~1 req/15s limit;
-  // error path memberi pesan retry, bukan alert blocking.
+  // Draft AI via Pollinations — anonymous tier, no key. ~1 req/15s limit +
+  // queue global: request bisa jalan 30-60s+ saat server penuh. Timeout
+  // eksplisit + 1 retry supaya queue panjang tidak langsung jadi error.
+  // `referrer` = identitas app (gratis), `private` = design tidak masuk
+  // public feed Pollinations.
   const handleAiGenerate = useCallback(async () => {
     const prompt = aiPrompt.trim();
     if (!prompt || aiLoading) return;
@@ -134,14 +137,26 @@ export function DesignSimulator() {
       // Prompt template khusus stiker — output diarahkan ke style yang
       // cocok untuk cetak (flat, clean edge, background polos).
       const stickerPrompt = `die-cut sticker design, ${prompt}, bold flat vector illustration style, clean sharp edges, centered on plain white background`;
-      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(stickerPrompt)}?width=1024&height=1024&model=flux&seed=${Math.floor(Math.random() * 1e6)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const blob = await res.blob();
-      if (!blob.type.startsWith("image/")) throw new Error("not an image");
-      applyImageSource(URL.createObjectURL(blob));
-    } catch {
-      setAiError("AI lagi sibuk atau koneksi bermasalah. Tunggu ±15 detik lalu coba lagi ya.");
+      const buildUrl = () =>
+        `https://image.pollinations.ai/prompt/${encodeURIComponent(stickerPrompt)}?width=1024&height=1024&model=flux&seed=${Math.floor(Math.random() * 1e6)}&referrer=bisaprint&private=true`;
+
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 120_000);
+        try {
+          const res = await fetch(buildUrl(), { signal: controller.signal });
+          if (!res.ok) continue; // 4xx/5xx sesaat → retry sekali
+          const blob = await res.blob();
+          if (!blob.type.startsWith("image/")) continue;
+          applyImageSource(URL.createObjectURL(blob));
+          return;
+        } catch {
+          // abort (timeout 120s) / network error → retry sekali lalu menyerah
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      setAiError("AI gratis lagi penuh antrean. Tunggu ±1 menit lalu coba lagi ya.");
     } finally {
       setAiLoading(false);
     }
@@ -927,6 +942,11 @@ export function DesignSimulator() {
                 )}
                 {aiLoading ? "Generating…" : "Generate Draft"}
               </button>
+              {aiLoading && (
+                <p aria-live="polite" className="mt-2 text-[11px] text-[var(--color-text-muted)]">
+                  AI gratis kadang antre — bisa sampai ±1 menit, jangan tutup halaman.
+                </p>
+              )}
               {aiError && (
                 <p role="alert" className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
                   {aiError}

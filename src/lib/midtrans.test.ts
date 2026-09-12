@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import {
-  getMidtransBaseUrl,
-  isMidtransConfigured,
-  generateOrderId,
-} from "./midtrans";
+import { getMidtransBaseUrl, isMidtransConfigured } from "./midtrans";
+import { generateOrderId } from "./orders";
 
 describe("getMidtransBaseUrl", () => {
   const originalEnv = process.env;

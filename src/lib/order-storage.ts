@@ -56,7 +56,12 @@ export interface StoredOrder {
   };
   payment: {
     status: "pending" | "paid" | "cancelled" | "expired";
-    midtransOrderId: string;
+    /** Channel order dibuat: "midtrans" = Snap gateway, "whatsapp" = order via
+     *  WA (transfer manual, dicocokkan admin). Optional — order lama (pre-method)
+     *  diperlakukan sebagai midtrans. */
+    method?: "midtrans" | "whatsapp";
+    /** Hanya terisi untuk order method "midtrans" — kunci lookup webhook. */
+    midtransOrderId?: string;
     paidAt?: string;
     /** Set when a paid webhook carries a gross_amount that doesn't match pricing.total. */
     discrepancy?: string;

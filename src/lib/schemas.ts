@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCTION_STATUSES } from "@/types";
 
 // Zod schemas untuk input validasi API routes (feature-architecture rule:
 // "API routes WAJIB validasi input (Zod)").
@@ -56,5 +57,5 @@ export const adminListQuerySchema = z.object({
 // Admin: production-status mutation — separate from payment.status by contract
 // (PD-A-04): admin workflow must never touch the Midtrans state machine.
 export const adminProductionPatchSchema = z.object({
-  productionStatus: z.enum(["baru", "diproses", "selesai", "diambil"]),
+  productionStatus: z.enum(PRODUCTION_STATUSES),
 });

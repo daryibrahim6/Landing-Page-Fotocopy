@@ -214,17 +214,59 @@ export function CheckoutForm() {
     }
   }, [product, form, pricing, fileUrl, router, validate]);
 
-  const handleWaOnly = useCallback(() => {
+  const handleWaOnly = useCallback(async () => {
     if (!product || !validate()) return;
     trackEvent("Lead", { source: "checkout-wa", product: product.id });
-    // Kode order unik — admin mencocokkan mutasi transfer manual dengan kode
-    // ini (zero-cost alternative sampai cek-mutasi otomatis dipasang).
-    const orderCode = `BSP-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+    setSubmitting(true);
+    setError("");
+    // Kode order dibuat server-side via /api/orders supaya order tercatat di
+    // dashboard admin (matching mutasi manual). Kalau penyimpanan gagal, WA
+    // tetap terbuka dengan kode lokal — order lewat chat tidak boleh gagal.
+    let orderCode = `BSP-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+    let stored = false;
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.id,
+          size: form.size,
+          material: form.material,
+          finishing: form.finishing,
+          quantity: form.quantity,
+          fileUrl: fileUrl || undefined,
+          customerDetails: {
+            name: form.name,
+            phone: form.phone,
+            email: form.email || undefined,
+          },
+          customerExtra: {
+            pickup: form.pickup,
+            address: form.address,
+            notes: form.notes,
+          },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.orderId === "string" && data.orderId) {
+          orderCode = data.orderId;
+          stored = true;
+        }
+      }
+    } catch {
+      // network/penyimpanan gagal → fallback kode lokal, WA tetap dibuka
+    }
     const fileInfo = fileUrl ? `\nFile: ${fileUrl}` : "";
     const msg = `Halo Admin Bisa Print, saya mau order.\nKode Order: ${orderCode}\nProduk: ${product.name}\nUkuran: ${form.size}\nBahan: ${form.material}\nFinishing: ${form.finishing}\nJumlah: ${form.quantity}\nNama: ${form.name}\nNo. WA: ${form.phone}\nPengambilan: ${form.pickup}${form.pickup === "kirim" ? `\nAlamat: ${form.address}` : ""}\nCatatan: ${form.notes}${fileInfo}`;
     window.open(waCustomUrl(msg), "_blank");
-    setSubmitted(true);
-  }, [product, form, fileUrl, validate]);
+    setSubmitting(false);
+    if (stored) {
+      router.push(`/checkout/success?orderId=${orderCode}`);
+    } else {
+      setSubmitted(true);
+    }
+  }, [product, form, fileUrl, validate, router]);
 
   if (!product) {
     return (
@@ -577,15 +619,25 @@ export function CheckoutForm() {
                   Bayar Sekarang
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleWaOnly}
-                  disabled={submitting || !form.name || !form.phone}
-                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1ebe5d] disabled:opacity-50"
-                >
-                  <MessageCircle className="size-4" />
-                  Order via WhatsApp
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={handleWaOnly}
+                    disabled={submitting || !form.name || !form.phone}
+                    className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1ebe5d] disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    ) : (
+                      <MessageCircle className="size-4" />
+                    )}
+                    Order via WhatsApp
+                  </button>
+                  <p className="mt-2 text-center text-[11px] text-[var(--color-text-muted)]">
+                    Order dulu tanpa bayar — kamu dapat kode order, admin konfirmasi detail &amp;
+                    total via WhatsApp sebelum kamu transfer.
+                  </p>
+                </>
               )}
             </div>
           </div>

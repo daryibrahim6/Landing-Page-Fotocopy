@@ -337,6 +337,12 @@ List kategori ini bukan dari contoh konkret yang user sebut, tapi dari riset e-c
 - Daftar order & status — untuk tracking produksi
 - Referensi: internal ops need
 
+**7. Order Persistence & Lifecycle** *(ditambahkan dari UX-0.5 sweep, 12 Sep 2026)*
+- Setiap order yang "dibuat" di client WAJIB punya record server-side SEBELUM user diarahkan keluar (buka WA, redirect payment). Tanpa itu: dashboard bohong, kode order yatim, follow-up mustahil.
+- Contoh kasus nyata: `handleWaOnly` bikin `BSP-XXXX` hanya di body pesan WA — tidak masuk `/admin/orders`, tidak bisa di-lookup, hilang kalau popup diblokir. Difix via `POST /api/orders`.
+- Order "pending" dari channel non-gateway harus punya TTL/cleanup path (sudah ada: `PENDING_ORDER_TTL_SECONDS`).
+- Referensi: order-management convention (Baymard), atomicity principle.
+
 ### Cara Eksekusi Functional Completeness Audit
 
 1. **Identifikasi SEMUA persona** di platform (Customer/pengunjung, Admin/owner untuk future dashboard)

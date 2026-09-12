@@ -18,9 +18,3 @@ export function getMidtransClientKey(): string {
 export function isMidtransConfigured(): boolean {
   return getMidtransClientKey().length > 0;
 }
-
-export function generateOrderId(): string {
-  const timestamp = Date.now().toString(36);
-  const random = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
-  return `BSP-${timestamp}-${random}`.toUpperCase();
-}

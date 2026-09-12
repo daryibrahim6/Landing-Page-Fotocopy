@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/redis";
-import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
-import { saveOrder, type StoredOrder } from "@/lib/order-storage";
+import { getMidtransBaseUrl, getMidtransServerKey } from "@/lib/midtrans";
+import { buildStoredOrder, generateOrderId } from "@/lib/orders";
+import { saveOrder } from "@/lib/order-storage";
 import { notifyAdminNewOrder, dispatchAdminNotification } from "@/lib/notification";
 import { createTokenBodySchema } from "@/lib/schemas";
-import { calculatePrice } from "@/lib/pricing";
-import { products } from "@/data/products";
 
 // Rate limit token creation per IP when Redis is configured (same policy as
 // /api/upload): blocks order-spam that would mint junk Midtrans transactions.
@@ -38,73 +37,17 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    const { productId, size, material, finishing, quantity, fileUrl, customerDetails, customerExtra } =
-      parsed.data;
-
-    // Server-side recompute: product and specs must exist in our catalog, and the
-    // price is always derived server-side — client-supplied amounts are ignored.
-    const product = products.find((p) => p.id === productId);
-    if (
-      !product ||
-      !product.sizes.includes(size) ||
-      !product.materials.includes(material) ||
-      !product.finishings.includes(finishing)
-    ) {
-      return NextResponse.json({ error: "Unknown product or spec option" }, { status: 400 });
-    }
-    if (!product.isCheckoutEnabled) {
-      return NextResponse.json(
-        { error: "Produk ini belum tersedia untuk checkout online. Hubungi admin via WhatsApp." },
-        { status: 400 },
-      );
-    }
-
-    const pricing = calculatePrice(productId, size, material, finishing, quantity);
-    if (pricing.total <= 0) {
-      return NextResponse.json({ error: "Could not compute price" }, { status: 400 });
-    }
-
+    // Server-side recompute: product/specs divalidasi ke katalog + harga
+    // dihitung ulang di buildStoredOrder — input harga client tidak dipercaya.
     const orderId = generateOrderId();
+    const built = buildStoredOrder(parsed.data, orderId, "midtrans");
+    if ("error" in built) {
+      return NextResponse.json({ error: built.error }, { status: 400 });
+    }
+    const { order } = built;
     const serverKey = getMidtransServerKey();
     const baseUrl = getMidtransBaseUrl();
-    const unitPrice = Math.round(pricing.total / quantity);
-
-    const order: StoredOrder = {
-      id: orderId,
-      productId: product.id,
-      productName: `${product.name} (${size} - ${material} - ${finishing})`,
-      specs: {
-        ukuran: size,
-        bahan: material,
-        finishing,
-        jumlah: String(quantity),
-      },
-      customer: {
-        name: customerDetails.name,
-        phone: customerDetails.phone,
-        email: customerDetails.email || "",
-        pickup: customerExtra?.pickup ?? "ambil",
-        address: customerExtra?.address,
-        notes: customerExtra?.notes,
-      },
-      pricing: {
-        subtotal: pricing.total,
-        total: pricing.total,
-      },
-      payment: {
-        status: "pending",
-        midtransOrderId: orderId,
-      },
-      // Only persist real file references: blob: keys (Upstash Blob —
-      // resolved via /api/admin/files) or legacy http(s) URLs. Local-dev
-      // data: URLs are dropped.
-      fileUrl:
-        fileUrl && (fileUrl.startsWith("http") || fileUrl.startsWith("blob:"))
-          ? fileUrl
-          : undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    const unitPrice = Math.round(order.pricing.total / parsed.data.quantity);
 
     await saveOrder(order);
     await dispatchAdminNotification(() => notifyAdminNewOrder(order));
@@ -130,20 +73,20 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         transaction_details: {
           order_id: orderId,
-          gross_amount: pricing.total,
+          gross_amount: order.pricing.total,
         },
         item_details: [
           {
-            id: product.id,
+            id: order.productId,
             price: unitPrice,
-            quantity,
+            quantity: parsed.data.quantity,
             name: order.productName,
           },
         ],
         customer_details: {
-          first_name: customerDetails.name,
-          phone: customerDetails.phone,
-          ...(customerDetails.email ? { email: customerDetails.email } : {}),
+          first_name: order.customer.name,
+          phone: order.customer.phone,
+          ...(order.customer.email ? { email: order.customer.email } : {}),
         },
         callbacks: {
           finish: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/checkout/success?orderId=${orderId}`,

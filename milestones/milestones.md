@@ -100,6 +100,10 @@ Feedback dari owner via WA → dieksekusi:
 
 | Task | Status | Deskripsi |
 |------|--------|-----------|
+| UX-0.5 Functional Completeness | ✅ Done | Sweep persona Customer+Admin × 7 kategori → 15 gap; 4 fix dieksekusi (`POST /api/orders` order WA tercatat, FAQ garansi/revisi, trust line, status "batal"). Detail: `reports/cross-audits/functional-completeness-sweep.md` |
+| Order tracking page customer | ⬜ Backlog | FC-06 — halaman cek status via orderId (sementara: success URL bookmark-able) |
+| Info rekening di success page | ⬜ Backlog | FC-07 — butuh nomor rekening owner |
+| Estimasi ongkir "kirim" | ⬜ Backlog | FC-05 — butuh tarif kurir owner |
 | Pricing matrix | ⬜ Backlog | Harga per material/ukuran/finishing (sekarang `priceFrom * quantity` + admin konfirmasi via WA) |
 | WA Business API | ⬜ Backlog | Notifikasi otomatis ke customer (sekarang WA URL ke admin via `logNotification`) |
 | E2E suite per flow | ⬜ Backlog | Spec Playwright untuk 5 flow |

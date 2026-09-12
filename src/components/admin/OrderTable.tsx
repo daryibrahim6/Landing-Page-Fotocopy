@@ -21,6 +21,7 @@ const PRODUCTION_LABEL: Record<ProductionStatus, string> = {
   diproses: "Diproses",
   selesai: "Selesai",
   diambil: "Diambil",
+  batal: "Batal",
 };
 
 function fmtDate(iso: string) {
@@ -102,6 +103,11 @@ export default function OrderTable({
                   <div className="min-w-0">
                     <p className="font-semibold text-gray-900">
                       {o.id}
+                      {o.payment.method === "whatsapp" && (
+                        <span className="ml-2 rounded bg-emerald-100 px-1.5 py-0.5 align-middle text-[11px] font-semibold text-emerald-800">
+                          via WA
+                        </span>
+                      )}
                       <span className="ml-2 font-normal text-gray-500">{fmtDate(o.createdAt)}</span>
                     </p>
                     <p className="mt-1 text-sm text-gray-700">
