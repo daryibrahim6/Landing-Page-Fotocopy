@@ -5,6 +5,8 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 
 **Last updated:** 12 September 2026
 
+> **Milestone 7 (feedback owner) terkirim — commit `56733f0`:** etalase dipangkas ke 7 produk + card "Produk Lainnya", upload preview kini tile design ke semua cell, fix math imposition (gap antar-cell), harga per-lembar tier (placeholder — tunggu price list owner), AI draft via Pollinations (gratis, tanpa key), kode order BSP-XXXX di WA checkout. 157/157 tests, build hijau.
+
 ---
 
 ## Legenda
