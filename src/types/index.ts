@@ -56,10 +56,13 @@ export interface MidtransCustomerDetails {
 }
 
 export interface MidtransCreateTokenBody {
-  items: MidtransItem[];
+  productId: string;
+  size: string;
+  material: string;
+  finishing: string;
+  quantity: number;
+  fileUrl?: string;
   customerDetails: MidtransCustomerDetails;
-  grossAmount: number;
-  specs?: Record<string, string>;
   customerExtra?: {
     pickup?: "ambil" | "kirim";
     address?: string;

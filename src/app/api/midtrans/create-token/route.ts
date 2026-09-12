@@ -3,7 +3,8 @@ import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib
 import { saveOrder, type StoredOrder } from "@/lib/order-storage";
 import { notifyAdminNewOrder, logNotification } from "@/lib/notification";
 import { createTokenBodySchema } from "@/lib/schemas";
-import type { MidtransCreateTokenBody, MidtransItem } from "@/types";
+import { calculatePrice } from "@/lib/pricing";
+import { products } from "@/data/products";
 
 export async function POST(request: Request) {
   try {
@@ -14,42 +15,59 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    const body = parsed.data as MidtransCreateTokenBody;
-    const { items, customerDetails, grossAmount } = body;
+    const { productId, size, material, finishing, quantity, fileUrl, customerDetails, customerExtra } =
+      parsed.data;
+
+    // Server-side recompute: product and specs must exist in our catalog, and the
+    // price is always derived server-side — client-supplied amounts are ignored.
+    const product = products.find((p) => p.id === productId);
+    if (
+      !product ||
+      !product.sizes.includes(size) ||
+      !product.materials.includes(material) ||
+      !product.finishings.includes(finishing)
+    ) {
+      return NextResponse.json({ error: "Unknown product or spec option" }, { status: 400 });
+    }
+
+    const pricing = calculatePrice(productId, size, material, finishing, quantity);
+    if (pricing.total <= 0) {
+      return NextResponse.json({ error: "Could not compute price" }, { status: 400 });
+    }
 
     const orderId = generateOrderId();
     const serverKey = getMidtransServerKey();
     const baseUrl = getMidtransBaseUrl();
-
-    const item = items[0];
-    const extra = body.customerExtra;
+    const unitPrice = Math.round(pricing.total / quantity);
 
     const order: StoredOrder = {
       id: orderId,
-      productId: item.id,
-      productName: item.name,
-      specs: body.specs ?? {
-        ukuran: "-",
-        bahan: "-",
-        finishing: "-",
-        jumlah: String(item.quantity),
+      productId: product.id,
+      productName: `${product.name} (${size} - ${material} - ${finishing})`,
+      specs: {
+        ukuran: size,
+        bahan: material,
+        finishing,
+        jumlah: String(quantity),
       },
       customer: {
         name: customerDetails.name,
         phone: customerDetails.phone,
-        email: customerDetails.email ?? "",
-        pickup: extra?.pickup ?? "ambil",
-        address: extra?.address,
-        notes: extra?.notes,
+        email: customerDetails.email || "",
+        pickup: customerExtra?.pickup ?? "ambil",
+        address: customerExtra?.address,
+        notes: customerExtra?.notes,
       },
       pricing: {
-        subtotal: grossAmount,
-        total: grossAmount,
+        subtotal: pricing.total,
+        total: pricing.total,
       },
       payment: {
         status: "pending",
         midtransOrderId: orderId,
       },
+      // Only persist real URLs (Vercel Blob). Local-dev data: URLs are dropped.
+      fileUrl: fileUrl?.startsWith("http") ? fileUrl : undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -78,18 +96,20 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         transaction_details: {
           order_id: orderId,
-          gross_amount: grossAmount,
+          gross_amount: pricing.total,
         },
-        item_details: items.map((item: MidtransItem) => ({
-          id: item.id,
-          price: item.price,
-          quantity: item.quantity,
-          name: item.name,
-        })),
+        item_details: [
+          {
+            id: product.id,
+            price: unitPrice,
+            quantity,
+            name: order.productName,
+          },
+        ],
         customer_details: {
           first_name: customerDetails.name,
           phone: customerDetails.phone,
-          email: customerDetails.email,
+          ...(customerDetails.email ? { email: customerDetails.email } : {}),
         },
         callbacks: {
           finish: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/checkout/success?orderId=${orderId}`,

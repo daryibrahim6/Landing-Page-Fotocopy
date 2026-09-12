@@ -10,8 +10,8 @@ export const templates: Record<string, string | ((...args: string[]) => string)>
     `Halo Admin Bisa Print, saya mau order.\nProduk: ${productName}\nJumlah:\nUkuran:\nBahan:\nCatatan:`,
   postCheckout: (orderId: string) =>
     `Halo Admin Bisa Print, saya sudah bayar order ${orderId}. Mohon konfirmasi dan cek file desain saya. Terima kasih!`,
-  adminNewOrder: (orderId: string, product: string, customer: string, phone: string, total: string, notes = "-") =>
-    `🔔 Order Baru #${orderId}\nProduk: ${product}\nCustomer: ${customer}\nWA: ${phone}\nTotal: ${total}\nCatatan: ${notes}\nSegera cek file desain di dashboard.`,
+  adminNewOrder: (orderId: string, product: string, customer: string, phone: string, total: string, notes = "-", file = "-") =>
+    `🔔 Order Baru #${orderId}\nProduk: ${product}\nCustomer: ${customer}\nWA: ${phone}\nTotal: ${total}\nCatatan: ${notes}\nFile: ${file}`,
   adminPaidOrder: (orderId: string, product: string, customer: string, phone: string, total: string) =>
     `✅ Pembayaran Berhasil #${orderId}\nProduk: ${product}\nCustomer: ${customer}\nWA: ${phone}\nTotal: ${total}\nOrder siap diproses.`,
 };

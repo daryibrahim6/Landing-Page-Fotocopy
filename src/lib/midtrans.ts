@@ -13,12 +13,14 @@ export function getMidtransClientKey(): string {
   return process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
 }
 
+// Client-safe check: only the NEXT_PUBLIC_ client key is visible in the browser.
+// Server key absence is handled server-side by the create-token simulation fallback.
 export function isMidtransConfigured(): boolean {
-  return getMidtransServerKey().length > 0 && getMidtransClientKey().length > 0;
+  return getMidtransClientKey().length > 0;
 }
 
 export function generateOrderId(): string {
   const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
+  const random = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
   return `BSP-${timestamp}-${random}`.toUpperCase();
 }

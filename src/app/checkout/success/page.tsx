@@ -2,16 +2,24 @@ import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import { getOrder, type StoredOrder } from "@/lib/order-storage";
 import { formatRupiah } from "@/lib/utils";
+import { orderIdSchema } from "@/lib/schemas";
 
 interface Props {
   searchParams: Promise<{ orderId?: string }>;
 }
 
+const STATUS_LABELS: Record<StoredOrder["payment"]["status"], string> = {
+  pending: "Menunggu Pembayaran",
+  paid: "Lunas",
+  cancelled: "Dibatalkan",
+  expired: "Kedaluwarsa",
+};
+
 export default async function CheckoutSuccessPage({ searchParams }: Props) {
   const { orderId } = await searchParams;
   let order: StoredOrder | null = null;
 
-  if (orderId) {
+  if (orderId && orderIdSchema.safeParse(orderId).success) {
     order = await getOrder(orderId);
   }
 
@@ -34,7 +42,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             </p>
             <p>Produk: {order.productName}</p>
             <p>Total: {formatRupiah(order.pricing.total)}</p>
-            <p>Status: {order.payment.status}</p>
+            <p>Status: {STATUS_LABELS[order.payment.status]}</p>
           </div>
         )}
         {orderId && !order && (

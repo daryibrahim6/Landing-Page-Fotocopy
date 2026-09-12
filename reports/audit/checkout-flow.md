@@ -63,7 +63,7 @@
 - **Opsi B — Validasi silang:** tetap terima `grossAmount` dari client tapi bandingkan dengan `calculatePrice()` server-side; tolak kalau beda >toleransi. Sama amannya, tapi menjaga kontrak client yang tidak perlu ada.
 - **Rekomendasi Devin:** Opsi A — hapus `grossAmount`/`price` dari schema, derive semua dari product+specs. Simpler contract, mustahil tamper.
 - **Kalau rekomendasi salah:** kalau `calculatePrice` tidak cover semua kombinasi (misal opsi Custom butuh harga manual admin), order legit bisa tertolak — mitigasi: fallback multiplier 1 + flag `needsManualQuote` di order, admin konfirmasi via WA (flow yang sudah ada).
-- **Future gap tag:** security | **Status:** OPEN
+- **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — server recompute via `calculatePrice`; schema baru menerima `productId+size+material+finishing+quantity` saja, field amount client di-strip oleh Zod (`schemas.test.ts` verifikasi `grossAmount`/`items` tidak pernah masuk kontrak).
 
 ### CF-A-12 — P1 — Tombol "Bayar Sekarang" tidak pernah render — seluruh jalur Snap unreachable
 - **Skenario:** `CheckoutForm` (client component) memanggil `isMidtransConfigured()` yang mengecek `MIDTRANS_SERVER_KEY` — env non-`NEXT_PUBLIC_` → di bundle client selalu `undefined` → fungsi selalu `false` → yang render selalu tombol "Order via WhatsApp". Jalur Snap/token/success page = dead code dari sisi UI, walaupun env Midtrans terisi penuh.
@@ -72,7 +72,7 @@
 - **Opsi A — Flag public eksplisit:** tambah `NEXT_PUBLIC_MIDTRANS_ENABLED=true`; `isMidtransConfigured()` cek flag itu + client key saja. Paling sederhana.
 - **Opsi B — Server-driven:** `/checkout` jadi Server Component yang pass prop `midtransEnabled` ke form. Lebih "benar" tapi ubah struktur page.
 - **Rekomendasi Devin:** Opsi A — satu env var, zero refactor, explicit.
-- **Future gap tag:** infra | **Status:** OPEN
+- **Future gap tag:** infra | **Status:** FIXED (Tahap 2, 12 Sep) — `isMidtransConfigured()` kini cek `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` saja (client-safe); server key tetap server-only via simulation fallback.
 
 ### CF-A-13 — P1 — Verifikasi signature webhook fail-open kalau `MIDTRANS_SERVER_KEY` kosong
 - **Skenario:** `if (serverKey) { verify }` — kalau env lupa diset di production, SIAPAPUN bisa POST `{order_id, transaction_status:"settlement", status_code:"200", gross_amount:"x"}` → order jadi `paid`. Fail-open di boundary finansial.
@@ -81,14 +81,14 @@
 - **Opsi A — Fail closed:** kalau `serverKey` kosong → return 500/503 + log error keras ("webhook disabled: no server key"). Benar untuk endpoint yang wajib auth.
 - **Opsi B — Dev bypass eksplisit:** allow skip hanya kalau `NODE_ENV !== "production"`. Praktis untuk dev tapi menambah kondisional env-sensitive.
 - **Rekomendasi Devin:** Opsi A — webhook tanpa secret tidak boleh melakukan apa-apa. Dev bisa set dummy key lokal.
-- **Future gap tag:** security | **Status:** OPEN
+- **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — webhook fail-closed: tanpa `MIDTRANS_SERVER_KEY` return 500, notifikasi ditolak.
 
 ### CF-A-14 — P1 — Webhook abaikan `fraud_status` dan `status_code`
 - **Skenario:** mapping hanya lihat `transaction_status`. Per docs Midtrans, transaksi sukses = `status_code 200` + `fraud_status accept` + `transaction_status settlement/capture`. `capture` dengan `fraud_status: "challenge"` (fraud review) → sekarang langsung ditandai `paid`.
 - **Bukti:** `webhook/route.ts` L14 (hanya destructure 5 field), L29-45 (mapping); `schemas.ts` L31-37 (`fraud_status` tidak ada di schema).
 - **Risiko:** transaksi ter-flag fraud tercatat `paid` → admin proses order yang harusnya review.
 - **Solusi:** extend schema (`status_code`, `fraud_status` optional), gate `capture` → `paid` hanya kalau `fraud_status !== "challenge"` (atau `accept`); log/abaikan sisanya. Solusi tunggal, jelas.
-- **Future gap tag:** security | **Status:** OPEN
+- **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — `paid` hanya jika `status_code==="200"` dan `fraud_status` bukan `challenge`/`deny`; capture+challenge → ignored (no status change).
 
 ### CF-A-15 — P1 — Transisi status order tidak monoton (paid bisa regresi)
 - **Skenario:** `updateOrderStatus` menimpa status apa pun dengan status baru. Midtrans bisa kirim notifikasi telat/out-of-order — `expire` yang datang setelah `settlement` akan mengubah order `paid` → `expired`. Read-modify-write non-atomik juga membuka race dua webhook bersamaan.
@@ -97,21 +97,21 @@
 - **Opsi A — Guard transisi:** `paid` terminal; `expired/cancelled` tidak boleh balik `pending`; tolak write yang regresi (log warning). Kecil, di satu fungsi.
 - **Opsi B — Reconcile via Status API:** sebelum update, panggil Midtrans GET status untuk otoritas terkini. Lebih akurat tapi menambah network call + complexity.
 - **Rekomendasi Devin:** Opsi A sekarang; Opsi B nanti kalau ada kasus dispute nyata.
-- **Future gap tag:** concurrency | **Status:** OPEN
+- **Future gap tag:** concurrency | **Status:** FIXED (Tahap 2, 12 Sep) — `updateOrderStatus` punya terminal-status guard (`paid`/`cancelled`/`expired` tidak bisa regresi; same-status idempotent). Ditest: `order-storage.test.ts` "blocks a late expire from regressing a paid order".
 
 ### CF-A-16 — P2 — Snap `onClose` tidak di-handle — tombol stuck disabled selamanya
 - **Skenario:** `snap.pay` hanya daftarkan `onSuccess/onPending/onError`. Kalau user tutup popup Snap (klik X) tanpa bayar, `onClose` tidak ada → `submitting` tetap `true` → tombol "Bayar Sekarang" spinner/disabled permanen sampai reload. Per docs Snap, `onClose` adalah callback resmi untuk kasus ini.
 - **Bukti:** `CheckoutForm.tsx` L187-202.
 - **Risiko:** user yang ragu/tutup popup tidak bisa retry — conversion drop.
 - **Solusi:** tambah `onClose: () => setSubmitting(false)` + pesan ringan ("Popup ditutup — klik Bayar lagi kalau masih mau lanjut"). Tunggal, jelas.
-- **Future gap tag:** none | **Status:** OPEN
+- **Future gap tag:** none | **Status:** FIXED (Tahap 2, 12 Sep) — `onClose` added: `setSubmitting(false)` + pesan retry "Popup pembayaran ditutup. Klik 'Bayar Sekarang' untuk mencoba lagi."
 
 ### CF-A-17 — P2 — Response error API diperlakukan seperti sukses
 - **Skenario:** kalau `create-token` return 400/500 (`{error}` tanpa `token`), kode jatuh ke `else` → buka WA + `setSubmitted(true)` → user lihat "Pesanan Diterima" padahal order mungkin tidak tersimpan (400 = sebelum `saveOrder`) atau orphan pending (Midtrans 500 = setelah save). Pesan sukses untuk kegagalan = dishonest UI.
 - **Bukti:** `CheckoutForm.tsx` L174-208 — tidak ada cek `res.ok` / `data.error`.
 - **Risiko:** user yakin order masuk padahal tidak; order pending yatim di storage.
 - **Solusi:** cek `res.ok` + `data.error` dulu → tampilkan error inline (pola `text-red-500` yang sudah ada) + WA sebagai *opsi* fallback, bukan auto-success. Tunggal, jelas.
-- **Future gap tag:** none | **Status:** OPEN
+- **Future gap tag:** none | **Status:** FIXED (Tahap 2, 12 Sep) — cek `!res.ok || data.error` → inline error, tidak pernah set `submitted` pada failure.
 
 ### CF-A-18 — P2 — `GET /api/orders/[orderId]` publik return PII order penuh, tidak dipakai app
 - **Skenario:** endpoint return `StoredOrder` lengkap (nama, phone, alamat, total) ke siapapun dengan `orderId` valid — tanpa auth. `grep` tidak menemukan caller di `src/` — success page pakai `getOrder()` langsung (server-side), bukan endpoint ini. Dead endpoint yang expose PII.
@@ -120,7 +120,7 @@
 - **Opsi A — Hapus route** (YAGNI; ponytail: deletion over addition). Kalau nanti butuh tracking page, buat ulang dengan desain auth.
 - **Opsi B — Keep + minimalkan response:** return hanya `{id, productName, status, total}` (tanpa PII) untuk future order-tracking. Berguna kalau halaman tracking direncanakan.
 - **Rekomendasi Devin:** Opsi A sekarang — tidak ada fitur yang pakai; re-add saat tracking dibutuhkan.
-- **Future gap tag:** security | **Status:** OPEN
+- **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — route `GET /api/orders/[orderId]` dihapus (0 caller, expose PII). Re-add nanti dengan access token saat halaman tracking dibuat.
 
 ### CF-A-19 — P2 — `/api/upload` publik tanpa rate limit/auth
 - **Skenario:** siapapun bisa POST file ≤10MB ke Vercel Blob berulang kali → cost/abuse, storage penuh file liar tidak terikat order.
@@ -130,69 +130,69 @@
 - **Opsi B — Signed upload flow:** request URL upload dulu (yang bisa di-rate-limit/di-audit), baru upload. Lebih proper tapi refactor.
 - **Opsi C — Accept untuk MVP** + monitoring Vercel usage; dokumentasikan sebagai known-limitation.
 - **Rekomendasi Devin:** Opsi A (rate limit) atau C + alert usage — tergantung traffic. Opsi B saat volume naik.
-- **Future gap tag:** security/infra | **Status:** OPEN
+- **Future gap tag:** security/infra | **Status:** FIXED (Tahap 2, 12 Sep) — `@upstash/ratelimit` sliding window 10 req/menit per IP (aktif hanya saat Redis dikonfigurasi; dev lokal unlimited).
 
 ### CF-A-20 — P2 — Webhook tidak membandingkan `gross_amount` dengan total order tersimpan
 - **Skenario:** notifikasi `settlement` dengan amount berbeda dari `order.pricing.total` tetap flip ke `paid`. Signature memang cover `gross_amount` (jadi tidak bisa dipalsukan tanpa key), tapi kombinasi dengan CF-A-11 (amount bisa tamper SAAT create) berarti underpaid transaction → settlement → paid tanpa alarm.
 - **Bukti:** `webhook/route.ts` — `gross_amount` hanya dipakai untuk signature, tidak dibandingkan ke order.
 - **Risiko:** pembayaran parsial/tampered lolos sebagai "lunas".
 - **Solusi:** setelah `updateOrderStatus`, bandingkan `Number(gross_amount)` dengan `order.pricing.total`; mismatch → flag order (`payment.discrepancy`) + log warning + jangan auto-`paid`. Tunggal, jelas — dan jadi net safety untuk CF-A-11.
-- **Future gap tag:** security | **Status:** OPEN
+- **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — webhook bandingkan `Math.round(gross_amount)` vs `order.pricing.total` sebelum `paid`; mismatch → `payment.discrepancy` flag + tetap pending.
 
 ### CF-A-21 — P3 — Email fabricate `customer-{phone}@bisaprint.com` dikirim ke Midtrans
 - **Skenario:** customer tanpa email → CheckoutForm fabrikasi `customer-<phone>@bisaprint.com` → Midtrans kirim receipt ke alamat itu. Kalau domain `bisaprint.com` bukan milik BisaPrint, receipt (berisi data order) pergi ke pihak ketiga.
 - **Bukti:** `CheckoutForm.tsx` L156.
 - **Risiko:** receipt email nyasar + data order ke domain orang lain.
 - **Solusi:** omit `email` saat kosong (schema sudah optional; Midtrans terima tanpa email), atau pakai domain yang dimiliki (`@bisaprint.id` dst) — verifikasi kepemilikan domain dulu.
-- **Future gap tag:** security/privacy | **Status:** OPEN
+- **Future gap tag:** security/privacy | **Status:** FIXED (Tahap 2, 12 Sep) — fabricate email dihapus; email hanya dikirim ke Midtrans kalau user isi (server juga omit field saat kosong).
 
 ### CF-A-22 — P3 — Validasi phone tidak konsisten client vs server
 - **Skenario:** client `PHONE_REGEX` = 9–15 digit; schema server `min(8)`. Server lebih longgar → data phone aneh bisa masuk order; juga tidak ada normalisasi `08xx` → `62xx` (template WA admin menampilkan mentah).
 - **Bukti:** `CheckoutForm.tsx` L27; `schemas.ts` L17.
 - **Solusi:** selaraskan — schema `z.string().regex(/^[0-9]{9,15}$/)` + optional transform normalisasi ke `62…` untuk konsistensi notif.
-- **Future gap tag:** none | **Status:** OPEN
+- **Future gap tag:** none | **Status:** FIXED (Tahap 2, 12 Sep) — `phoneSchema` shared di `schemas.ts`: regex `^[0-9]{9,15}$` + normalisasi ke `62` prefix, dipakai server-side; client strip non-digit + regex sama.
 
 ### CF-A-23 — P3 — Field `StoredOrder.fileUrl` tidak pernah diisi; notif admin nyebut "dashboard" yang belum ada
 - **Skenario:** `CheckoutForm` kirim file URL di `specs.file` (string record), bukan `order.fileUrl` (field dedicated, selalu `undefined`). Dan template `adminNewOrder` bilang "Segera cek file desain di dashboard" — `production-dashboard-flow` masih backlog → admin tidak punya link file sama sekali di notif.
 - **Bukti:** `order-storage.ts` L31 (field ada); `create-token/route.ts` L31-36 (specs pass-through, fileUrl tidak diset); `wa.ts` L14 (teks dashboard).
 - **Solusi:** set `order.fileUrl = specs.file` (atau field dedicated di body) + masukkan URL file ke template WA admin, ganti teks "dashboard" sementara dashboard belum ada.
-- **Future gap tag:** cross-flow | **Status:** OPEN
+- **Future gap tag:** cross-flow | **Status:** FIXED (Tahap 2, 12 Sep) — `order.fileUrl` diisi dari `fileUrl` body (hanya URL http — data URL lokal didrop); template `adminNewOrder` tampilkan `File: <url>` bukan "cek dashboard".
 
 ### CF-A-24 — P3 — Fallback in-memory diam di production
 - **Skenario:** kalau `UPSTASH_*` lupa diset di deploy production, order masuk ke `Map` per-instance serverless — webhook yang hit instance lain → `order not found` → status tidak pernah update, dan tidak ada error yang terlihat. Gagal diam-diam.
 - **Bukti:** `order-storage.ts` L35-51 — fallback silent; tidak ada warning.
 - **Solusi:** `console.warn` satu kali saat fallback aktif ("order storage = in-memory, non-persistent") — atau fail hard kalau `NODE_ENV === "production" && !redis`. Kecil.
-- **Future gap tag:** infra | **Status:** OPEN
+- **Future gap tag:** infra | **Status:** FIXED (Tahap 2, 12 Sep) — `console.warn` di module load saat Redis env absent ("non-persistent, per-instance. Set env vars for production").
 
 ### CF-A-25 — P3 — `transaction_status` tak dikenal dipetakan ke `pending`
 - **Skenario:** `refund`, `partial_refund`, `chargeback` (midtrans punya status ini) → switch default → `pending`. Refund seharusnya tidak menurunkan status ke pending.
 - **Bukti:** `webhook/route.ts` L29-45 (default case → pending); schema `transaction_status: z.string()` menerima apa saja.
 - **Solusi:** default → tidak update status, hanya log (`unknown status, ignored`). Tunggal.
-- **Future gap tag:** none | **Status:** OPEN
+- **Future gap tag:** none | **Status:** FIXED (Tahap 2, 12 Sep) — status tak dikenal (refund/chargeback/authorize/dst) → log + `ignored: true`, tidak menyentuh order.
 
 ### CF-A-26 — P3 — Order `pending` yatim menumpuk tanpa TTL/cleanup
 - **Skenario:** setiap klik "Bayar" membuat order baru; user yang abandon → order `pending` di Redis selamanya (expire webhook Midtrans tiba 24 jam — baik) — tapi order `simulation`/gagal tidak pernah dapat notifikasi expire. Tanpa TTL, storage tumbuh tak terbatas.
 - **Bukti:** `order-storage.ts` — `redis.set` tanpa TTL; tidak ada cleanup.
 - **Solusi:** TTL `order:*` keys misal 30 hari (`redis.set(key, val, { ex: 2592000 })`) — cukup untuk window produksi, auto-cleanup. Tunggal.
-- **Future gap tag:** scale | **Status:** OPEN
+- **Future gap tag:** scale | **Status:** FIXED (Tahap 2, 12 Sep) — `ORDER_TTL_SECONDS` = 30 hari di `redis.set` (order + midtrans index keys).
 
 ### CF-A-27 — P4 — Inkonsistensi multi-item & subtotal
 - **Skenario:** schema izinkan `items[]` tapi order hanya rekam `items[0]` sebagai `productName`; `pricing.subtotal = grossAmount` (bukan `sum(price*qty)`). Form selalu kirim 1 item jadi tidak terlihat, tapi kontrak API misleading.
 - **Bukti:** `create-token/route.ts` L24 (`items[0]`), L46 (`subtotal: grossAmount`).
 - **Solusi:** kalau memang single-item → schema `items: z.array(...).length(1)` + dokumentasi; kalau multi-item direncanakan → rekam array. Keputusan produk kecil.
-- **Future gap tag:** none | **Status:** OPEN
+- **Future gap tag:** none | **Status:** FIXED (Tahap 2, 12 Sep) — kontrak diubah ke single-product (`productId`+specs+qty), items dibangun server-side; `subtotal`/`total` = hasil `calculatePrice` bukan dari client.
 
 ### CF-A-28 — P4 — `generateOrderId` pakai `Math.random`
 - **Skenario:** order ID = `BSP-<base36 timestamp>-<6 char base36 random>` — ruang random ~2.1B per timestamp, timestamp bocor di ID itu sendiri. Secara praktis unguessable, tapi `crypto.randomBytes`/`randomUUID` adalah best practice untuk identifier yang dipakai lookup tanpa auth.
 - **Bukti:** `src/lib/midtrans.ts` L20-23.
 - **Solusi:** `crypto.getRandomValues`/`randomBytes(4).toString("hex")` untuk segmen random. Satu baris.
-- **Future gap tag:** security | **Status:** OPEN
+- **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — `generateOrderId` pakai `crypto.randomUUID()` (CSPRNG, Node+browser-safe).
 
 ### CF-A-29 — P4 — Halaman success menampilkan status `pending` mentah & order tanpa format check
 - **Skenario:** `?orderId=<apa saja>` → tampil "Pesanan Diterima" + ID mentah; order yang ada menampilkan `payment.status` sebagai teks Inggris ("pending") ke user Indonesia.
 - **Bukti:** `success/page.tsx` L37 (`{order.payment.status}`), L40-44.
 - **Solusi:** map status ke label Indonesia ("Menunggu Pembayaran" dst); optional validasi format orderId sebelum `getOrder`. Kosmetik.
-- **Future gap tag:** none | **Status:** OPEN
+- **Future gap tag:** none | **Status:** FIXED (Tahap 2, 12 Sep) — `STATUS_LABELS` map status→Bahasa Indonesia di success page; `orderIdSchema` guard sebelum `getOrder`.
 
 ---
 
@@ -233,4 +233,26 @@
 ## Status Vocabulary Note
 
 - Temuan carry-over CF-A-01..CF-A-10: FIXED/VERIFIED (bukti di tabel).
-- Re-audit v2: **19 temuan OPEN** (P0×1, P1×4, P2×5, P3×6, P4×3). Menunggu approval untuk Tahap 2.
+- Re-audit v2: **19 temuan FIXED** (P0×1, P1×4, P2×5, P3×6, P4×3) — Tahap 2 selesai 12 Sep.
+
+## Tahap 2 — Fix Log (2026-09-12)
+
+Keputusan user (all recommended): scope semua 19 · CF-A-11 server recompute · CF-A-18 hapus route · CF-A-19 rate limit IP.
+
+| File | Perubahan |
+|---|---|
+| `src/lib/redis.ts` (baru) | Shared Upstash client — `null` saat env kosong |
+| `src/lib/order-storage.ts` | Import shared redis; `ORDER_TTL_SECONDS` 30d; `TERMINAL_STATUSES` guard (paid/cancelled/expired tak bisa regresi; same-status no-op); `payment.discrepancy` field; warn-once saat fallback in-memory |
+| `src/lib/midtrans.ts` | `isMidtransConfigured()` → cek `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` saja (client-safe); `generateOrderId` → `crypto.randomUUID()` |
+| `src/lib/schemas.ts` | `createTokenBodySchema` kontrak baru (`productId`+specs+`quantity`, tanpa field harga); `phoneSchema` normalisasi `62`; webhook schema + `fraud_status`/`payment_type` |
+| `src/types/index.ts` | `MidtransCreateTokenBody` diselaraskan ke kontrak baru |
+| `api/midtrans/create-token/route.ts` | Server recompute via `calculatePrice` + validasi specs vs `products`; grossAmount/item server-built; `order.fileUrl` diisi (http-only); email di-omit saat kosong |
+| `api/midtrans/webhook/route.ts` | Fail-closed tanpa server key (500); gate `status_code==="200"` + `fraud_status`; unknown status → ignored (tidak mutate); gross_amount vs total compare → `discrepancy` flag |
+| `api/upload/route.ts` | `@upstash/ratelimit` sliding window 10/menit per IP (aktif hanya dengan Redis) |
+| `api/orders/[orderId]/` | **Dihapus** (dead endpoint, expose PII) |
+| `CheckoutForm.tsx` | Body baru; `!res.ok \|\| data.error` → inline error; `onClose` reset submitting; email tidak difabrikasi |
+| `checkout/success/page.tsx` | `STATUS_LABELS` Indonesia; `orderIdSchema` guard |
+| `src/lib/wa.ts` + `notification.ts` | Template `adminNewOrder` + arg `file` → `File: <url>` |
+| Tests | `schemas.test.ts` ditulis ulang (12 tests); `order-storage.test.ts` baru (8 tests) — termasuk regression paid→expired |
+
+**Re-check:** `tsc --noEmit` clean · `eslint` clean · `vitest` **53/53 pass** (46→53) · `npm run build` hijau — `/api/orders/[orderId]` hilang dari route table.

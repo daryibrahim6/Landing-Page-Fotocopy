@@ -27,6 +27,7 @@ export function notifyAdminNewOrder(order: StoredOrder): AdminNotification {
     order.customer.phone,
     total,
     order.customer.notes ?? "-",
+    order.fileUrl ?? "-",
   );
   return {
     channel: "whatsapp",

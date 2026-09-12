@@ -142,26 +142,16 @@ export function CheckoutForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [
-            {
-              id: product.id,
-              name: `${product.name} (${form.size} - ${form.material} - ${form.finishing})`,
-              price: Math.round(pricing.total / form.quantity),
-              quantity: form.quantity,
-            },
-          ],
+          productId: product.id,
+          size: form.size,
+          material: form.material,
+          finishing: form.finishing,
+          quantity: form.quantity,
+          fileUrl: fileUrl || undefined,
           customerDetails: {
             name: form.name,
             phone: form.phone,
-            email: form.email || `customer-${form.phone.replace(/\D/g, "")}@bisaprint.com`,
-          },
-          grossAmount: pricing.total,
-          specs: {
-            ukuran: form.size,
-            bahan: form.material,
-            finishing: form.finishing,
-            jumlah: String(form.quantity),
-            file: fileUrl || "Belum upload",
+            email: form.email || undefined,
           },
           customerExtra: {
             pickup: form.pickup,
@@ -172,6 +162,12 @@ export function CheckoutForm() {
       });
 
       const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setSubmitting(false);
+        setError(data.error ?? "Gagal membuat pesanan. Silakan coba lagi atau hubungi admin via WhatsApp.");
+        return;
+      }
 
       if (data.simulation) {
         const waLink = buildWAUrl("postCheckout", data.orderId);
@@ -198,6 +194,10 @@ export function CheckoutForm() {
           onError: () => {
             setSubmitting(false);
             setError("Pembayaran gagal. Silakan coba lagi.");
+          },
+          onClose: () => {
+            setSubmitting(false);
+            setError("Popup pembayaran ditutup. Klik 'Bayar Sekarang' untuk mencoba lagi.");
           },
         });
       } else {

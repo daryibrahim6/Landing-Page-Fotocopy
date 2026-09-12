@@ -1,8 +1,30 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "@/lib/redis";
+
+// Rate limit uploads per IP when Redis is configured (production).
+// Local dev without UPSTASH_* falls through unlimited.
+const ratelimit = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "1 m") })
+  : null;
 
 export async function POST(request: Request) {
   try {
+    if (ratelimit) {
+      const ip =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+        request.headers.get("x-real-ip") ??
+        "anonymous";
+      const { success } = await ratelimit.limit(`upload:${ip}`);
+      if (!success) {
+        return NextResponse.json(
+          { error: "Too many uploads. Coba lagi dalam 1 menit." },
+          { status: 429 },
+        );
+      }
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
