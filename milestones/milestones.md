@@ -89,6 +89,10 @@ Feedback dari owner via WA → dieksekusi:
 | Kode order WA | ✅ Done | `BSP-XXXX` unik di pesan checkout WA — matching mutasi transfer manual (zero-cost) |
 | Guide text kalkulator | ✅ Done | Intro singkat di atas preset: "berapa pcs dalam 1 lembar A3" |
 | Pembayaran | ✅ Done | Konfirmasi: checkout WA-only selama env Midtrans kosong — sesuai request "sementara gausah bayar di web" |
+| PDF siap cetak | ✅ Done | Export upload-mode embed gambar asli per cell + cutline + siku marks — output naik-cetak langsung (commit `8164e94`) |
+| AI prompt per produk | ✅ Done | Template prompt khusus stiker (flat vector, clean edge, white bg) |
+
+**Visi owner (self-service pipeline)** — scope v1 disepakati: **stiker dulu**, notifikasi via **link download**, AI = **draft + cek admin**. Sudah jalan: pilih stiker → AI/upload → auto-layout → PDF siap cetak → order WA + kode BSP-XXXX. Sisa untuk auto-penuh: (a) pembayaran perlu Midtrans/mutasi-checker untuk tahu "lunas", (b) auto-kirim file ke WA butuh gateway (Fonnte/Cloud API/Telegram) — sementara link `/api/admin/files` di dashboard.
 
 **Payment roadmap (disepakati)**: sekarang WA + kode order (zero cost) → nanti kalau mau auto-acc tanpa gateway: jasa cek-mutasi (Moota/Mutasiku ~Rp100-300rb/bln) → atau aktifkan Midtrans (QRIS/VA) kapanpun via env.
 
