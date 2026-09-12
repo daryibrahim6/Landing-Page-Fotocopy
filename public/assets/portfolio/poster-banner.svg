@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="400" fill="#FFF7ED"/>
+  <g transform="translate(110 46) rotate(2)">
+    <rect width="180" height="280" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
+    <rect width="180" height="110" rx="10" fill="url(#pbg)"/>
+    <defs>
+      <linearGradient id="pbg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#F06292"/>
+        <stop offset="1" stop-color="#DE127A"/>
+      </linearGradient>
+    </defs>
+    <circle cx="140" cy="34" r="26" fill="#fff" opacity="0.25"/>
+    <circle cx="36" cy="86" r="18" fill="#fff" opacity="0.18"/>
+    <rect x="20" y="36" width="110" height="14" rx="7" fill="#fff"/>
+    <rect x="20" y="58" width="76" height="10" rx="5" fill="#fff" opacity="0.7"/>
+    <rect x="20" y="130" width="140" height="10" rx="5" fill="#0F172A"/>
+    <rect x="20" y="148" width="120" height="7" rx="3.5" fill="#94A3B8"/>
+    <rect x="20" y="162" width="140" height="7" rx="3.5" fill="#94A3B8"/>
+    <rect x="20" y="176" width="90" height="7" rx="3.5" fill="#94A3B8"/>
+    <rect x="20" y="204" width="64" height="40" rx="8" fill="#E87817"/>
+    <rect x="94" y="204" width="64" height="40" rx="8" fill="#0F172A"/>
+    <rect x="20" y="256" width="140" height="8" rx="4" fill="#E2E8F0"/>
+  </g>
+  <g transform="translate(56 240) rotate(-8)">
+    <rect width="70" height="120" rx="10" fill="#0F172A"/>
+    <ellipse cx="35" cy="12" rx="30" ry="9" fill="#334155"/>
+    <rect x="12" y="40" width="46" height="7" rx="3.5" fill="#fff" opacity="0.8"/>
+    <rect x="12" y="54" width="34" height="7" rx="3.5" fill="#fff" opacity="0.45"/>
+  </g>
+  <text x="200" y="374" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="15" font-weight="700" fill="#9A3412">Poster &amp; Banner Event</text>
+</svg>

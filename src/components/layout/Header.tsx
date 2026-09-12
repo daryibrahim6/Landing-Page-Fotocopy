@@ -121,34 +121,34 @@ export function Header() {
   }, []);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300",
-        isScrolled
-          ? "bg-white/85 shadow-sm backdrop-blur-md"
-          : "bg-transparent",
-      )}
-    >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 md:h-20 lg:px-8">
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
+      {/* Floating glass pill — logo pink tetap kontras karena duduk di pill putih,
+          bukan langsung di atas hero gradient. */}
+      <div
+        className={cn(
+          "mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 rounded-full border py-2 pl-4 pr-2 backdrop-blur-xl transition-all duration-300 sm:h-16 sm:pl-5 sm:pr-2.5",
+          isScrolled
+            ? "border-white/60 bg-white/90 shadow-xl shadow-slate-900/15"
+            : "border-white/40 bg-white/80 shadow-lg shadow-slate-900/10",
+        )}
+      >
         <Link
           href="/"
-          className="shrink-0 transition-opacity hover:opacity-80"
+          className="shrink-0 rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           onClick={() => setIsMenuOpen(false)}
+          aria-label="BisaPrint — kembali ke beranda"
         >
           <Image
-            src="/assets/brand/logo-bisaprint.webp"
+            src="/assets/brand/logo-bisaprint.svg"
             alt="BisaPrint"
             width={160}
-            height={56}
-            className="h-10 w-auto md:h-12"
+            height={35}
+            className="h-8 w-auto sm:h-9"
             priority
           />
         </Link>
 
-        <nav
-          className="hidden items-center gap-1 rounded-full border border-[var(--color-border)] bg-white/60 px-2 py-1.5 backdrop-blur-sm md:flex"
-          aria-label="Navigasi utama"
-        >
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.sectionId}
@@ -166,7 +166,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="hidden shrink-0 md:block">
             <WhatsAppButton
               label="Chat Admin"
@@ -191,28 +191,17 @@ export function Header() {
         </div>
       </div>
 
-      <div
-        className={cn(
-          "h-0.5 w-full transition-opacity duration-300",
-          isScrolled ? "opacity-100" : "opacity-0",
-        )}
-        style={{
-          background:
-            "linear-gradient(to right, transparent, var(--color-border), transparent)",
-        }}
-        aria-hidden="true"
-      />
-
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+          <motion.nav
+            initial={{ height: 0, opacity: 0, y: -8 }}
+            animate={{ height: "auto", opacity: 1, y: 0 }}
+            exit={{ height: 0, opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden bg-white/95 backdrop-blur-md md:hidden"
+            className="mx-auto mt-2 max-w-5xl overflow-hidden rounded-3xl border border-white/60 bg-white/95 shadow-xl shadow-slate-900/15 backdrop-blur-xl md:hidden"
+            aria-label="Navigasi mobile"
           >
-            <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Navigasi mobile">
+            <div className="flex flex-col gap-1 px-3 py-3">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.sectionId}
@@ -228,7 +217,7 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
-              <div className="mt-2 px-2">
+              <div className="mt-1 px-1 pb-1">
                 <WhatsAppButton
                   label="Chat Admin"
                   variant="primary"
@@ -236,8 +225,8 @@ export function Header() {
                   className="w-full justify-center"
                 />
               </div>
-            </nav>
-          </motion.div>
+            </div>
+          </motion.nav>
         )}
       </AnimatePresence>
     </header>

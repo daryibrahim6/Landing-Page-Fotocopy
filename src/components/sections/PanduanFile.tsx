@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, Image as ImageIcon, Ruler, Droplet, Crop, Type, AlertTriangle } from "lucide-react";
+import { FileText, Image as ImageIcon, Ruler, Droplet, Crop, Type, AlertTriangle, MessageCircle } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { buildWAUrl } from "@/lib/wa";
+import { trackEvent } from "@/lib/tracking";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
@@ -58,8 +60,8 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
 
 export function PanduanFile() {
@@ -74,35 +76,38 @@ export function PanduanFile() {
         </p>
       </ScrollReveal>
 
-      <div className="relative mx-auto mt-12 max-w-3xl">
-        <div className="absolute -left-3 top-0 h-full w-1 rounded-full bg-[var(--color-border)] max-md:hidden" aria-hidden="true" />
-
-        <motion.div
-          className="space-y-6"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
-          {guidelines.map((item, i) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                className="relative flex items-start gap-5 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm transition-all duration-200 hover:translate-x-1 hover:border-[var(--color-primary)]"
-              >
+      <motion.div
+        className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        {guidelines.map((item, i) => {
+          const Icon = item.icon;
+          return (
+            <motion.div
+              key={item.title}
+              variants={itemVariants}
+              className={cn(
+                "group relative flex flex-col gap-3 rounded-2xl border-2 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1",
+                item.status === "warning"
+                  ? "border-[var(--color-accent)]/50 hover:border-[var(--color-accent)]"
+                  : "border-[var(--color-border)] hover:border-[var(--color-primary)]",
+              )}
+            >
+              <div className="flex items-center justify-between">
                 <div
                   className={cn(
-                    "flex size-12 shrink-0 items-center justify-center rounded-xl",
+                    "flex size-11 shrink-0 items-center justify-center rounded-xl",
                     item.status === "warning"
                       ? "bg-[var(--color-accent)]/10"
-                      : "bg-[var(--color-bg-soft)]",
+                      : "bg-primary/10",
                   )}
                 >
                   <Icon
                     className={cn(
-                      "size-6",
+                      "size-5",
                       item.status === "warning"
                         ? "text-[var(--color-accent)]"
                         : "text-[var(--color-primary)]",
@@ -110,54 +115,54 @@ export function PanduanFile() {
                     aria-hidden="true"
                   />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-display text-base font-bold text-[var(--color-text-primary)]">
-                      {item.title}
-                    </h3>
-                    {item.status === "warning" && (
-                      <span className="rounded-full bg-[var(--color-accent)]/10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent)]">
-                        PENTING
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                    {item.desc}
-                  </p>
-                </div>
-
-                <div className="shrink-0 self-center">
-                  <span
-                    className={cn(
-                      "flex size-8 items-center justify-center rounded-full text-xs font-bold",
-                      item.status === "warning"
-                        ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
-                        : "bg-[var(--color-bg-soft)] text-[var(--color-primary)]",
-                    )}
-                  >
-                    {i + 1}
+                <span className="font-display text-sm font-black text-[var(--color-border)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-display text-base font-bold text-[var(--color-text-primary)]">
+                  {item.title}
+                </h3>
+                {item.status === "warning" && (
+                  <span className="rounded-full bg-[var(--color-accent)]/10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent)]">
+                    PENTING
                   </span>
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
+                )}
+              </div>
+              <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                {item.desc}
+              </p>
+            </motion.div>
+          );
+        })}
 
-      <motion.div
-        className="relative mx-auto mt-12 max-w-2xl text-center"
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay: 0.3 }}
-      >
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6">
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-            <strong className="text-[var(--color-text-primary)]">Masih bingung?</strong>{" "}
-            Gak usah khawatir – kirim aja file kamu, admin kami bakal cek dan kasih tahu kalau ada yang perlu diperbaiki.{" "}
-            <span className="font-display font-bold text-[var(--color-primary)]">Gratis!</span>
+        {/* Tile CTA — nutup grid */}
+        <motion.a
+          variants={itemVariants}
+          href={buildWAUrl("general")}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent("Lead", { source: "panduan-file-cta" })}
+          className="group relative flex flex-col justify-between gap-3 overflow-hidden rounded-2xl p-5 text-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+          style={{
+            background:
+              "linear-gradient(150deg, #EE3B97 0%, #DE127A 55%, #A50D5F 100%)",
+          }}
+        >
+          <div
+            className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-white/15"
+            aria-hidden="true"
+          />
+          <span className="relative flex size-11 items-center justify-center rounded-xl bg-white/20">
+            <MessageCircle className="size-5" aria-hidden="true" />
+          </span>
+          <h3 className="relative font-display text-base font-bold leading-snug">
+            Masih bingung? Kirim aja file kamu
+          </h3>
+          <p className="relative text-sm leading-relaxed text-white/85">
+            Admin cek &amp; kasih tahu kalau ada yang perlu diperbaiki. Gratis!
           </p>
-        </div>
+        </motion.a>
       </motion.div>
     </SectionWrapper>
   );

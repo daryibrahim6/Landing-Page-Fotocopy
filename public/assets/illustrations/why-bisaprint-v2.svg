@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 420" fill="none" role="img" aria-label="Ilustrasi keunggulan BisaPrint — produk cetak dicek kualitasnya">
+  <defs>
+    <linearGradient id="wCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F1F5F9"/>
+    </linearGradient>
+    <linearGradient id="wPink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F06292"/>
+      <stop offset="1" stop-color="#DE127A"/>
+    </linearGradient>
+    <linearGradient id="wOrange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4A261"/>
+      <stop offset="1" stop-color="#E87817"/>
+    </linearGradient>
+    <filter id="soft3" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="280" cy="388" rx="240" ry="28" fill="#0F172A" opacity="0.12" filter="url(#soft3)"/>
+
+  <!-- tumpukan kertas cetak -->
+  <g transform="translate(120 120) rotate(-5)">
+    <rect x="18" y="28" width="240" height="220" rx="14" fill="#CBD5E1"/>
+    <rect x="9" y="14" width="240" height="220" rx="14" fill="#E2E8F0"/>
+    <rect x="0" y="0" width="240" height="220" rx="14" fill="url(#wCard)" stroke="#CBD5E1" stroke-width="2"/>
+    <rect x="20" y="24" width="120" height="14" rx="7" fill="#0F172A"/>
+    <rect x="20" y="50" width="200" height="8" rx="4" fill="#CBD5E1"/>
+    <rect x="20" y="66" width="200" height="8" rx="4" fill="#CBD5E1"/>
+    <rect x="20" y="82" width="140" height="8" rx="4" fill="#CBD5E1"/>
+    <rect x="20" y="112" width="96" height="72" rx="10" fill="url(#wPink)"/>
+    <path d="M68 130l8 14h-16zM58 148l10-12 8 8 6-6 12 14H58z" fill="#fff" opacity="0.9"/>
+    <rect x="128" y="112" width="92" height="10" rx="5" fill="#DE127A" opacity="0.75"/>
+    <rect x="128" y="130" width="92" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="128" y="144" width="70" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="128" y="164" width="60" height="20" rx="10" fill="#0F172A"/>
+  </g>
+
+  <!-- box packaging -->
+  <g transform="translate(380 210)">
+    <path d="M0 30l70-26 74 26v84l-74 26-70-26z" fill="url(#wOrange)"/>
+    <path d="M0 30l70 26v84l-70-26z" fill="#0F172A" opacity="0.18"/>
+    <path d="M144 30l-74 26v84l74-26z" fill="#fff" opacity="0.12"/>
+    <path d="M0 30l70-26 74 26-74 26z" fill="#fff" opacity="0.28"/>
+    <path d="M70 56l-24-9" stroke="#fff" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+    <rect x="86" y="72" width="44" height="30" rx="6" fill="#fff" opacity="0.85" transform="skewY(18)"/>
+    <rect x="92" y="92" width="32" height="5" rx="2.5" fill="#DE127A" transform="skewY(18)"/>
+  </g>
+
+  <!-- stiker lepas -->
+  <g transform="translate(60 260) rotate(-12)">
+    <rect width="96" height="96" rx="20" fill="url(#wPink)"/>
+    <rect x="-5" y="-5" width="106" height="106" rx="24" fill="none" stroke="#DE127A" stroke-width="2" stroke-dasharray="6 5" opacity="0.45"/>
+    <path d="M48 28c-14-15-40-5-40 15 0 17 20 29 40 42 20-13 40-25 40-42 0-20-26-30-40-15z" fill="#fff" opacity="0.95"/>
+  </g>
+
+  <!-- badge cek kualitas -->
+  <g transform="translate(356 60) rotate(4)">
+    <rect width="150" height="62" rx="31" fill="#0F172A"/>
+    <circle cx="32" cy="31" r="17" fill="#22C55E"/>
+    <path d="M24 31l6 6 11-11" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="56" y="27" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="800" fill="#fff">File Dicek</text>
+    <text x="56" y="44" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#94A3B8">Sebelum naik cetak</text>
+  </g>
+
+  <!-- rol stiker -->
+  <g transform="translate(430 330) rotate(10)">
+    <rect width="110" height="34" rx="17" fill="#DE127A"/>
+    <ellipse cx="14" cy="17" rx="10" ry="14" fill="#FBCFE8"/>
+    <ellipse cx="14" cy="17" rx="10" ry="14" fill="none" stroke="#9D174D" stroke-width="2.5"/>
+    <rect x="30" y="9" width="26" height="16" rx="4" fill="#fff" opacity="0.9"/>
+    <rect x="64" y="9" width="26" height="16" rx="4" fill="#fff" opacity="0.9"/>
+  </g>
+
+  <path d="M500 60l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#F4A261"/>
+  <path d="M70 60l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#DE127A" opacity="0.6"/>
+</svg>

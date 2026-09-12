@@ -69,26 +69,26 @@ const photoVariants = {
 };
 
 const BADGES = [
-  { icon: "star", text: "10.000+ Customer", rotate: "-1.5deg" },
-  { icon: "check", text: "Cetak Satuan Bisa", rotate: "1deg" },
-  { icon: "zap", text: "Estimasi Cepat", rotate: "-0.5deg" },
+  { icon: "star", text: "10.000+ Customer" },
+  { icon: "check", text: "Cetak Satuan Bisa" },
+  { icon: "zap", text: "Estimasi Cepat" },
 ] as const;
 
 function BadgeIcon({ icon }: { icon: string }) {
   if (icon === "star")
     return (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 text-[var(--color-accent)]" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 text-[var(--color-accent-yellow)]" aria-hidden="true">
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
       </svg>
     );
   if (icon === "check")
     return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="size-4 text-[var(--color-accent)]" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="size-4 text-[var(--color-accent-yellow)]" aria-hidden="true">
         <path d="M20 6L9 17l-5-5" />
       </svg>
     );
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-4 text-[var(--color-accent)]" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-4 text-[var(--color-accent-yellow)]" aria-hidden="true">
       <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
     </svg>
   );
@@ -100,51 +100,64 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-svh items-center overflow-hidden bg-white"
+      className="relative flex min-h-svh items-center overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(160deg, #EE3B97 0%, #DE127A 42%, #B00E63 72%, #7E0B48 100%)",
+      }}
     >
-      <div className="absolute inset-0 z-0">
+      {/* Layered texture: dot grid + radial glows — gradient tidak flat */}
+      <div className="absolute inset-0 z-0" aria-hidden="true">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.35]"
-          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.18]"
           style={{
             backgroundImage:
-              "radial-gradient(circle, var(--color-border) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
+              "radial-gradient(circle, rgba(255,255,255,0.55) 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
+            maskImage:
+              "radial-gradient(ellipse at 30% 30%, black 0%, transparent 65%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at 30% 30%, black 0%, transparent 65%)",
           }}
         />
         <div
           className="absolute inset-0"
-          aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse at 80% 20%, rgba(15,23,42,0.04) 0%, transparent 60%)",
+              "radial-gradient(ellipse 60% 50% at 85% 15%, rgba(255,255,255,0.22) 0%, transparent 65%)",
           }}
         />
         <div
           className="absolute inset-0"
-          aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 80%, rgba(15,23,42,0.03) 0%, transparent 50%)",
+              "radial-gradient(ellipse 55% 60% at 10% 90%, rgba(232,120,23,0.35) 0%, transparent 60%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 110%, rgba(126,11,72,0.8) 0%, transparent 70%)",
           }}
         />
       </div>
 
       <motion.div
-        className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-10 xl:px-16"
+        className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-10 px-4 pb-20 pt-28 sm:px-6 sm:pt-32 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-10 lg:pt-24 xl:px-16"
         initial={prefersReduced ? "visible" : "hidden"}
         animate="visible"
       >
-        <div className="flex flex-col justify-center py-8 lg:py-0">
+        <div className="flex flex-col justify-center">
           <motion.div
-            className="mb-5 flex flex-wrap gap-2"
+            className="mb-6 flex flex-wrap gap-2"
             variants={badgeContainerVariants}
           >
             {BADGES.map((badge) => (
               <motion.span
                 key={badge.text}
                 variants={badgeItemVariants}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-soft)] px-3 py-1.5 text-xs font-bold text-[var(--color-text-secondary)] shadow-sm"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-sm"
               >
                 <BadgeIcon icon={badge.icon} />
                 {badge.text}
@@ -152,15 +165,29 @@ export function HeroSection() {
             ))}
           </motion.div>
 
-          <div className="mb-5">
+          <div className="mb-6">
             <motion.h1
-              className="font-display text-5xl font-black leading-[1.05] tracking-tight text-[var(--color-text-primary)] sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[6rem]"
+              className="font-display text-5xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem]"
               variants={headlineVariants}
             >
               bisa
               <br />
-              <span className="text-[var(--color-primary)]">
+              <span className="relative inline-block text-[var(--color-accent-yellow)]">
                 mewujudkan
+                <svg
+                  viewBox="0 0 300 14"
+                  className="absolute -bottom-1 left-0 w-full"
+                  fill="none"
+                  aria-hidden="true"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M4 10C60 4 150 2 296 8"
+                    stroke="#E87817"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </span>
               <br />
               imajinasi mu
@@ -168,26 +195,26 @@ export function HeroSection() {
           </div>
 
           <motion.p
-            className="max-w-xl text-lg leading-relaxed text-[var(--color-text-secondary)] md:text-xl lg:text-2xl"
+            className="max-w-xl text-lg leading-relaxed text-white/85 md:text-xl lg:text-2xl"
             variants={subtextVariants}
           >
             Cetak apa saja &mdash; cepat, rapi, berkualitas.
           </motion.p>
 
-          <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
             <motion.div custom={0} variants={ctaVariants}>
               <WhatsAppButton
                 label="Order via WhatsApp"
                 message="Halo BisaPrint, saya ingin pesan cetak."
                 variant="primary"
                 size="lg"
-                className="bg-[#25D366] text-white hover:bg-[#1ebe5d] shadow-lg shadow-[#25D366]/30"
+                className="bg-[#25D366] text-white hover:bg-[#1ebe5d] shadow-lg shadow-[#0b3d2e]/40"
               />
             </motion.div>
             <motion.div custom={1} variants={ctaVariants}>
               <a
                 href="#produk"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-bg-soft-2)] px-7 py-4 font-display text-base font-bold text-[var(--color-text-primary)] transition duration-200 hover:bg-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 font-display text-base font-bold text-[var(--color-primary)] shadow-lg shadow-slate-900/20 transition duration-200 hover:bg-pink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -205,26 +232,26 @@ export function HeroSection() {
           </div>
 
           <motion.div
-            className="mt-8 flex items-center gap-4"
+            className="mt-10 flex items-center gap-4"
             variants={proofVariants}
           >
             <div className="flex -space-x-3">
-              <span className="flex size-10 items-center justify-center rounded-full border-2 border-white bg-[var(--color-bg-soft-2)] text-sm font-bold text-[var(--color-text-secondary)] shadow-sm">
+              <span className="flex size-10 items-center justify-center rounded-full border-2 border-white/80 bg-white/20 text-sm font-bold text-white backdrop-blur-sm">
                 1
               </span>
-              <span className="flex size-10 items-center justify-center rounded-full border-2 border-white bg-[var(--color-bg-soft-2)] text-sm font-bold text-[var(--color-text-secondary)] shadow-sm">
+              <span className="flex size-10 items-center justify-center rounded-full border-2 border-white/80 bg-white/20 text-sm font-bold text-white backdrop-blur-sm">
                 0
               </span>
-              <span className="flex size-10 items-center justify-center rounded-full border-2 border-white bg-[var(--color-primary)] text-sm font-bold text-white shadow-sm">
+              <span className="flex size-10 items-center justify-center rounded-full border-2 border-white/80 bg-[var(--color-accent)] text-sm font-bold text-white">
                 K
               </span>
             </div>
-            <p className="text-base font-bold text-[var(--color-text-primary)]">
+            <p className="text-base font-bold text-white">
               10.000+ Customer{" "}
-              <span className="font-normal text-[var(--color-text-muted)]">
+              <span className="font-normal text-white/60">
                 &bull;
               </span>{" "}
-              Dipercaya sejak 2020
+              <span className="font-normal text-white/80">Dipercaya sejak 2020</span>
             </p>
           </motion.div>
         </div>
@@ -233,11 +260,11 @@ export function HeroSection() {
           className="hidden lg:flex lg:items-center lg:justify-center"
           variants={photoVariants}
         >
-          <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white p-6 shadow-xl">
-            <div className="relative aspect-[4/3] w-full">
+          <div className="relative w-full max-w-2xl rounded-[2rem] border border-white/25 bg-white/10 p-5 shadow-2xl shadow-slate-900/25 backdrop-blur-md">
+            <div className="relative aspect-[640/520] w-full">
               <Image
-                src="/assets/illustrations/print-team.svg"
-                alt="BisaPrint – Percetakan Digital"
+                src="/assets/illustrations/hero-print.svg"
+                alt="Lembar stiker die-cut, kartu nama, dan poster hasil cetak BisaPrint"
                 fill
                 className="object-contain"
                 priority

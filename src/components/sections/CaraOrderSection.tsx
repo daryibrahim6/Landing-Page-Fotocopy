@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ShoppingBag, MessageCircle, FileText, Search, CreditCard, Printer, MapPin } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import type { LucideIcon } from "lucide-react";
 
 const steps: { icon: LucideIcon; title: string; description: string }[] = [
@@ -46,81 +47,104 @@ const steps: { icon: LucideIcon; title: string; description: string }[] = [
 ];
 
 const stepVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, x: 24 },
   visible: (i: number) => ({
     opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: "easeOut" as const, delay: i * 0.1 },
+    x: 0,
+    transition: { duration: 0.45, ease: "easeOut" as const, delay: i * 0.08 },
   }),
 };
 
 export function CaraOrderSection() {
   return (
     <SectionWrapper id="cara-order" bgVariant="white" className="relative overflow-hidden">
-      <ScrollReveal className="relative flex flex-col items-center text-center">
-        <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
-          Cara Order via WhatsApp
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg">
-          Gampang banget! Ikuti 7 langkah simpel ini.
-        </p>
-      </ScrollReveal>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
+        {/* Panel kiri — sticky di desktop */}
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <ScrollReveal>
+            <p className="font-display text-sm font-bold uppercase tracking-widest text-[var(--color-primary)]">
+              Cara Order
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
+              Cara Order via WhatsApp
+            </h2>
+            <p className="mt-4 max-w-md text-base text-[var(--color-text-secondary)] md:text-lg">
+              Gampang banget! Ikuti 7 langkah simpel ini — dari pilih produk sampai pesanan sampai di tangan.
+            </p>
 
-      <div className="mx-auto mt-10 max-w-2xl">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-[var(--color-border)] bg-white">
-          <Image
-            src="/assets/illustrations/cara-order.svg"
-            alt="Ilustrasi cara order BisaPrint"
-            fill
-            className="object-contain p-4"
-            sizes="(max-width: 768px) 100vw, 672px"
-          />
+            <div className="relative mx-auto mt-8 max-w-sm lg:mx-0">
+              <div className="relative aspect-square w-full">
+                <Image
+                  src="/assets/illustrations/chat-order.svg"
+                  alt="Ilustrasi percakapan order di WhatsApp dengan admin BisaPrint"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 380px"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center lg:justify-start">
+              <WhatsAppButton
+                label="Mulai Order Sekarang"
+                message="Halo BisaPrint, saya ingin pesan cetak."
+                variant="primary"
+                size="md"
+              />
+            </div>
+          </ScrollReveal>
         </div>
-      </div>
 
-      <div className="relative mt-14">
-        <div
-          className="pointer-events-none absolute left-0 right-0 top-8 hidden h-0.5 lg:block"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(90deg, var(--color-border) 0px, var(--color-border) 8px, transparent 8px, transparent 14px)",
-          }}
-          aria-hidden="true"
-        />
-
-        <div className="relative grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 lg:gap-4">
+        {/* Timeline kanan */}
+        <ol className="relative space-y-4">
+          <div
+            className="pointer-events-none absolute bottom-6 left-7 top-6 w-0.5 -translate-x-1/2"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to bottom, var(--color-border) 0px, var(--color-border) 6px, transparent 6px, transparent 12px)",
+            }}
+            aria-hidden="true"
+          />
           {steps.map((step, i) => {
             const Icon = step.icon;
+            const isLast = i === steps.length - 1;
             return (
-              <motion.div
-                key={i}
+              <motion.li
+                key={step.title}
                 custom={i}
                 variants={stepVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-40px" }}
-                whileHover={{ y: -4 }}
-                className="relative flex flex-col items-center text-center"
+                className="relative flex items-start gap-4"
               >
-                <div className="relative z-10 flex size-14 items-center justify-center rounded-full border-2 border-[var(--color-primary)] bg-white text-xl font-bold text-[var(--color-primary)] shadow-md">
+                <span
+                  className={
+                    "relative z-10 flex size-14 shrink-0 items-center justify-center rounded-2xl border-2 font-display text-lg font-black shadow-sm " +
+                    (isLast
+                      ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+                      : "border-[var(--color-border)] bg-white text-[var(--color-primary)]")
+                  }
+                >
                   {i + 1}
-                </div>
-
-                <div className="mt-4 w-full rounded-2xl border-2 border-[var(--color-border)] bg-white p-4 shadow-sm">
-                  <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
-                    <Icon className="size-5 text-[var(--color-primary)]" aria-hidden="true" />
+                </span>
+                <div className="flex-1 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-4 shadow-sm transition-all duration-200 hover:border-[var(--color-primary)] hover:shadow-md sm:p-5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                      <Icon className="size-4 text-[var(--color-primary)]" aria-hidden="true" />
+                    </span>
+                    <h3 className="font-display text-base font-bold text-[var(--color-text-primary)]">
+                      {step.title}
+                    </h3>
                   </div>
-                  <h3 className="mt-2 font-display text-sm font-bold text-[var(--color-text-primary)]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-secondary)]">
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">
                     {step.description}
                   </p>
                 </div>
-              </motion.div>
+              </motion.li>
             );
           })}
-        </div>
+        </ol>
       </div>
     </SectionWrapper>
   );

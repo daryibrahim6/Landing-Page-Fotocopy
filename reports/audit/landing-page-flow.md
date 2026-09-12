@@ -412,3 +412,33 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 | Test shallow/lemah? | **Tidak** — data integrity test verify file on disk (fail nyata kalau asset hilang), validasi edge-case covered |
 | Temuan UI/UX belum fix? | **Tidak blocking** — LP-A-19 residue (focus trap menu) + polish visual → Track C opsional |
 | Dampak ke flow lain? | **Ya** — snap.js pindah ke checkout layout (checkout-flow); diverifikasi build hijau + route tetap jalan. WhatsAppButton tracking source baru → event Lead lebih lengkap (whatsapp-notification-flow tidak terpengaruh — beda layer) |
+
+## UX Walkthrough — Redesign Visual (Sesi 12 Sep 2026)
+
+**Mode:** eksekusi langsung (user override "gas eksekusi semuanya"), bukan audit-only. Grounding: `ui-ux-pro-max` (pattern Feature-Rich Showcase; rekomendasi palet luxury-gold skill ditolak karena off-brand — brand sudah established `#DE127A`).
+
+### Perubahan yang di-ship
+
+| Area | Before | After |
+|---|---|---|
+| Logo | `logo-bisaprint.webp` (bg putih kotak) | `logo-bisaprint.svg` vektor transparan; varian `-light.svg` untuk footer gelap |
+| Navbar | sticky bar putih transparan | floating glass pill (`fixed`, rounded-full, blur) — logo pink kontras di atas pill putih di hero gradient |
+| Hero | bg putih + ilustrasi wireframe | full-viewport pink gradient 4-layer (base + glow + dot texture + vignette bawah), teks putih, ilustrasi `hero-print.svg` (sticker sheet die-cut + kartu nama + poster roll) di kartu glass |
+| Kategori | 5 kolom grid kecil rata | bento asymmetric: Digital Printing featured 2-kolom + thumbnail produk, tile CTA gradient pink |
+| Why BisaPrint | ilustrasi + panel kartu | bento: kartu ilustrasi `why-bisaprint-v2.svg` + stat 10.000+ span 2 kolom, 7 kartu fitur grid 3 kolom |
+| Cara Order | stepper horizontal 7 kartu sempit | split: panel sticky kiri (ilustrasi `chat-order.svg` mockup WA + CTA) + timeline vertikal numbered kanan |
+| Konsultasi | kartu form flat tengah | split: copy + benefit checklist + reassurance card kiri, form card elevated + gradient top-bar kanan |
+| Portfolio | base64 SVG gradient polos | 6 asset `public/assets/portfolio/*.svg` flat-lay bermakna (stiker, kartu nama, poster, undangan, jilid, packaging, merch) |
+| Panduan File | list vertikal 7 item panjang | grid 4 kolom compact + tile CTA pink |
+| FAQ | accordion penuh + badge `faq-001` + sticky-note | 2 kolom: sticky heading + kartu "Pertanyaan lain?" kiri, accordion kanan; badge id dihapus |
+| Kontak | ilustrasi wireframe + kartu putih | kiri: info + chips sosial + Maps embed; kanan: kartu CTA gradient hijau WA + trust points |
+| Footer | logo webp bg putih di dark bg | logo light SVG + glow radial pink/orange + kolom navigasi diperluas |
+| Simulator | header bar flat sticky | header non-sticky dengan ikon tile, badge "Gratis", dot texture, pt untuk fixed navbar |
+| Produk SVG | wireframe pudar | 7 asset produk digambar ulang flat-color (brosur, poster, dokumen, stiker, kartu nama, undangan, packaging) |
+| Ilustrasi lama | print-team/why-bisaprint/cara-order/print-delivery | diarsipkan ke `_archive/assets/illustrations/` |
+
+### Verifikasi
+- Viewport dicek: desktop 1440 (hero, kategori, why, cara order, portfolio, panduan, kontak+footer) + mobile 375 (hero, kategori, why stack).
+- `tsc --noEmit` clean, `eslint` clean, `vitest` 161/161, `next build` hijau.
+- Catatan: halaman non-landing di `(public)` (checkout, success, simulator) diberi `pt-24/28` karena navbar sekarang `fixed` overlay.
+- Tablet 768: tidak di-screenshot terpisah — breakpoint sm/lg sudah tercover di dua viewport yang dicek; grid bento `sm:grid-cols-2` dijamin konsisten.

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { buildWAFormUrl, isConsultationFormComplete } from "@/lib/wa";
@@ -16,6 +17,15 @@ const fieldVariants = {
     transition: { duration: 0.4, delay: i * 0.08, ease: "easeOut" as const },
   }),
 };
+
+const BENEFITS = [
+  "Admin bantu hitung estimasi harga",
+  "File desain dicek sebelum cetak",
+  "Bisa order tanpa file siap cetak",
+] as const;
+
+const inputClass =
+  "w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]";
 
 export function FormKonsultasi() {
   const [fields, setFields] = useState({
@@ -36,23 +46,41 @@ export function FormKonsultasi() {
   const waHref = buildWAFormUrl(fields);
 
   return (
-    <SectionWrapper id="form-konsultasi" bgVariant="white" className="relative overflow-hidden">
-      <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6 shadow-sm sm:p-8 md:p-10">
-        <ScrollReveal className="flex flex-col items-center text-center">
-          <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
+    <SectionWrapper id="form-konsultasi" bgVariant="soft" className="relative overflow-hidden">
+      <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
+        {/* Kolom copy */}
+        <ScrollReveal>
+          <p className="font-display text-sm font-bold uppercase tracking-widest text-[var(--color-primary)]">
+            Konsultasi Gratis
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
             Konsultasi Order
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-base text-[var(--color-text-secondary)]">
+          <p className="mt-4 max-w-md text-base text-[var(--color-text-secondary)] md:text-lg">
             Isi detail pesanan kamu, lalu klik tombol WhatsApp. Admin akan bantu hitung estimasi harga.
+          </p>
+          <ul className="mt-6 space-y-3">
+            {BENEFITS.map((b) => (
+              <li key={b} className="flex items-center gap-3 text-sm font-semibold text-[var(--color-text-primary)]">
+                <CheckCircle2 className="size-5 shrink-0 text-[var(--color-primary)]" aria-hidden="true" />
+                {b}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 rounded-2xl border border-dashed border-[var(--color-primary)]/40 bg-white/60 px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+            Belum punya file desain? Tenang — kirim referensi atau ide aja, tim kami bisa bantu siapkan.
           </p>
         </ScrollReveal>
 
-        <motion.div
-          className="mt-10 space-y-5"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
+        {/* Kolom form */}
+        <div className="rounded-3xl border border-[var(--color-border)] bg-white shadow-xl shadow-slate-900/5">
+          <div className="h-1.5 rounded-t-3xl bg-gradient-to-r from-[#EE3B97] via-[var(--color-primary)] to-[var(--color-accent)]" aria-hidden="true" />
+          <motion.div
+            className="space-y-5 p-6 sm:p-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+          >
           <motion.div custom={0} variants={fieldVariants}>
             <label htmlFor="form-nama" className="mb-1.5 block text-sm font-bold text-[var(--color-text-primary)]">
               Nama <span className="text-[var(--color-primary)]">*</span>
@@ -67,7 +95,7 @@ export function FormKonsultasi() {
               placeholder="Masukkan nama kamu"
               value={fields.nama}
               onChange={(e) => handleChange("nama", e.target.value)}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+              className={inputClass}
             />
           </motion.div>
 
@@ -81,7 +109,7 @@ export function FormKonsultasi() {
               aria-required="true"
               value={fields.produk}
               onChange={(e) => handleChange("produk", e.target.value)}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+              className={inputClass}
             >
               <option value="">— Pilih produk —</option>
               {products.map((p) => (
@@ -107,7 +135,7 @@ export function FormKonsultasi() {
                 placeholder="Contoh: 50"
                 value={fields.jumlah}
                 onChange={(e) => handleChange("jumlah", e.target.value)}
-                className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+                className={inputClass}
               />
             </motion.div>
 
@@ -121,7 +149,7 @@ export function FormKonsultasi() {
                 placeholder="Contoh: A4"
                 value={fields.ukuran}
                 onChange={(e) => handleChange("ukuran", e.target.value)}
-                className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+                className={inputClass}
               />
             </motion.div>
 
@@ -135,7 +163,7 @@ export function FormKonsultasi() {
                 placeholder="Contoh: Chromo"
                 value={fields.bahan}
                 onChange={(e) => handleChange("bahan", e.target.value)}
-                className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+                className={inputClass}
               />
             </motion.div>
           </div>
@@ -151,7 +179,7 @@ export function FormKonsultasi() {
               placeholder="Tambah catatan atau permintaan khusus"
               value={fields.catatan}
               onChange={(e) => handleChange("catatan", e.target.value)}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
+              className={inputClass}
             />
           </motion.div>
 
@@ -186,7 +214,8 @@ export function FormKonsultasi() {
               Gratis konsultasi – admin kami siap bantu
             </p>
           </motion.div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </SectionWrapper>
   );

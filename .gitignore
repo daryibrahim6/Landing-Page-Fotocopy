@@ -75,3 +75,4 @@ build.log
 # QA screenshot evidence (binary artifacts, large)
 /reports/screenshots/
 /reports/mutation/
+.playwright-mcp/

@@ -1,27 +1,12 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { faqItems } from "@/data/faq";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { cn } from "@/lib/utils";
-
-function StickyNote({ children }: { children: ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, rotate: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, rotate: "2deg", scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="mx-auto mb-8 w-fit rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-soft)] px-5 py-3 shadow-sm"
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 export function FaqSection() {
   const [openId, setOpenId] = useState<string | null>(faqItems[0]?.id ?? null);
@@ -31,48 +16,57 @@ export function FaqSection() {
   };
 
   return (
-    <SectionWrapper id="faq" bgVariant="white" className="relative overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.35]"
-        aria-hidden="true"
-        style={{
-          backgroundImage: `radial-gradient(circle, var(--color-border) 1px, transparent 1px)`,
-          backgroundSize: "24px 24px",
-        }}
-      />
+    <SectionWrapper id="faq" bgVariant="soft" className="relative overflow-hidden">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
+        {/* Kolom kiri — sticky */}
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <ScrollReveal>
+            <div className="flex items-center gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                <HelpCircle className="size-5 text-[var(--color-primary)]" aria-hidden="true" />
+              </span>
+              <p className="font-display text-sm font-bold uppercase tracking-widest text-[var(--color-primary)]">
+                FAQ
+              </p>
+            </div>
+            <h2 className="mt-3 font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
+              Sering Ditanya
+            </h2>
+            <p className="mt-4 max-w-md text-base text-[var(--color-text-secondary)] md:text-lg">
+              Jawaban buat pertanyaan yang paling sering muncul. Klik pertanyaan untuk lihat jawabannya.
+            </p>
 
-      <ScrollReveal className="relative flex flex-col items-center text-center">
-        <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
-          Sering Ditanya
-          <span className="ml-2 inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] align-middle">
-            <HelpCircle className="size-[22px] text-[var(--color-primary)]" aria-hidden="true" />
-          </span>
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg">
-          Jawaban buat pertanyaan yang paling sering muncul.
-        </p>
-      </ScrollReveal>
+            <div className="mt-8 rounded-3xl border border-[var(--color-border)] bg-white p-6 shadow-sm">
+              <p className="font-display text-lg font-bold text-[var(--color-text-primary)]">
+                Pertanyaan lain?
+              </p>
+              <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+                Langsung tanya admin — dibalas cepat di jam kerja.
+              </p>
+              <WhatsAppButton
+                label="Tanya via WhatsApp"
+                message="Halo BisaPrint, saya punya pertanyaan seputar layanan cetak."
+                variant="primary"
+                size="md"
+                className="mt-4"
+              />
+            </div>
+          </ScrollReveal>
+        </div>
 
-      <div className="mt-10">
-        <StickyNote>
-          <p className="font-display text-sm font-black text-[var(--color-text-primary)]">
-            Klik pertanyaan untuk lihat jawaban
-          </p>
-        </StickyNote>
-      </div>
+        {/* Kolom kanan — accordion */}
+        <div className="space-y-3">
+          {faqItems.map((item) => {
+            const isOpen = openId === item.id;
 
-      <div className="relative mx-auto max-w-3xl space-y-4">
-        {faqItems.map((item) => {
-          const isOpen = openId === item.id;
-
-          return (
-            <div key={item.id} className="transition-all duration-200 hover:scale-[1.01]">
+            return (
               <div
+                key={item.id}
                 className={cn(
                   "overflow-hidden rounded-2xl border-2 bg-white shadow-sm transition-colors",
                   isOpen
                     ? "border-primary shadow-md shadow-primary/10"
-                    : "border-dashed border-[var(--color-border)]",
+                    : "border-[var(--color-border)] hover:border-[var(--color-primary)]/40",
                 )}
               >
                 <button
@@ -81,17 +75,14 @@ export function FaqSection() {
                   id={`faq-btn-${item.id}`}
                   aria-expanded={isOpen}
                   aria-controls={`faq-panel-${item.id}`}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 rounded-2xl"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
                 >
-                  <span className="flex items-center font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
-                    <span className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-primary)] text-sm font-black">
-                      {item.id}
-                    </span>
+                  <span className="font-display text-base font-bold text-[var(--color-text-primary)] md:text-lg">
                     {item.question}
                   </span>
                   <span
                     className={cn(
-                      "flex size-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
+                      "flex size-9 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
                       isOpen ? "bg-primary text-white" : "bg-[var(--color-bg-soft)] text-primary",
                     )}
                   >
@@ -118,24 +109,9 @@ export function FaqSection() {
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div
-        className="relative mx-auto mt-12 flex max-w-3xl flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left"
-      >
-        <p className="font-display text-lg font-bold text-[var(--color-text-primary)] md:text-xl">
-          Pertanyaan lain? Langsung tanya aja.
-        </p>
-        <WhatsAppButton
-          label="Tanya via WhatsApp"
-          message="Halo BisaPrint, saya punya pertanyaan seputar layanan cetak."
-          variant="primary"
-          size="md"
-          className="shrink-0"
-        />
+            );
+          })}
+        </div>
       </div>
     </SectionWrapper>
   );

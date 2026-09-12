@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" fill="none" role="img" aria-label="Ilustrasi order via WhatsApp">
+  <defs>
+    <linearGradient id="phBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="bubbleIn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F1F5F9"/>
+    </linearGradient>
+    <linearGradient id="chatBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ECE5DD"/>
+      <stop offset="1" stop-color="#D9CDD2"/>
+    </linearGradient>
+    <filter id="soft2" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="240" cy="452" rx="180" ry="24" fill="#0F172A" opacity="0.14" filter="url(#soft2)"/>
+
+  <!-- phone -->
+  <g transform="translate(130 28)">
+    <rect width="220" height="430" rx="34" fill="url(#phBody)"/>
+    <rect x="8" y="8" width="204" height="414" rx="27" fill="url(#chatBg)"/>
+    <rect x="86" y="14" width="48" height="9" rx="4.5" fill="#0F172A"/>
+
+    <!-- header WA -->
+    <rect x="8" y="8" width="204" height="52" rx="27" fill="#075E54"/>
+    <rect x="8" y="34" width="204" height="26" fill="#075E54"/>
+    <circle cx="32" cy="38" r="13" fill="#DE127A"/>
+    <path d="M26 38h8M26 42h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" transform="translate(0 -3)"/>
+    <rect x="52" y="28" width="64" height="7" rx="3.5" fill="#fff"/>
+    <rect x="52" y="40" width="40" height="5" rx="2.5" fill="#fff" opacity="0.5"/>
+    <circle cx="178" cy="38" r="2.5" fill="#fff" opacity="0.8"/>
+    <circle cx="190" cy="38" r="2.5" fill="#fff" opacity="0.8"/>
+    <circle cx="202" cy="38" r="2.5" fill="#fff" opacity="0.8"/>
+
+    <!-- bubble masuk: order -->
+    <g transform="translate(18 76)">
+      <rect width="128" height="56" rx="10" fill="url(#bubbleIn)"/>
+      <path d="M0 0l10 0 -10 12z" fill="#fff"/>
+      <rect x="10" y="10" width="96" height="7" rx="3.5" fill="#475569" opacity="0.85"/>
+      <rect x="10" y="24" width="72" height="7" rx="3.5" fill="#475569" opacity="0.6"/>
+      <rect x="10" y="38" width="44" height="7" rx="3.5" fill="#475569" opacity="0.4"/>
+    </g>
+
+    <!-- bubble keluar: admin -->
+    <g transform="translate(66 146)">
+      <rect width="136" height="44" rx="10" fill="#DCF8C6"/>
+      <path d="M136 0l-10 0 10 12z" fill="#DCF8C6"/>
+      <rect x="12" y="10" width="100" height="7" rx="3.5" fill="#1F2937" opacity="0.85"/>
+      <rect x="12" y="24" width="72" height="7" rx="3.5" fill="#1F2937" opacity="0.55"/>
+      <path d="M116 32l3 3 6-6M124 32l3 3 6-6" stroke="#34B7F1" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- bubble masuk: file kartu -->
+    <g transform="translate(18 204)">
+      <rect width="140" height="72" rx="10" fill="url(#bubbleIn)"/>
+      <rect x="10" y="10" width="120" height="34" rx="6" fill="#DE127A"/>
+      <rect x="18" y="20" width="40" height="6" rx="3" fill="#fff"/>
+      <rect x="18" y="30" width="60" height="5" rx="2.5" fill="#fff" opacity="0.6"/>
+      <circle cx="114" cy="27" r="8" fill="#E87817"/>
+      <rect x="10" y="52" width="80" height="6" rx="3" fill="#475569" opacity="0.5"/>
+    </g>
+
+    <!-- bubble keluar: siap -->
+    <g transform="translate(86 290)">
+      <rect width="116" height="40" rx="10" fill="#DCF8C6"/>
+      <path d="M116 0l-10 0 10 12z" fill="#DCF8C6"/>
+      <rect x="12" y="12" width="84" height="7" rx="3.5" fill="#1F2937" opacity="0.85"/>
+      <path d="M92 26l3 3 6-6M100 26l3 3 6-6" stroke="#34B7F1" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- input bar -->
+    <rect x="14" y="376" width="152" height="32" rx="16" fill="#fff"/>
+    <circle cx="186" cy="392" r="18" fill="#25D366"/>
+    <path d="M181 392l10-6v12z" fill="#fff"/>
+  </g>
+
+  <!-- floating badge: kode order -->
+  <g transform="translate(300 100) rotate(5)">
+    <rect width="140" height="60" rx="14" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
+    <rect x="12" y="12" width="54" height="10" rx="5" fill="#DE127A"/>
+    <rect x="12" y="30" width="116" height="8" rx="4" fill="#CBD5E1"/>
+    <rect x="12" y="44" width="80" height="8" rx="4" fill="#E2E8F0"/>
+    <text x="14" y="22" font-family="Plus Jakarta Sans, sans-serif" font-size="9" font-weight="800" fill="#fff">BSP-X4K2</text>
+  </g>
+
+  <!-- floating check -->
+  <g transform="translate(60 330)">
+    <circle cx="30" cy="30" r="30" fill="#DE127A"/>
+    <path d="M18 31l8 8 16-16" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <path d="M416 320l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#F4A261"/>
+  <path d="M80 90l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#DE127A" opacity="0.7"/>
+</svg>

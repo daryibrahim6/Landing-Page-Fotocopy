@@ -16,7 +16,9 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <WavyDivider color="#FFFFFF" flip={false} />
+      <div className="bg-[#7E0B48]">
+        <WavyDivider color="#FFFFFF" flip={false} />
+      </div>
 
       <CatalogSection />
       <WavyDivider color="#F8FAFC" flip />

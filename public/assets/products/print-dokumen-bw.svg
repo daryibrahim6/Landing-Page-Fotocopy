@@ -1,16 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Print dokumen hitam putih BisaPrint">
-  <rect width="400" height="300" fill="#F8FAFC" rx="16"/>
-  <rect x="90" y="70" width="160" height="200" rx="12" fill="#ffffff" stroke="#E2E8F0" stroke-width="2"/>
-  <rect x="110" y="100" width="120" height="70" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="2"/>
-  <rect x="120" y="115" width="80" height="6" rx="3" fill="#0F172A" opacity="0.8"/>
-  <rect x="120" y="130" width="100" height="6" rx="3" fill="#0F172A" opacity="0.8"/>
-  <rect x="120" y="145" width="70" height="6" rx="3" fill="#0F172A" opacity="0.8"/>
-  <rect x="110" y="185" width="120" height="6" rx="3" fill="#E2E8F0"/>
-  <rect x="110" y="198" width="120" height="6" rx="3" fill="#E2E8F0"/>
-  <rect x="110" y="211" width="120" height="6" rx="3" fill="#E2E8F0"/>
-  <rect x="110" y="224" width="80" height="6" rx="3" fill="#E2E8F0"/>
-  <rect x="280" y="120" width="60" height="90" rx="8" fill="#ffffff" stroke="#E2E8F0" stroke-width="2" transform="rotate(6 310 165)"/>
-  <rect x="290" y="140" width="40" height="5" rx="2" fill="#0F172A" opacity="0.8" transform="rotate(6 310 165)"/>
-  <rect x="290" y="150" width="40" height="5" rx="2" fill="#0F172A" opacity="0.8" transform="rotate(6 310 165)"/>
-  <rect x="290" y="160" width="40" height="5" rx="2" fill="#0F172A" opacity="0.8" transform="rotate(6 310 165)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Print dokumen BisaPrint" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#F0FDFA"/>
+  <g transform="translate(90 46) rotate(-3)">
+    <rect x="16" y="24" width="200" height="210" rx="10" fill="#94A3B8"/>
+    <rect x="8" y="12" width="200" height="210" rx="10" fill="#CBD5E1"/>
+    <rect width="200" height="210" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
+    <g fill="#0F172A">
+      <circle cx="12" cy="16" r="4"/><circle cx="12" cy="32" r="4"/><circle cx="12" cy="48" r="4"/>
+      <circle cx="12" cy="64" r="4"/><circle cx="12" cy="80" r="4"/><circle cx="12" cy="96" r="4"/>
+      <circle cx="12" cy="112" r="4"/><circle cx="12" cy="128" r="4"/><circle cx="12" cy="144" r="4"/>
+      <circle cx="12" cy="160" r="4"/><circle cx="12" cy="176" r="4"/><circle cx="12" cy="192" r="4"/>
+    </g>
+    <rect x="32" y="24" width="90" height="12" rx="6" fill="#0F172A"/>
+    <rect x="32" y="48" width="150" height="6" rx="3" fill="#94A3B8"/>
+    <rect x="32" y="60" width="150" height="6" rx="3" fill="#94A3B8"/>
+    <rect x="32" y="72" width="110" height="6" rx="3" fill="#94A3B8"/>
+    <rect x="32" y="94" width="150" height="6" rx="3" fill="#E2E8F0"/>
+    <rect x="32" y="106" width="150" height="6" rx="3" fill="#E2E8F0"/>
+    <rect x="32" y="118" width="130" height="6" rx="3" fill="#E2E8F0"/>
+    <rect x="32" y="140" width="70" height="28" rx="6" fill="#0D9488"/>
+    <rect x="110" y="140" width="70" height="28" rx="6" fill="#E87817"/>
+  </g>
 </svg>
