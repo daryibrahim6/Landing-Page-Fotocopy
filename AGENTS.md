@@ -11,7 +11,7 @@ Rules di `.devin/rules/` TIDAK semua always-on. Sebelum mulai task apapun, cek t
 
 | Jenis Task | Wajib Baca File Ini Dulu |
 |---|---|
-| **SEMUA TASK (always-on)** | `.devin/rules/quality-radar.md` — defect detection mindset, 24 tipe kejanggalan (K1-K27), pre-ship audit |
+| **SEMUA TASK (always-on)** | `.devin/rules/quality-radar.md` — defect detection mindset, 27 tipe kejanggalan (K1-K27), pre-ship audit |
 | Build gagal, CI/CD error, deploy, rendering strategy (SSG/ISR/dynamic) | `.devin/rules/nextjs-build-cicd-optimization.md` |
 | Nulis/edit test (Playwright/e2e), audit business gap, QA/QC | `.devin/rules/qa-qc-workflow-and-status-tracking.md` |
 | **Re-audit/reprompt planning, batching flow, coverage tracking** | `.devin/rules/flow-coverage-tracking.md` — coverage gate: semua file di `reports/audit/*.md` wajib masuk plan; micro-UX feedback sweep per flow; matrix di `reports/flow-coverage-matrix.md` |
@@ -23,7 +23,7 @@ Rules di `.devin/rules/` TIDAK semua always-on. Sebelum mulai task apapun, cek t
 | Pilih/organisasi library, dependency baru | `.devin/rules/lib-architecture.md` |
 | Styling, komponen visual, layout, UI apapun | `.devin/rules/design-taste.md` (walaupun manual-trigger, WAJIB dibaca kalau task ini soal visual) |
 
-**`quality-radar.md` is always-on** — apply 24 kejanggalan categories (K1-K27) ke setiap task tanpa peduli jenis task. Pre-ship audit (24 quick scan + 6 deep scan) WAJIB sebelum declare task selesai.
+**`quality-radar.md` is always-on** — apply 27 kejanggalan categories (K1-K27) ke setiap task tanpa peduli jenis task. Pre-ship audit (27 quick scan + 8 deep scan) WAJIB sebelum declare task selesai.
 
 **Setelah baca rules yang relevan, sebutkan singkat di awal jawaban: "Baca [nama file] dulu, poin utama yang saya terapkan: ..."** — supaya user bisa cross-check rules-nya beneran dipakai bukan cuma dibaca sekilas.
 <!-- END:routing -->
@@ -39,7 +39,7 @@ Rules di `.devin/rules/` TIDAK semua always-on. Sebelum mulai task apapun, cek t
 6. **PRD/Blueprint**: `PRD_BisaPrint_Website.md` adalah spec produk awal — jangan pakai untuk keputusan sehari-hari tanpa konfirmasi user. Blueprint project lain ada di `_archive/`, bukan patokan aktif.
 7. **Jangan pernah maksa test passed**: Kalau test error, diagnosis root cause dulu (app bug vs test outdated) sebelum ubah apapun. Ini berlaku di SEMUA konteks testing, tidak peduli rules spesifik apa yang lagi dipakai.
 8. **Jangan klaim "selesai"/"aman"/"clear" tanpa bukti eksplisit**: Setiap laporan status harus disertai bukti dari code (file + behavior), bukan kesimpulan sepihak. Kalau ada item non-blocking / non-scope / noted-but-deferred, WAJIB sebutkan eksplisit bersamaan dengan statement "aman"/"clear" — jangan bilang "tidak ada yang perlu lu tangani" tanpa qualifier. Format wajib: "X findings VERIFIED, 0 OPEN. Tapi ada N item non-[scope] yang noted: [list singkat]. Mau fix atau skip?"
-9. **Quality Radar (always-on)**: Setiap task WAJIB apply `.devin/rules/quality-radar.md` — 24 tipe kejanggalan (K1-K27) + pre-ship audit. Tidak peduli task type: UI, code, architecture, test, docs. Sebelum bilang "selesai", jalankan quick scan (24 pertanyaan) + deep scan (6 pertanyaan).
+9. **Quality Radar (always-on)**: Setiap task WAJIB apply `.devin/rules/quality-radar.md` — 27 tipe kejanggalan (K1-K27) + pre-ship audit. Tidak peduli task type: UI, code, architecture, test, docs. Sebelum bilang "selesai", jalankan quick scan (27 pertanyaan) + deep scan (8 pertanyaan).
 10. **WAJIB tutup SETIAP jawaban dengan self-report checkpoint berikut** (bukan cuma untuk task testing/QA — untuk SEMUA jenis task tanpa kecuali):
    ```
    INSTRUKSI YANG DIMINTA: [ringkas ulang instruksi user dalam 1-2 kalimat]
