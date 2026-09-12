@@ -192,6 +192,19 @@
 
 ---
 
+#### DS-A-13 — Transformer scale tidak di-reset → image double-scaling setelah resize
+
+- **Severity:** P2
+- **Skenario:** `handleTransformEnd` baca `node.scaleX/scaleY` → hitung mm → `setDesignMm` — tapi **tidak pernah `node.scaleX(1)`**. Pattern resmi Konva: bake transform ke width/height lalu reset scale. Tanpa reset, scale menumpuk: re-render dengan `width=designPxW` baru dikalikan scale lama → image render lebih besar dari `designMm` tracked → kompound di tiap resize.
+- **Bukti:** `DesignCanvas.tsx` `handleTransformEnd` (sebelum fix); Konva docs Transformer example.
+- **Risiko:** Ukuran visual ≠ ukuran tracked → ghost grid + hasil imposisi tidak match gambar.
+- **Opsi:** (a) `node.scaleX(1); node.scaleY(1)` setelah baca (pattern resmi). (b) Pass scale sebagai prop — lebih kompleks.
+- **Rekomendasi Devin:** (a).
+- **Future gap tag:** none
+- **Status:** FIXED — `node.scaleX(1); node.scaleY(1)` ditambahkan + komentar penjelasan.
+
+---
+
 #### DS-A-12 — Input angka: clear → snap ke 1 (tidak bisa hapus digit)
 
 - **Severity:** P4
@@ -253,14 +266,14 @@
 | P3 | 3 | DS-A-03, DS-A-08, DS-A-10 | FIXED / ACK (DS-A-08) |
 | P4 | 4 | DS-A-04, DS-A-09, DS-A-11, DS-A-12 | FIXED |
 
-**Total: 9 FIXED, 1 ACK, 0 OPEN.**
+**Total: 10 FIXED, 1 ACK, 0 OPEN** (DS-A-13 ditambahkan di deep recheck).
 
 ## Tahap 2 Fix Log
 
 | File | Perubahan |
 |---|---|
 | `src/components/design-simulator/DesignSimulator.tsx` | Dims derive dari `BISA_PRINT_A3` · PNG export clone+dims inject · radius bulat `- gap` (preview+PDF) · disclaimer harga indikatif · string-state inputs · `htmlFor`/`aria-pressed`/`aria-label` lengkap · tips upload disync |
-| `src/components/design-simulator/DesignCanvas.tsx` | `draggable`/`dragBoundFunc`/`onDragEnd` dihapus · `anchorSize` 8→14 · input numeric L×T keyboard-accessible |
+| `src/components/design-simulator/DesignCanvas.tsx` | `draggable`/`dragBoundFunc`/`onDragEnd` dihapus · `anchorSize` 8→14 · input numeric L×T keyboard-accessible · scale reset post-transform (DS-A-13, deep recheck) |
 | `src/components/design-simulator/UploadZone.tsx` | Cap 10MB + `reader.onerror` |
 
 **Verifikasi Tahap 2:** `tsc` clean · `eslint` 0 problems · `vitest` **111/111** (paper-sizes math tidak berubah → tests tetap hijau).

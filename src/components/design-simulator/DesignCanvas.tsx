@@ -125,6 +125,11 @@ export function DesignCanvas({
     const scaleY = node.scaleY();
     const newWidthMm = (node.width() * scaleX) / mmScale;
     const newHeightMm = (node.height() * scaleY) / mmScale;
+    // Konva pattern: bake the transform into width/height and reset scale —
+    // otherwise the stale scale compounds with the new width prop and the
+    // image renders double-scaled vs the tracked mm size.
+    node.scaleX(1);
+    node.scaleY(1);
     setDesignMm({
       width: Math.max(10, Math.round(newWidthMm)),
       height: Math.max(10, Math.round(newHeightMm)),
