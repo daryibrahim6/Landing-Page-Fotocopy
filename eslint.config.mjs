@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Archived foreign-project reference material — not linted, not committed.
+    "_archive/**",
+    // Playwright artifacts (generated, not source).
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 

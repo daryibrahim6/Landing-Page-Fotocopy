@@ -80,13 +80,13 @@ File `reports/flow-coverage-matrix.md` adalah single source of truth untuk mappi
 
 ## 4b. Milestone Sync
 
-Setiap kali satu flow selesai satu tahap besar (Track A / E2E / Track B / Track C / Final AMAN), WAJIB update `milestones/milestones.md` → **Milestone 6 (QA/QC Re-Audit & Flow Coverage)**:
+Setiap kali satu flow selesai satu tahap besar (Track A / E2E / Track B / Track C / Final AMAN), WAJIB update `milestones/milestones.md` di tabel milestone QA/QC/re-audit yang aktif:
 
 - Update kolom status flow yang bersangkutan (✅ Done / 🔄 In Progress / ⬜ Belum).
 - Update counter progress flow selesai re-audit penuh (X dari total flow terdaftar).
 - Deskripsi ditulis ringkas tapi akurat — bukti (jumlah test, commit, temuan) boleh disebut; jangan klaim tanpa bukti.
 
-Milestone 6 bukan task mentor — itu tracking internal ronde re-audit. Format mengikuti tabel milestone yang sudah ada.
+Milestone QA/QC adalah tracking internal ronde re-audit, bukan task fitur. Format mengikuti tabel milestone yang sudah ada.
 
 ---
 

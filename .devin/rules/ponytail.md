@@ -125,6 +125,6 @@ Update `reports/status.md` (dan file per-flow di `reports/audit/`, `reports/test
 
 ## Blueprint Reference
 
-`blueprint/` adalah spec awal dari mentor. JANGAN dipakai untuk keputusan sehari-hari kecuali benar-benar dibutuhkan. Jika suatu keputusan butuh merujuk ke blueprint dan hasilnya berbeda dari kondisi project saat ini: WAJIB laporkan ke user sebelum mengambil tindakan berdasarkan blueprint lama.
+`PRD_BisaPrint_Website.md` adalah spec produk awal. JANGAN dipakai untuk keputusan sehari-hari kecuali benar-benar dibutuhkan. Jika suatu keputusan butuh merujuk ke PRD dan hasilnya berbeda dari kondisi project saat ini: WAJIB laporkan ke user sebelum mengambil tindakan berdasarkan spec lama. (Blueprint project lain yang diarsipkan ada di `_archive/` — bukan patokan.)
 
 Not lazy about: understanding the problem (read it fully and trace the real flow before picking a rung, a small diff you don't understand is just laziness dressed up as efficiency), input validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs (the platform is never the spec ideal, a clock drifts, a sensor reads off), anything explicitly requested. Lazy code without its check is unfinished: non-trivial logic leaves ONE runnable check behind, the smallest thing that fails if the logic breaks (a Vitest test file; no fixtures needed for simple logic). Trivial one-liners need no test.
