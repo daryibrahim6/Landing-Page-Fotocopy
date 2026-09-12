@@ -1,23 +1,362 @@
-# Audit — landing-page-flow
+# Audit: Landing Page Flow
 
-**Tier:** Core | **Prefix ID:** `LP`
-**Scope IN:** `src/app/page.tsx` + global shell (`layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`), semua `src/components/sections/*`, `src/components/layout/*` (Header, Footer), `src/components/shared/*`, `src/components/ui/*`, `src/components/tracking/*` (GA/MetaPixel), `src/data/*` (products, faq, portfolio, testimonials), `src/lib/constants.ts` (contact/URL), `src/lib/tracking.ts`, `src/lib/utils.ts`, `src/types/*`
-**Scope OUT:** `/checkout`, `/simulator`, API routes
-**Last audit:** 2026-09-08 (gabungan) → di-split ke file ini 2026-09-12. Re-audit v2 belum dijalankan.
+**Status:** Track A Tahap 0+1 selesai (re-audit v2) — **12 temuan OPEN** menunggu approval untuk Tahap 2.
 
-## Temuan (carry-over, semua diverifikasi resolved 12 Sep)
+**Tanggal re-audit:** sesi terbaru — audit formal penuh pertama untuk flow ini (temuan LP-A-01..07 di bawah adalah carry-over dari audit gabungan lama, sudah di-verifikasi ulang terhadap kode saat ini).
 
-| ID | Sev | Temuan | Status | Bukti resolusi |
-|---|---|---|---|---|
-| LP-A-01 (ex UI-A-001) | P1 | Konflik design direction (Y2K vs clean) | ✅ FIXED-via-DECISION | Hybrid diterapkan via Wave 1 (`eabec24`, `f098e70`) — font Fredoka headline, Poppins body, background netral |
-| LP-A-02 (ex UI-A-002) | P1 | Fredoka untuk semua heading = kesan anak-anak | ✅ FIXED | Fredoka restricted ke display/headline (`font-display`) |
-| LP-A-03 (ex UI-A-003) | P1 | Logo tidak transparan/SVG | ✅ FIXED | `logo-bisaprint.webp` real dipakai di Header & Footer (`de05c23`) |
-| LP-A-04 (ex UI-A-004) | P2 | Banyak produk pakai gambar sama | ✅ FIXED | 12 SVG per-produk (`20ccb1c`) |
-| LP-A-05 (ex UI-A-005) | P2 | Dekorasi assets overload | ✅ FIXED | Dekorasi dibersihkan di Wave 1 |
-| LP-A-06 (ex UI-A-006) | P2 | ProductCard pakai `<a>` bukan `next/link` | ⚠️ VERIFY | Perlu cek `src/components/shared/ProductCard.tsx` saat re-audit |
-| LP-A-07 (ex UI-A-007) | P3 | WavyDivider pink tint | ✅ FIXED-via-DECISION | Aksen pink selektif dipertahankan (arah hybrid) |
+---
 
-## Catatan
+## Scope (Tahap 0 — Frozen)
 
-- Track C (UI/UX walkthrough) per-section belum dijalankan sebagai audit formal — temuan visual resolved lewat iterasi Wave 1.
-- E2E: spec belum ada.
+### User Story / Business Rules
+
+- **User bisa:** mendarat di `/`, membaca value prop + bukti sosial, browse kategori → katalog produk, filter produk per kategori, baca portfolio/testimoni/FAQ/panduan file, isi form konsultasi, dan konversi via: (a) WhatsApp CTA (pesan pre-filled), (b) tombol "Pesan Sekarang" → `/checkout?product=…` untuk produk `isCheckoutEnabled`, (c) link `/simulator`.
+- **Roles:** anonymous visitor (satu-satunya actor di client); admin menerima hasil konversi via WhatsApp/Midtrans (di luar scope UI ini).
+- **Output yang wajib benar:**
+  1. Semua link/CTA bekerja dari route manapun — nav anchor tidak boleh dead-click.
+  2. Semua gambar yang direferensikan ada di `public/` — no 404.
+  3. Konten yang tampil = konten nyata (bukan placeholder yang mengklaim real).
+  4. Metadata/OG/JSON-LD akurat & env-correct.
+  5. WA CTA membawa pesan pre-fill yang benar ke nomor yang benar.
+  6. Harga "Mulai Rp…" di kartu produk konsisten dengan `products` data.
+
+### Boundary IN
+
+| Area | File |
+|---|---|
+| Page + shell | `src/app/page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `globals.css` (relevan) |
+| Sections | semua `src/components/sections/*` (11 file) |
+| Layout comps | `Header.tsx`, `Footer.tsx` |
+| Shared comps | `ProductCard`, `WhatsAppButton`, `ScrollReveal`, `SectionWrapper`, `WavyDivider`, `DecorativeImage`, `BlobDecoration` |
+| UI/tracking | `src/components/ui/*`, `src/components/tracking/*` |
+| Data | `src/data/products.ts`, `portfolio.ts`, `testimonials.ts`, `faq.ts` |
+| Shared lib (read-path) | `src/lib/constants.ts`, `wa.ts`, `tracking.ts`, `utils.ts`, `pricing.ts` (dipakai ProductCard via `formatRupiah`) |
+
+### Boundary OUT
+
+| Area | Kenapa OUT |
+|---|---|
+| `/checkout` pages + `src/app/api/*` | checkout-flow (Track A selesai — CLEAR) |
+| `/simulator` | design-simulator-flow (belum di-audit v2) |
+| `wa.ts` template admin & `notification.ts` internals | whatsapp-notification-flow; yang di-scope di sini hanya URL builder yang dipakai CTA |
+| Midtrans webhook/payment logic | checkout-flow |
+
+Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checkout-flow (CF-A-30) — di sini hanya dicek konsistensi UI flag.
+
+### Risiko & Prioritas
+
+| Risiko | Skenario paling berisiko |
+|---|---|
+| Konversi mati | CTA/nav tidak bekerja → funnel utama (WA + checkout) bocor tanpa terlihat |
+| Trust | Placeholder diklaim sebagai hasil kerja asli → kredibilitas rusak |
+| SEO | Metadata/sitemap salah → organic traffic untuk landing page hilang |
+| A11y | Konten bergerak tanpa pause, menu tanpa escape — WCAG gap |
+
+**Vitest vs E2E:** logic murni (wa URL builders, formatRupiah, phone normalize) → Vitest (sudah ada). Interaksi komponen (filter katalog, form validation, nav) → kandidat Track B. Full-journey (landing → WA/checkout) → E2E (skipped per keputusan user).
+
+---
+
+## Temuan Track A (Tahap 1)
+
+### Carry-over (di-verifikasi ulang terhadap kode saat ini)
+
+| ID | Sev | Status re-verifikasi |
+|---|---|---|
+| LP-A-01 design direction conflict | P1 | FIXED (keputusan desain — Plus Jakarta Sans/Poppins terpasang di `layout.tsx`) |
+| LP-A-02 font terlalu luas | P1 | FIXED (font-display vs body sudah dipisah via CSS var) |
+| LP-A-03 logo transparency | P1 | FIXED (`logo-bisaprint.svg`+`webp` ada di `public/assets/brand/`) |
+| LP-A-04 duplikasi product imagery | P2 | FIXED (12 SVG produk unik di `public/assets/products/`) |
+| LP-A-05 decorative asset berlebih | P2 | FIXED (folder `decoratives/` tidak ada lagi — lihat LP-A-10 untuk residu) |
+| LP-A-06 ProductCard `<a>` vs `next/link` | P2 | **FIXED — verified** (`ProductCard.tsx:105` pakai `<Link>` untuk `/checkout?product=…`) |
+| LP-A-07 pink tint WavyDivider | P3 | FIXED (keputusan desain) |
+
+### Temuan Baru
+
+---
+
+#### LP-A-08 — Nav & Footer anchor links DEAD di route non-home
+
+- **Severity:** P1
+- **Skenario:** User di `/checkout`, `/checkout/success`, `/simulator`, atau halaman 404 klik nav "Produk"/"Portfolio"/"Cara Order"/"FAQ" → **tidak terjadi apa-apa**. `handleNavClick` melakukan `e.preventDefault()`, lalu `document.getElementById(targetId)` return `null` di halaman tanpa section → silent no-op. User terjebak, satu-satunya jalan keluar = logo/back browser.
+- **Bukti:** `src/components/layout/Header.tsx:68-71` (`e.preventDefault()` + `getElementById` tanpa fallback), pola identik di `src/components/layout/Footer.tsx:20-22`.
+- **Risiko:** Conversion leak — user yang masuk checkout tapi mau balik lihat produk/FAQ tidak bisa via UI. Header+Footer render di SEMUA page (via `layout.tsx`), jadi bug ini aktif di setiap route.
+- **Opsi:**
+  - (a) Fallback: kalau `getElementById` null → `router.push("/#" + targetId)` — simpel, bekerja, hash diproses browser setelah navigasi.
+  - (b) Pakai `href="/#produk"` plain tanpa preventDefault — browser handle native, tapi smooth-scroll custom hilang di home.
+  - (c) Selalu `router.push` ke `/${href}` kecuali sudah di `/` — lebih eksplisit, sedikit lebih verbose.
+- **Rekomendasi Devin:** (a) — satu baris fallback di handler existing, tidak mengubah perilaku di home, menutup semua route.
+- **Future gap tag:** cross-flow (Header/Footer shared semua flow), a11y
+- **Status:** OPEN
+
+---
+
+#### LP-A-09 — Portfolio section menampilkan placeholder base64, copy mengklaim hasil asli
+
+- **Severity:** P2
+- **Skenario:** Section "Hasil Cetak Kami" dengan copy "Ribuan produk sudah keluar dari mesin kami. Ini sebagian hasilnya." menampilkan 10+ tile yang SEMUANYA `data:image/svg+xml;base64` gradient berwarna — bukan foto hasil cetak. Ada `// TODO: replace with higher res version` di `PortfolioGallery.tsx:81`.
+- **Bukti:** `src/data/portfolio.ts:15,22,29,…` (semua `image:` = `data:image/svg+xml;base64,…` gradient), `src/components/sections/PortfolioGallery.tsx:81,49-61`.
+- **Risiko:** Trust — landing page adalah aset kredibilitas; klaim "hasil cetak" dengan tile gradient abstrak terlihat sebagai placeholder production. Juga `next/image` me-render data-URI tanpa benefit optimasi.
+- **Opsi:**
+  - (a) Ganti dengan foto hasil kerja asli (ideal, tapi butuh aset nyata dari user).
+  - (b) Sembunyikan `PortfolioGallery` dari `page.tsx` sampai aset ada + ubah copy — paling jujur.
+  - (c) Pertahankan tapi ubah copy jadi "contoh kategori produk" — kompromi.
+- **Rekomendasi Devin:** (b) — remove section dari render sampai user supply foto asli. Placeholder yang mengklaim hasil nyata lebih buruk daripada tidak ada section. **Butuh keputusan user** (konten/aset).
+- **Future gap tag:** none
+- **Status:** OPEN — product decision
+
+---
+
+#### LP-A-10 — Footer mereferensikan asset yang tidak ada → 404 setiap page load
+
+- **Severity:** P2
+- **Skenario:** `Footer.tsx:33` render `<Image src="/assets/decoratives/wavy-divider.webp" …>` — folder `public/assets/decoratives/` **tidak ada** (diverifikasi `ls public/assets/`). Setiap page load → request 404 + div `h-[60px]` kosong. `alt=""` jadi invisible secara visual, tapi request gagal tetap terjadi.
+- **Bukti:** `src/components/layout/Footer.tsx:32-38`; `ls public/assets/` → hanya `brand hero icon illustrations machines products`.
+- **Risiko:** 404 noise di setiap page (network + console), gap layout 60px, failed asset di audit tools/Lighthouse.
+- **Opsi:**
+  - (a) Hapus blok Image (kemungkinan besar residu LP-A-05 saat decorative assets dibersihkan tapi referensi ketinggalan).
+  - (b) Buat asset wavy-divider yang sebenarnya.
+- **Rekomendasi Devin:** (a) — komponen `WavyDivider` SVG sudah ada dan dipakai di page.tsx; blok footer ini duplikat/residu.
+- **Future gap tag:** none
+- **Status:** OPEN
+
+---
+
+#### LP-A-11 — KategoriProduk `onSelect` tidak pernah di-wire → klik kategori tidak memfilter katalog
+
+- **Severity:** P2
+- **Skenario:** Kartu kategori (mis. "Stiker & Label") di-klik → `onSelect?.(cat.id)` dipanggil tapi `page.tsx:22` me-render `<KategoriProduk />` **tanpa prop** → callback noop. Scroll ke `#produk` jalan, tapi filter katalog TIDAK berubah — user tetap lihat "Semua". Fitur setengah terpasang: prop ada, wiring tidak.
+- **Bukti:** `src/components/sections/KategoriProduk.tsx:41-46` (`onSelect?.(cat.id)`), `src/app/page.tsx:22` (no prop), `ProductCatalog.tsx:19` (state filter lokal `activeCategory` tidak expose ke parent).
+- **Risiko:** UX friction + broken affordance — kartu kategori menyiratkan "lihat produk kategori ini" tapi tidak memfilter.
+- **Opsi:**
+  - (a) Lift state: `activeCategory` naik ke `page.tsx`, pass `onSelect` + `activeCategory` ke kedua komponen — wiring lengkap, page.tsx jadi client component (katalog sudah client anyway — state bisa di bridge via wrapper client kecil).
+  - (b) Hapus prop `onSelect` + ubah kartu jadi anchor scroll murni ke `#produk` — jujur terhadap perilaku aktual.
+  - (c) URL-param approach: klik kategori → `/#produk?cat=…` — lebih kompleks, shareable.
+- **Rekomendasi Devin:** (a) — intent desain jelas untuk memfilter (prop sudah disiapkan); bridge client wrapper tipis di page.tsx agar kategori klik → filter katalog.
+- **Future gap tag:** cross-flow (interaksi antar section)
+- **Status:** OPEN
+
+---
+
+#### LP-A-12 — Hero render `opacity: 0` di SSR → LCP tertunda sampai hydration + animasi
+
+- **Severity:** P2
+- **Skenario:** `HeroSection` pakai `initial="hidden" animate="visible"` (framer-motion) — SSR HTML emit `opacity:0` pada h1/subtext/CTA. Chrome **mengabaikan elemen opacity:0 sebagai kandidat LCP** → LCP landing page tercatat saat animasi selesai (~detik ke-1.5-2.5+), bukan saat HTML tiba. Tanpa JS, hero blank.
+- **Bukti:** `src/components/sections/HeroSection.tsx:129-133` (`initial="hidden"`), `7-67` (semua variant `opacity: 0`).
+- **Risiko:** Landing page = halaman paling penting untuk LCP/SEO; riset eksternal (web.dev, DebugBear, Shopify) konsisten: jangan sembunyikan LCP element di balik animasi entry.
+- **Opsi:**
+  - (a) Hapus `initial="hidden"` untuk elemen above-fold (h1, subtext) — animasi hanya via CSS/non-blocking, atau `initial={false}` untuk paint langsung lalu animasi transform saja.
+  - (b) Pertahankan animasi tapi render SSR visible + `useReducedMotion` — lebih kompleks.
+  - (c) Terima LCP hit — tidak direkomendasikan untuk landing page.
+- **Rekomendasi Devin:** (a) — elemen hero tampil segera; animasi masih bisa jalan pada transform/badge non-LCP. Consistent dengan `ScrollReveal` yang sudah respect `useReducedMotion`.
+- **Future gap tag:** scale (traffic mobile lambat), a11y
+- **Status:** OPEN
+
+---
+
+#### LP-A-13 — Google site verification = placeholder literal di production HTML
+
+- **Severity:** P3
+- **Skenario:** `layout.tsx:65` emit `<meta name="google-site-verification" content="YOUR_GOOGLE_SITE_VERIFICATION">` — placeholder ship ke production. Search Console verification tidak akan pernah berhasil + meta tag sampah di HTML.
+- **Bukti:** `src/app/layout.tsx:65`.
+- **Risiko:** GSC tidak terverifikasi → tidak bisa submit sitemap/monitor index; meta tag palsu.
+- **Opsi:**
+  - (a) Env-driven: `google: process.env.GOOGLE_SITE_VERIFICATION` + omit kalau kosong.
+  - (b) Hapus field sampai nilai asli ada.
+- **Rekomendasi Devin:** (a) — pattern env yang sama dengan `META_PIXEL_ID`/`GA_ID` yang sudah benar.
+- **Future gap tag:** monitoring (SEO verification)
+- **Status:** OPEN
+
+---
+
+#### LP-A-14 — `metadataBase` hardcoded `https://bisaprint.com`, tanpa env override
+
+- **Severity:** P3
+- **Skenario:** `layout.tsx:30` hardcode domain. Preview/staging deploy (Vercel preview, domain lain) → canonical + OG URL tetap mengarah ke `bisaprint.com` → social preview salah, canonical bocor ke domain prod dari staging.
+- **Bukti:** `src/app/layout.tsx:30`; `src/lib/constants.ts` tidak punya `SITE_URL`.
+- **Risiko:** SEO/social — OG image + canonical salah di non-prod; susah tes staging.
+- **Opsi:**
+  - (a) `metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://bisaprint.com")` — env-first, fallback prod.
+  - (b) Hardcode ok kalau tidak ada staging — rapuh.
+- **Rekomendasi Devin:** (a) — konsisten dengan env-driven constants lain.
+- **Future gap tag:** infra (deploy non-prod)
+- **Status:** OPEN
+
+---
+
+#### LP-A-15 — Tidak ada `sitemap.ts` / `robots.ts`
+
+- **Severity:** P3
+- **Skenario:** `ls src/app/` → tidak ada `sitemap.ts`, `robots.ts`, atau file statis di `public/`. `robots: { index: true }` ada di metadata tapi tidak ada sitemap untuk crawler dan tidak ada robots.txt directive.
+- **Bukti:** `src/app/` listing (verified); `layout.tsx:64`.
+- **Risiko:** Landing page lokal-business bergantung pada organic search — tanpa sitemap Google crawl kurang efisien; tanpa robots.txt tidak ada kontrol/disallow `/api`, `/checkout/success` dsb.
+- **Opsi:**
+  - (a) Tambah `src/app/sitemap.ts` + `src/app/robots.ts` (file convention Next.js native — ~30 baris total).
+  - (b) Static `public/robots.txt` + `sitemap.xml` — manual, rawan basi.
+- **Rekomendasi Devin:** (a) — native, typed, zero maintenance untuk 4-5 route.
+- **Future gap tag:** monitoring (SEO)
+- **Status:** OPEN
+
+---
+
+#### LP-A-16 — Testimonial marquee auto-scroll: pause hanya via hover → WCAG 2.2.2
+
+- **Severity:** P3
+- **Skenario:** Testimoni auto-scroll infinite (`animate-scroll-x`, `duplicated` array, `animationPlayState` toggle hanya `onMouseEnter/Leave`). Keyboard user & touch user **tidak bisa pause** → WCAG 2.2 SC 2.2.2 (Pause, Stop, Hide — Level A): konten bergerak otomatis >5 detik paralel konten lain wajib punya mekanisme pause.
+- **Bukti:** `src/components/sections/Testimonials.tsx:208-229` (`onMouseEnter/Leave` saja, tidak ada tombol/focus pause), `globals.css:174-180`.
+- **Risiko:** A11y Level A violation. `prefers-reduced-motion` sudah handle reduced-motion user ✓ — tapi sighted keyboard/touch user tidak tercover.
+- **Opsi:**
+  - (a) Tambah tombol pause/play visible + `onFocus`/`onBlur` pause — WCAG-complete.
+  - (b) Pause on `focus-within` + touchstart — minimal, tanpa tombol.
+- **Rekomendasi Devin:** (a) — tombol pause kecil + focus pause = paling accessible dan jelas.
+- **Future gap tag:** a11y
+- **Status:** OPEN
+
+---
+
+#### LP-A-17 — Midtrans Snap script + preconnect dimuat global di semua page (termasuk landing)
+
+- **Severity:** P3
+- **Skenario:** `layout.tsx` load `snap.js` `afterInteractive` di root layout → ikut di landing page padahal hanya dipakai di `/checkout`. Selain itu `<link rel="preconnect" href="https://app.sandbox.midtrans.com">` (line 122) hardcoded **sandbox** — di production env preconnect mengarah ke host yang salah (prod = `app.midtrans.com`).
+- **Bukti:** `src/app/layout.tsx` (Script snap + line 122 preconnect); `getMidtransBaseUrl()` di `src/lib/midtrans.ts` sudah env-aware, preconnect tidak.
+- **Risiko:** JS pihak ketiga ekstra di critical path landing (network + parse), preconnect hint salah di prod, sandbox host di-preconnect saat prod.
+- **Opsi:**
+  - (a) Pindah load snap ke `checkout` layout/page saja + preconnect env-aware (`getMidtransBaseUrl()`).
+  - (b) Biarkan global — snap perlu ready sebelum user klik bayar; tapi checkout sudah dedicated page, bisa load di sana.
+- **Rekomendasi Devin:** (a) — scope script ke route yang pakai; fix preconnect ke env. Perlu verifikasi snap ready saat user tiba di checkout (afterInteractive cukup).
+- **Future gap tag:** scale/perf, infra
+- **Status:** OPEN
+
+---
+
+#### LP-A-18 — Dead components: `GoogleMap.tsx`, `DecorativeImage.tsx`, `BlobDecoration.tsx`
+
+- **Severity:** P4
+- **Skenario:** Tiga komponen tidak diimpor file manapun (grep verified — hanya self-reference). `GoogleMap` digantikan iframe inline di `ContactSection`; `DecorativeImage`/`BlobDecoration` residu LP-A-05.
+- **Bukti:** `grep -l "DecorativeImage\|BlobDecoration\|GoogleMap" src/**/*.tsx` → hanya file itu sendiri.
+- **Risiko:** Dead code membingungkan audit berikutnya + ukuran repo; `GoogleMap` bahkan refer env `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` yang tidak relevan (ContactSection pakai `MAPS_EMBED_URL` tanpa key).
+- **Opsi:** (a) Hapus ketiganya. (b) Archive ke `_archive/`. 
+- **Rekomendasi Devin:** (a) — tidak ada plan reuse; ContactSection sudah punya embed jalan.
+- **Future gap tag:** none
+- **Status:** OPEN
+
+---
+
+#### LP-A-19 — Cluster a11y/responsif: mobile menu tanpa Escape/focus, tab kategori tanpa state ARIA, hero abaikan reduced-motion, `h-screen` mobile
+
+- **Severity:** P4 (bundle advisory)
+- **Skenario:**
+  1. Mobile menu (Header) tidak close via `Escape`, tidak ada focus management saat buka/tutup.
+  2. Category tabs `ProductCatalog` adalah `<button>` tanpa `aria-pressed`/`role="tablist"` — screen reader tidak tahu tab aktif.
+  3. `HeroSection` motion tidak cek `useReducedMotion` (inkonsisten dengan `ScrollReveal`/`Testimonials` yang sudah).
+  4. `h-screen` hero = 100vh termasuk URL bar mobile → konten bisa terpotong di mobile (`h-svh`/`min-h-svh` lebih aman).
+- **Bukti:** `Header.tsx` (AnimatePresence menu, no keydown handler), `ProductCatalog.tsx:41-54`, `HeroSection.tsx:95-100`, `layout.tsx` (`useReducedMotion` tidak dipakai Hero).
+- **Risiko:** a11y gaps kecil — tidak blocking tapi menurunkan skor audit a11y.
+- **Opsi:** (a) Bundle fix kecil per item. (b) Defer ke Track C polish.
+- **Rekomendasi Devin:** (a) untuk Escape + `aria-pressed` (murah); defer sisanya ke Track C kalau mau.
+- **Future gap tag:** a11y
+- **Status:** OPEN
+
+---
+
+#### LP-A-20 — JSON-LD duplikat hardcode data kontak (drift dari `constants.ts`)
+
+- **Severity:** P4
+- **Skenario:** `layout.tsx` JSON-LD hardcode `+6281299435019`, `bisadigitalprint@gmail.com`, alamat Bekasi — duplikat `WA_NUMBER`/`EMAIL_URL`/`MAPS_EMBED_URL` di `constants.ts`. Kalau env/constants berubah → JSON-LD bohong ke Google.
+- **Bukti:** `src/app/layout.tsx` (LocalBusiness JSON-LD) vs `src/lib/constants.ts:1-5`.
+- **Risiko:** Stale structured data — nomor WA di schema beda dari tombol WA = local SEO signal salah.
+- **Opsi:** (a) Import dari constants di JSON-LD. (b) Biarkan — rapuh.
+- **Rekomendasi Devin:** (a) — single source of truth.
+- **Future gap tag:** none
+- **Status:** OPEN
+
+---
+
+#### LP-A-21 — Tracking konversi tidak konsisten + klaim error reporting palsu
+
+- **Severity:** P4
+- **Skenario:**
+  1. `trackEvent("Lead")` hanya di floating `WhatsAppButton` (`WhatsAppButton.tsx:82`); CTA WA lain (hero, katalog "Chat Admin", FAQ "Tanya", kontak, ProductCard "Tanya Admin", header) **tidak tracked** → data konversi undercount besar.
+  2. `error.tsx` bilang "Tim kami sudah diberitahu" tapi tidak ada Sentry/error reporting — klaim palsu.
+- **Bukti:** `src/components/shared/WhatsAppButton.tsx:82` (hanya variant floating), `src/app/error.tsx:22`, `src/lib/tracking.ts`.
+- **Risiko:** Funnel analytics tidak akurat; error production tidak pernah sampai ke tim.
+- **Opsi:**
+  - (a) Track semua WA CTA (pass `source` per lokasi) + hapus/ubah klaim error.tsx atau wire reporting real.
+  - (b) Terima undercount — data tetap salah.
+- **Rekomendasi Devin:** (a) bagian tracking — murah (`trackEvent` sudah ada); error reporting = backlog monitoring (dokumentasikan).
+- **Future gap tag:** monitoring
+- **Status:** OPEN
+
+---
+
+#### LP-A-22 — FormKonsultasi validasi lemah (jumlah "0"/negatif lolos; bukan `<form>`; error tanpa ARIA)
+
+- **Severity:** P4
+- **Skenario:** `onClick` cek `!fields.jumlah` — truthy check pada string → `"0"`, `"-5"`, `"e"` lolos ke WA. Bukan elemen `<form>` → Enter di input tidak submit (anchor CTA), error `<p>` tidak di-associate via `aria-describedby`/`aria-invalid`/`role="alert"`.
+- **Bukti:** `src/components/sections/FormKonsultasi.tsx:158-163` (`!fields.jumlah` truthy), `59-66` (input tanpa `aria-invalid`), `170-172` (error tanpa `role="alert"`).
+- **Risiko:** Pesan WA terkirim dengan jumlah invalid; a11y form.
+- **Opsi:** (a) Validasi `Number(jumlah) > 0` + `role="alert"` + bungkus `<form>`. (b) Defer Track C.
+- **Rekomendasi Devin:** (a) — murah, sejalan validasi checkout `phoneSchema` pattern.
+- **Future gap tag:** a11y
+- **Status:** OPEN
+
+---
+
+#### LP-A-23 — Meta Pixel + GA fire tanpa consent; tidak ada halaman privacy
+
+- **Severity:** P4 (advisory)
+- **Skenario:** `MetaPixel`/`GoogleAnalytics` load `afterInteractive` begitu env set — tanpa consent banner/opt-out. Tidak ada `/privacy` page. Untuk bisnis Indonesia (UU PDP) + Meta Pixel tracking `Lead` events, consent notice adalah praktik yang direkomendasikan.
+- **Bukti:** `src/components/tracking/*`, `layout.tsx` render unconditional saat env ada.
+- **Risiko:** Compliance/privacy — rendah untuk skala ini tapi noted; tidak ada privacy page untuk link footer.
+- **Opsi:**
+  - (a) Consent banner ringan (localStorage opt-in) + privacy page.
+  - (b) Dokumentasikan sebagai known gap, defer ke roadmap.
+- **Rekomendasi Devin:** (b) — defer sadar; UU PDP enforcement untuk site skala ini rendah, tapi catat supaya tidak lupa saat scale.
+- **Future gap tag:** security/compliance, monitoring
+- **Status:** OPEN — defer kandidat
+
+---
+
+## Riset Eksternal (Tahap 1 — wajib)
+
+| Area | Current approach | Best practice (sumber) | Gap? |
+|---|---|---|---|
+| LCP hero animation | `initial="hidden"` → opacity 0 di SSR, animasi in | LCP element tidak boleh hidden/animasi entry (web.dev, DebugBear, Shopify — Chrome abaikan opacity:0 sbg kandidat LCP) | **Ya → LP-A-12** |
+| Konten bergerak >5s | Marquee testimoni, pause hover saja | WCAG 2.2 SC 2.2.2 Level A: mekanisme pause/stop/hide untuk SEMUA user (W3C) | **Ya → LP-A-16** |
+| SEO files | Metadata API lengkap; no sitemap/robots | Next.js `app/sitemap.ts` + `app/robots.ts` file convention (Next docs) | **Ya → LP-A-15** |
+| Canonical/metadataBase | Hardcoded `bisaprint.com` | Env-driven metadataBase (Next docs — OG/canonical resolution) | **Ya → LP-A-14** |
+| Site verification meta | Placeholder literal | Env-driven atau omit (Google Search Console docs) | **Ya → LP-A-13** |
+| Third-party script scope | snap.js global via root layout | `next/script` load hanya di route yang pakai (Next script optimization docs) | **Ya → LP-A-17** |
+| Anchor nav lintas route | preventDefault + scrollIntoView, no fallback | Fallback navigasi ke `/#anchor` saat section tidak ada | **Ya → LP-A-08** |
+| Reduced motion | `useReducedMotion` di ScrollReveal/Testimonials, tapi tidak di Hero | Respect `prefers-reduced-motion` konsisten (WCAG 2.3.3 advisory) | Parsial → LP-A-19 |
+| Consent/tracking | Pixel+GA unconditional | Consent notice untuk tracking (UU PDP / best practice) | Advisory → LP-A-23 |
+
+## 5 Kelas Blind Spot — cross-check
+
+| Kelas | Temuan di flow ini |
+|---|---|
+| Stale Reference | LP-A-10 (asset mati), LP-A-18 (dead comps), LP-A-20 (JSON-LD drift), LP-A-06 verified-resolved |
+| Concurrent/Race | Tidak ada state shared antar user di landing (read-only page) — N/A |
+| Time-Based Transition | Tidak ada state time-based — N/A |
+| Partial Failure multi-step | FormKonsultasi → WA (single step, validation lemah → LP-A-22) |
+| Cross-User Cache/Staleness | Halaman statis, data statis — N/A (produk/data perlu rebuild, acceptable) |
+
+## Test Coverage (Tahap 1 — catatan, Track B yang deep-dive)
+
+- Logic murni yang dipakai landing: `waUrl`/`buildWAUrl`/`buildWAFormUrl` (wa.test.ts ✓), `formatRupiah` (utils.test.ts ✓), `trackEvent` (tracking.test.ts ✓) — sudah ter-cover.
+- Component-level (filter katalog, validasi form, nav fallback, marquee pause): **0 test** — kandidat Track B setelah fix.
+- E2E: skipped per keputusan user (nav + conversion paths = kandidat pertama nanti).
+
+---
+
+## Rekap
+
+| Severity | Count | IDs |
+|---|---|---|
+| P1 | 1 | LP-A-08 |
+| P2 | 4 | LP-A-09, LP-A-10, LP-A-11, LP-A-12 |
+| P3 | 5 | LP-A-13, LP-A-14, LP-A-15, LP-A-16, LP-A-17 |
+| P4 | 6 | LP-A-18, LP-A-19, LP-A-20, LP-A-21, LP-A-22, LP-A-23 |
+
+**Total temuan OPEN: 16** (carry-over 01-07 semua FIXED/verified).
+
+**Butuh keputusan user:** LP-A-09 (portfolio placeholder — butuh aset asli atau sembunyikan section), LP-A-23 (consent — defer disarankan). Sisanya fixable langsung.
