@@ -55,7 +55,7 @@ export function ProductCatalog({
             aria-pressed={activeCategory === tab.id}
             onClick={() => setActiveCategory(tab.id)}
             className={cn(
-              "rounded-full px-5 py-2 text-sm font-bold transition-colors",
+              "min-h-11 rounded-full px-5 py-2 text-sm font-bold transition-colors",
               activeCategory === tab.id
                 ? "bg-primary text-white shadow-md"
                 : "border-2 border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",

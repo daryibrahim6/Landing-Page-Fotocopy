@@ -1,17 +1,18 @@
 "use client";
 
 
+import { FileText, Gift, Printer, Shirt, Tag, type LucideIcon } from "lucide-react";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { categories } from "@/data/products";
 import { cn } from "@/lib/utils";
 import type { ProductCategory } from "@/types";
 
-const categoryIcons: Record<ProductCategory, string> = {
-  "digital-printing": "🖨️",
-  "print-dokumen": "📄",
-  "stiker-label": "🏷️",
-  "dtf-apparel": "👕",
-  "produk-custom": "🎁",
+const categoryIcons: Record<ProductCategory, LucideIcon> = {
+  "digital-printing": Printer,
+  "print-dokumen": FileText,
+  "stiker-label": Tag,
+  "dtf-apparel": Shirt,
+  "produk-custom": Gift,
 };
 
 interface KategoriProdukProps {
@@ -47,9 +48,14 @@ export function KategoriProduk({ onSelect }: KategoriProdukProps) {
               className="group relative flex flex-col items-center gap-4 rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 text-center transition-all duration-200 hover:scale-[1.03] hover:-translate-y-1 hover:border-[var(--color-primary)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
               style={{ transform: `rotate(${i % 2 === 0 ? 1 : -1}deg)` }}
             >
-              <span className="text-4xl" role="img" aria-hidden="true">
-                {categoryIcons[cat.id]}
-              </span>
+              {(() => {
+                const Icon = categoryIcons[cat.id];
+                return (
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <Icon className="size-8" aria-hidden="true" />
+                  </span>
+                );
+              })()}
               <div>
                 <h3 className="font-display text-lg font-bold text-[var(--color-text-primary)]">
                   {cat.name}

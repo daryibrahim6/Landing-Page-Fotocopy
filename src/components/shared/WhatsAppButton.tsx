@@ -44,10 +44,11 @@ const sizeStyles = {
     md: "gap-2 px-6 py-3 text-base",
     lg: "gap-2.5 px-8 py-4 text-lg",
   },
+  // Smaller on mobile so the FAB covers less of the content it floats over.
   floating: {
-    sm: "size-12",
-    md: "size-14",
-    lg: "size-16",
+    sm: "size-11 sm:size-12",
+    md: "size-12 sm:size-14",
+    lg: "size-14 sm:size-16",
   },
 } as const;
 
@@ -86,7 +87,7 @@ export function WhatsAppButton({
           onClick={handleClick}
           whileHover={{ scale: 1.1 }}
           className={cn(
-            "group relative inline-flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition hover:bg-[#1ebe5d] hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#25D366]/40 animate-pulse-wa",
+            "group relative inline-flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition hover:bg-[#1ebe5d] hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1ebe5d] animate-pulse-wa",
             sizeStyles.floating[size],
             className,
           )}
@@ -110,10 +111,10 @@ export function WhatsAppButton({
       rel="noopener noreferrer"
       onClick={handleClick}
       className={cn(
-        "inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/30",
+        "inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-3",
         isPrimary
-          ? "bg-primary text-white hover:animate-pulse hover:bg-primary/90"
-          : "border-2 border-primary bg-transparent text-primary hover:bg-primary/10",
+          ? "bg-primary text-white hover:animate-pulse hover:bg-primary/90 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+          : "border-2 border-primary bg-transparent text-primary hover:bg-primary/10 focus-visible:ring-primary/30",
         sizeStyles[variant][size],
         className,
       )}

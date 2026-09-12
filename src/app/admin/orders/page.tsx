@@ -3,11 +3,11 @@ import { isPersistentStorage, listOrders } from "@/lib/order-storage";
 import OrderTable from "@/components/admin/OrderTable";
 
 export const metadata: Metadata = {
-  title: "Admin — Order Masuk | BisaPrint",
+  title: "Admin – Order Masuk | BisaPrint",
   robots: { index: false, follow: false },
 };
 
-// Always read fresh — order list changes on every checkout/webhook.
+// Always read fresh – order list changes on every checkout/webhook.
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
@@ -26,7 +26,7 @@ export default async function AdminOrdersPage() {
       </div>
       {!isPersistentStorage() && (
         <p role="alert" className="mb-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Mode in-memory — order tidak persisten. Isi UPSTASH_REDIS_REST_URL/TOKEN untuk production.
+          Mode in-memory – order tidak persisten. Isi UPSTASH_REDIS_REST_URL/TOKEN untuk production.
         </p>
       )}
       <OrderTable initialOrders={orders} initialCursor={nextCursor} />

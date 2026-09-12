@@ -359,7 +359,7 @@ export function CheckoutForm() {
                       errors.quantity ? "border-red-400" : "border-[var(--color-border)]",
                     )}
                   />
-                  {errors.quantity && <p className="mt-1 text-xs text-red-500">{errors.quantity}</p>}
+                  {errors.quantity && <p role="alert" className="mt-1 text-xs text-red-500">{errors.quantity}</p>}
                 </div>
               </div>
             </fieldset>
@@ -382,7 +382,7 @@ export function CheckoutForm() {
                     <span className="text-sm font-semibold text-[var(--color-text-secondary)]">
                       Upload file desain (PDF/PNG/JPG, max 10MB)
                     </span>
-                    <span className="text-xs text-[var(--color-text-muted)]">Opsional — bisa dikirim via WhatsApp nanti</span>
+                    <span className="text-xs text-[var(--color-text-muted)]">Opsional – bisa dikirim via WhatsApp nanti</span>
                   </label>
                 ) : (
                   <div className="flex items-center justify-between gap-3">
@@ -390,13 +390,13 @@ export function CheckoutForm() {
                       <FileText className="size-5 text-primary" />
                       <span className="text-sm font-medium text-[var(--color-text-primary)]">{file.name}</span>
                     </div>
-                    <button type="button" onClick={clearFile} className="rounded-full p-1 hover:bg-red-50">
+                    <button type="button" onClick={clearFile} aria-label="Hapus file desain" className="rounded-full p-2 hover:bg-red-50">
                       <X className="size-4 text-red-500" />
                     </button>
                   </div>
                 )}
-                {fileUploading && <p className="mt-2 text-xs text-[var(--color-text-muted)]">Mengupload...</p>}
-                {errors.file && <p className="mt-2 text-xs text-red-500">{errors.file}</p>}
+                {fileUploading && <p className="mt-2 text-xs text-[var(--color-text-muted)]" aria-live="polite">Mengupload...</p>}
+                {errors.file && <p role="alert" className="mt-2 text-xs text-red-500">{errors.file}</p>}
                 {fileUrl && <p className="mt-2 text-xs text-green-600">File siap</p>}
               </div>
             </fieldset>
@@ -415,6 +415,8 @@ export function CheckoutForm() {
                   error={errors.name}
                   placeholder="Nama kamu"
                   required
+                  autoComplete="name"
+                  maxLength={200}
                 />
                 <Field
                   id="phone"
@@ -425,6 +427,8 @@ export function CheckoutForm() {
                   error={errors.phone}
                   placeholder="0812xxxxxxx"
                   required
+                  autoComplete="tel"
+                  maxLength={15}
                 />
                 <Field
                   id="email"
@@ -434,11 +438,13 @@ export function CheckoutForm() {
                   onChange={(value) => update("email", value)}
                   error={errors.email}
                   placeholder="email@kamu.com"
+                  autoComplete="email"
+                  maxLength={254}
                 />
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
+                <fieldset>
+                  <legend className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
                     Pengambilan
-                  </label>
+                  </legend>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -467,7 +473,7 @@ export function CheckoutForm() {
                       Dikirim
                     </button>
                   </div>
-                </div>
+                </fieldset>
                 {form.pickup === "kirim" && (
                   <div className="sm:col-span-2">
                     <label htmlFor="address" className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
@@ -476,6 +482,8 @@ export function CheckoutForm() {
                     <textarea
                       id="address"
                       rows={2}
+                      autoComplete="street-address"
+                      maxLength={500}
                       value={form.address}
                       onChange={(e) => update("address", e.target.value)}
                       className={cn(
@@ -484,7 +492,7 @@ export function CheckoutForm() {
                       )}
                       placeholder="Jl. ..."
                     />
-                    {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address}</p>}
+                    {errors.address && <p role="alert" className="mt-1 text-xs text-red-500">{errors.address}</p>}
                   </div>
                 )}
                 <div className="sm:col-span-2">
@@ -494,6 +502,7 @@ export function CheckoutForm() {
                   <textarea
                     id="notes"
                     rows={2}
+                    maxLength={1000}
                     value={form.notes}
                     onChange={(e) => update("notes", e.target.value)}
                     className="w-full rounded-xl border-2 border-[var(--color-border)] px-4 py-2.5 text-sm outline-none transition focus:border-primary"
@@ -511,23 +520,23 @@ export function CheckoutForm() {
               </h3>
 
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span className="text-[var(--color-text-secondary)]">Produk</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">{product.name}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span className="text-[var(--color-text-secondary)]">Ukuran</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">{form.size}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span className="text-[var(--color-text-secondary)]">Bahan</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">{form.material}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span className="text-[var(--color-text-secondary)]">Finishing</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">{form.finishing}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <span className="text-[var(--color-text-secondary)]">Jumlah</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">{form.quantity} {product.unit}</span>
                 </div>
@@ -547,7 +556,7 @@ export function CheckoutForm() {
               </div>
 
               {error && (
-                <p className="text-sm font-semibold text-red-500">{error}</p>
+                <p role="alert" className="text-sm font-semibold text-red-500">{error}</p>
               )}
 
               {isMidtransConfigured() ? (
@@ -555,7 +564,7 @@ export function CheckoutForm() {
                   type="button"
                   onClick={handleMidtrans}
                   disabled={submitting || !form.name || !form.phone}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-50"
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary disabled:opacity-50"
                 >
                   {submitting ? (
                     <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -569,7 +578,7 @@ export function CheckoutForm() {
                   type="button"
                   onClick={handleWaOnly}
                   disabled={submitting || !form.name || !form.phone}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d] disabled:opacity-50"
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1ebe5d] disabled:opacity-50"
                 >
                   <MessageCircle className="size-4" />
                   Order via WhatsApp
@@ -595,10 +604,10 @@ function OptionGroup({
   onSelect: (value: string) => void;
 }) {
   return (
-    <div>
-      <label className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
+    <fieldset>
+      <legend className="mb-1 block text-sm font-medium text-[var(--color-text-secondary)]">
         {label}
-      </label>
+      </legend>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => (
           <button
@@ -607,7 +616,7 @@ function OptionGroup({
             onClick={() => onSelect(opt)}
             aria-pressed={selected === opt}
             className={cn(
-              "rounded-full border-2 px-4 py-2 text-sm font-semibold transition",
+              "min-h-11 rounded-full border-2 px-4 py-2 text-sm font-semibold transition",
               selected === opt
                 ? "border-primary bg-primary text-white"
                 : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
@@ -617,7 +626,7 @@ function OptionGroup({
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 
@@ -630,6 +639,8 @@ function Field({
   error,
   placeholder,
   required,
+  autoComplete,
+  maxLength,
 }: {
   id: string;
   label: string;
@@ -639,6 +650,8 @@ function Field({
   error?: string;
   placeholder?: string;
   required?: boolean;
+  autoComplete?: string;
+  maxLength?: number;
 }) {
   return (
     <div>
@@ -651,13 +664,15 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
+        autoComplete={autoComplete}
+        maxLength={maxLength}
         className={cn(
           "w-full rounded-xl border-2 px-4 py-2.5 text-sm outline-none transition focus:border-primary",
           error ? "border-red-400" : "border-[var(--color-border)]",
         )}
         placeholder={placeholder}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p role="alert" className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );
 }

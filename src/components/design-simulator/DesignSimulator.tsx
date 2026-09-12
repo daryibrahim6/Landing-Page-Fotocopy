@@ -39,13 +39,13 @@ const PRESETS: Preset[] = [
   { name: "Label 6 × 4 cm", w: 60, h: 40, shape: "square" },
 ];
 
-// Default price per A3 sheet for UMKM sticker (placeholder — admin can adjust)
+// Default price per A3 sheet for UMKM sticker (placeholder – admin can adjust)
 const BASE_SHEET_PRICE = 15000;
 
 export function DesignSimulator() {
   const [mode, setMode] = useState<"calculator" | "upload">("calculator");
 
-  // Calculator state — kept as strings so inputs can be cleared while typing;
+  // Calculator state – kept as strings so inputs can be cleared while typing;
   // parsed to numbers at the point of use (<= 0 → no result).
   const [designW, setDesignW] = useState("50");
   const [designH, setDesignH] = useState("50");
@@ -55,6 +55,7 @@ export function DesignSimulator() {
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [fileName, setFileName] = useState("layout-stiker-umkm");
   const [zoom, setZoom] = useState(100);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   // Upload state
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
@@ -118,7 +119,7 @@ export function DesignSimulator() {
     if (!svgRef.current) return;
     try {
       const svg = svgRef.current;
-      // Clone + inject explicit width/height — SVGs with only a viewBox have no
+      // Clone + inject explicit width/height – SVGs with only a viewBox have no
       // intrinsic size, so canvas drawImage produces blank/degraded output
       // (Firefox fails silently; spec falls back to canvas size).
       const clone = svg.cloneNode(true) as SVGSVGElement;
@@ -149,8 +150,9 @@ export function DesignSimulator() {
         a.click();
       };
       img.src = url;
+      setExportError(null);
     } catch {
-      alert("Gagal export PNG. Coba tombol Print.");
+      setExportError("Gagal export PNG. Coba tombol Print.");
     }
   }, [fileName]);
 
@@ -220,8 +222,9 @@ export function DesignSimulator() {
       pdf.line(w - m, h - m - 5, w - m - 15, h - m - 5);
 
       pdf.save(`${fileName || "layout-stiker-umkm"}.pdf`);
+      setExportError(null);
     } catch {
-      alert("Gagal export PDF. Pastikan koneksi internet stabil.");
+      setExportError("Gagal export PDF. Pastikan koneksi internet stabil.");
     }
   }, [result, cut, shape, fileName]);
 
@@ -274,7 +277,7 @@ export function DesignSimulator() {
                     key={preset.name}
                     type="button"
                     onClick={() => applyPreset(preset)}
-                    className="rounded-full border-2 border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition hover:border-primary hover:text-primary"
+                    className="min-h-11 rounded-full border-2 border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition hover:border-primary hover:text-primary"
                   >
                     {preset.name}
                   </button>
@@ -294,7 +297,7 @@ export function DesignSimulator() {
                   onClick={() => setShape("round")}
                   aria-pressed={shape === "round"}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                    "flex min-h-11 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     shape === "round"
                       ? "border-primary bg-primary text-white"
                       : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
@@ -308,7 +311,7 @@ export function DesignSimulator() {
                   onClick={() => setShape("square")}
                   aria-pressed={shape === "square"}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                    "flex min-h-11 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     shape === "square"
                       ? "border-primary bg-primary text-white"
                       : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
@@ -319,10 +322,10 @@ export function DesignSimulator() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {shape === "round" ? (
                 <div>
                   <label htmlFor="ds-width" className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
-                    {shape === "round" ? "Diameter (mm)" : "Lebar (mm)"}
+                    Diameter (mm)
                   </label>
                   <input
                     id="ds-width"
@@ -330,26 +333,45 @@ export function DesignSimulator() {
                     min={1}
                     max={500}
                     value={designW}
-                    onChange={(e) => setDesignW(e.target.value)}
+                    onChange={(e) => {
+                      setDesignW(e.target.value);
+                      setDesignH(e.target.value);
+                    }}
                     className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
                   />
                 </div>
-                <div>
-                  <label htmlFor="ds-height" className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
-                    {shape === "round" ? "Diameter (mm)" : "Tinggi (mm)"}
-                  </label>
-                  <input
-                    id="ds-height"
-                    type="number"
-                    min={1}
-                    max={500}
-                    value={designH}
-                    onChange={(e) => setDesignH(e.target.value)}
-                    disabled={shape === "round"}
-                    className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary disabled:opacity-50"
-                  />
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="ds-width" className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
+                      Lebar (mm)
+                    </label>
+                    <input
+                      id="ds-width"
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={designW}
+                      onChange={(e) => setDesignW(e.target.value)}
+                      className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ds-height" className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
+                      Tinggi (mm)
+                    </label>
+                    <input
+                      id="ds-height"
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={designH}
+                      onChange={(e) => setDesignH(e.target.value)}
+                      className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {shape === "square" && designW !== designH && (
                 <div className="mt-3 flex items-center gap-2">
@@ -358,7 +380,7 @@ export function DesignSimulator() {
                     onClick={() => setOrientation("portrait")}
                     aria-pressed={orientation === "portrait"}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                      "flex min-h-11 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                       orientation === "portrait"
                         ? "border-primary bg-primary text-white"
                         : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
@@ -372,7 +394,7 @@ export function DesignSimulator() {
                     onClick={() => setOrientation("landscape")}
                     aria-pressed={orientation === "landscape"}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                      "flex min-h-11 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                       orientation === "landscape"
                         ? "border-primary bg-primary text-white"
                         : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
@@ -396,26 +418,26 @@ export function DesignSimulator() {
                   onClick={() => setCut("kiss")}
                   aria-pressed={cut === "kiss"}
                   className={cn(
-                    "rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                    "min-h-11 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     cut === "kiss"
                       ? "border-primary bg-primary text-white"
                       : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
                   )}
                 >
-                  Kiss Cut — gap 2 mm
+                  Kiss Cut – gap 2 mm
                 </button>
                 <button
                   type="button"
                   onClick={() => setCut("die")}
                   aria-pressed={cut === "die"}
                   className={cn(
-                    "rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                    "min-h-11 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     cut === "die"
                       ? "border-primary bg-primary text-white"
                       : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary",
                   )}
                 >
-                  Die Cut — gap 4 mm
+                  Die Cut – gap 4 mm
                 </button>
               </div>
             </div>
@@ -442,7 +464,7 @@ export function DesignSimulator() {
                 <div className="rounded-2xl border-2 border-[var(--color-border)] bg-white p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                      Preview Layout (A3 — 325×485 mm)
+                      Preview Layout (A3 – 325×485 mm)
                     </p>
                     <div className="flex items-center gap-1">
                       <button
@@ -566,6 +588,11 @@ export function DesignSimulator() {
                         Simpan PDF
                       </button>
                     </div>
+                    {exportError && (
+                      <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
+                        {exportError}
+                      </p>
+                    )}
                   </div>
                 </div>
               </>
@@ -598,37 +625,37 @@ export function DesignSimulator() {
                   Hasil Simulasi
                 </p>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Bentuk</span>
                     <span className="font-semibold text-[var(--color-text-primary)] capitalize">
                       {shape === "round" ? "Bulat" : "Kotak"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Ukuran design</span>
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       {sw} × {sh} mm
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Jenis potong</span>
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       {cut === "kiss" ? "Kiss cut" : "Die cut"} ({cut === "kiss" ? GAP_KISS_CUT_MM : GAP_DIE_CUT_MM} mm)
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Layout</span>
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       {result.cols} × {result.rows}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Efisiensi area</span>
                     <span className={cn("font-semibold", result.utilization > 60 ? "text-green-600" : result.utilization > 35 ? "text-accent" : "text-red-500")}>
                       {result.utilization}%
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Jumlah lembar</span>
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       {sheets} lembar
@@ -642,7 +669,7 @@ export function DesignSimulator() {
                       {result.total}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="font-bold text-[var(--color-text-primary)]">
                       Estimasi harga*
                     </span>
@@ -651,7 +678,7 @@ export function DesignSimulator() {
                     </span>
                   </div>
                   <p className="text-[11px] italic text-[var(--color-text-muted)]">
-                    *Indikatif per lembar A3 — harga final dikonfirmasi admin via WhatsApp.
+                    *Indikatif per lembar A3 – harga final dikonfirmasi admin via WhatsApp.
                   </p>
                   {result.rotated && (
                     <p className="text-xs italic text-accent">
@@ -722,7 +749,7 @@ export function DesignSimulator() {
                 Ukuran Kertas
               </label>
               <p className="text-sm text-[var(--color-text-secondary)]">
-                A3 BisaPrint — 325 × 485 mm (area cetak 305 × 460 mm)
+                A3 BisaPrint – 325 × 485 mm (area cetak 305 × 460 mm)
               </p>
             </div>
 
@@ -736,13 +763,13 @@ export function DesignSimulator() {
                   Hasil Simulasi
                 </label>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Ukuran design</span>
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       {uploadImposition.designWidthMm} × {uploadImposition.designHeightMm} mm
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-[var(--color-text-secondary)]">Layout</span>
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       {uploadImposition.cols} × {uploadImposition.rows}

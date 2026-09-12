@@ -177,7 +177,7 @@ export function Header() {
 
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-soft)] md:hidden"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-soft)] md:hidden"
             aria-expanded={isMenuOpen}
             aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
             onClick={() => setIsMenuOpen((open) => !open)}

@@ -99,11 +99,11 @@ function ClientBadgeCard({ badge }: { badge: ClientBadge }) {
         <Icon className="size-[18px] text-[var(--color-primary)]" aria-hidden="true" />
       </span>
       <div className="min-w-0">
-        <p className="truncate text-sm font-bold text-[var(--color-text-primary)]">
+        <p className="truncate text-sm font-bold text-[var(--color-text-primary)]" title={badge.name}>
           {badge.name}
         </p>
         {badge.description && (
-          <p className="truncate text-xs text-[var(--color-text-muted)]">{badge.description}</p>
+          <p className="truncate text-xs text-[var(--color-text-muted)]" title={badge.description}>{badge.description}</p>
         )}
       </div>
     </div>

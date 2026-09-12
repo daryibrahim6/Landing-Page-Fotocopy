@@ -90,7 +90,7 @@ export default function OrderTable({
           {error}
         </p>
       )}
-      {orders.length === 0 ? (
+      {orders.length === 0 && !loading ? (
         <p className="py-10 text-center text-gray-500">Belum ada order masuk.</p>
       ) : (
         <ul className="space-y-3">
@@ -107,7 +107,7 @@ export default function OrderTable({
                     <p className="mt-1 text-sm text-gray-700">
                       {o.customer.name} · {o.customer.phone} ·{" "}
                       {o.customer.pickup === "kirim" ? "Kirim" : "Ambil"}
-                      {o.customer.address ? ` — ${o.customer.address}` : ""}
+                      {o.customer.address ? ` · ${o.customer.address}` : ""}
                     </p>
                     <p className="mt-1 text-sm text-gray-600">
                       {o.productName} · {Object.entries(o.specs).map(([k, v]) => `${k}: ${v}`).join(", ")}
@@ -148,7 +148,8 @@ export default function OrderTable({
                       <select
                         value={prod}
                         onChange={(e) => setStatus(o.id, e.target.value as ProductionStatus)}
-                        className="rounded border border-gray-300 bg-white px-2 py-1 text-sm"
+                        aria-label={`Status produksi untuk ${o.id}`}
+                        className="min-h-11 rounded border border-gray-300 bg-white px-2 py-1 text-sm"
                       >
                         {PRODUCTION_STATUSES.map((s) => (
                           <option key={s} value={s}>
@@ -164,13 +165,24 @@ export default function OrderTable({
           })}
         </ul>
       )}
+      {loading && (
+        <ul className="mt-3 space-y-3" aria-hidden="true">
+          {[0, 1].map((i) => (
+            <li key={i} className="animate-pulse rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="h-4 w-40 rounded bg-gray-200" />
+              <div className="mt-2 h-3 w-64 max-w-full rounded bg-gray-200" />
+              <div className="mt-2 h-3 w-52 max-w-full rounded bg-gray-200" />
+            </li>
+          ))}
+        </ul>
+      )}
       {cursor !== null && (
         <div className="mt-4 text-center">
           <button
             type="button"
             onClick={loadMore}
             disabled={loading}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 disabled:opacity-50"
+            className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 disabled:opacity-50"
           >
             {loading ? "Memuat…" : "Muat lebih banyak"}
           </button>

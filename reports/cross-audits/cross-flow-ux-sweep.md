@@ -128,6 +128,35 @@ Evidence snapshot tersimpan di `reports/screenshots/{landing-page-flow,checkout-
 | B (advisory) | **11** | semua flow |
 | Scan clean | 10/21 | — |
 
+---
+
+## Hasil Batch Fix (12 Sep 2026 — semua 18 temuan dieksekusi)
+
+| ID | Status | Fix |
+|---|---|---|
+| UX-A-01 | FIXED | `alert()` → inline error state + `role="alert"` (`UploadZone` 4× → `error` state; `DesignSimulator` 2× → `exportError` state render di bawah tombol export) |
+| UX-A-02 | FIXED | `aria-label="Hapus file desain"` + `p-2` (touch area lebih besar) di `CheckoutForm` |
+| UX-A-03 | FIXED | Emoji → Lucide (`Printer, FileText, Tag, Shirt, Gift`) dalam badge `bg-primary/10` di `KategoriProduk` |
+| UX-A-04 | FIXED | UploadZone dropzone: `role="button"` + `tabIndex={0}` + `onKeyDown` Enter/Space + `focus-visible:outline-primary` + input reset `e.target.value=""` agar re-upload file sama tetap trigger |
+| UX-A-05 | FIXED | `role="alert"` di semua error dinamis checkout (qty, file, address, global, Field) + `aria-live="polite"` di "Mengupload…" |
+| UX-A-06 | FIXED | FAB dikecilkan di mobile (`size-12 sm:size-14` WA, `size-12 sm:size-14` simulator); **root fix** = admin surface tidak lagi render FAB sama sekali (UX-B-08 route group). Overlap publik residual = inherent fixed-element, partially mitigated — chip tetap reachable via scroll |
+| UX-A-07 | FIXED | Shape `round` → single input "Diameter (mm)" (designH auto-sync); shape `square` → Lebar/Tinggi terpisah |
+| UX-B-01 | FIXED | ` — ` → ` – ` di ~19 string user-facing (metadata, labels, disclaimers, FAQ, alt, joiner OrderTable → `·`) |
+| UX-B-02 | FIXED | `gap-4` di semua `flex justify-between` (9× simulator + 5× checkout) |
+| UX-B-03 | FIXED | `min-h-11` (44px) di preset/chip simulator, OptionGroup, filter katalog, "Pesan Sekarang"/"Tanya Admin", CTA checkout, social Footer (`size-10→size-11`), hamburger Header, select Produksi, "Muat lebih" |
+| UX-B-04 | FIXED | `title={badge.name}`/`title={badge.description}` di truncate Testimonials |
+| UX-B-05 | FIXED | `autoComplete` — checkout: `name`/`tel`/`email`/`street-address`; konsultasi: `name` |
+| UX-B-06 | FIXED | `maxLength` sesuai Zod — name 200, phone 15, email 254, address 500, notes 1000, catatan konsultasi 1000 |
+| UX-B-07 | FIXED | Focus ring CTA di bg berwarna → `ring-white ring-offset-2 ring-offset-{bg}` (WhatsAppButton primary+floating, FloatingSimulator, ProductCard, CTA checkout, link WA konsultasi) |
+| UX-B-08 | FIXED | **Route group `(public)/`** — page/checkout/simulator dipindah; root layout bare; `(public)/layout.tsx` pegang Header/Footer/FABs; `admin/layout.tsx` minimal. URL tidak berubah (build verified) |
+| UX-B-09 | FIXED | `shrink-0` di circle fixed-size: Footer socials, Header hamburger, ContactSection WA icon, FaqSection badge, KategoriProduk icon badge |
+| UX-B-10 | FIXED | OptionGroup + "Pengambilan" → `<fieldset><legend>` (group label berasosiasi) |
+| UX-B-11 | FIXED | Skeleton rows `animate-pulse` saat `loadMore` di OrderTable (menggantikan text-only "Memuat…") |
+
+**Verifikasi:** `tsc` clean · `eslint` 0 · **vitest 152/152** · `next build` hijau (semua route utuh, URL tidak berubah) · visual verify: `/admin/orders` tanpa chrome marketing (`verify-admin-orders-desktop-2026-09-12.png`), `/simulator` mobile single-diameter + FAB lebih kecil (`verify-simulator-mobile-2026-09-12.png`).
+
+**Catatan:** FAB publik tetap fixed — overlap konten saat scroll bersifat inherent; mitigasi = ukuran lebih kecil di mobile + tidak ada FAB di admin. Kalau mau zero-overlap absolut perlu pattern dismissible FAB (tidak direkomendasikan — menambah state untuk gain kecil).
+
 **Halaman di-snapshot:** `/`, `/checkout`, `/checkout?product=…`, `/checkout/success` (real + invalid), `/simulator`, `/admin/orders` — 3 viewport masing-masing.
 
 ---

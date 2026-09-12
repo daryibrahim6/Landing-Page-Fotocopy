@@ -21,7 +21,7 @@ export const faqItems: FaqItem[] = [
     id: "faq-003",
     question: "Apakah bisa desain sekalian?",
     answer:
-      "Bisa. Tim kami siap bantu desain untuk kebutuhan cetak kamu. Biaya desain tergantung tingkat kerumitan — konsultasi dulu ya.",
+      "Bisa. Tim kami siap bantu desain untuk kebutuhan cetak kamu. Biaya desain tergantung tingkat kerumitan – konsultasi dulu ya.",
   },
   {
     id: "faq-004",

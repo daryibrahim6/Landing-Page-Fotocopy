@@ -3,10 +3,6 @@ import type { ReactNode } from "react";
 import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
-import { FloatingSimulator } from "@/components/design-simulator/FloatingSimulator";
 import { MetaPixel } from "@/components/tracking/MetaPixel";
 import { GoogleAnalytics } from "@/components/tracking/GoogleAnalytics";
 import { EMAIL_URL, IG_URL, SITE_URL, WA_NUMBER } from "@/lib/constants";
@@ -28,7 +24,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Bisa Print — Percetakan Digital Bekasi, Stiker, DTF, Kartu Nama & Lebih",
+  title: "Bisa Print – Percetakan Digital Bekasi, Stiker, DTF, Kartu Nama & Lebih",
   description:
     "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp. 10.000+ customer. Cepat, custom, harga terjangkau.",
   keywords: [
@@ -48,7 +44,7 @@ export const metadata: Metadata = {
     locale: "id_ID",
     type: "website",
     siteName: "Bisa Print",
-    title: "Bisa Print — Percetakan Digital Bekasi",
+    title: "Bisa Print – Percetakan Digital Bekasi",
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
     url: SITE_URL,
@@ -56,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bisa Print — Percetakan Digital Bekasi",
+    title: "Bisa Print – Percetakan Digital Bekasi",
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
     images: ["/assets/brand/og-image.webp"],
@@ -126,17 +122,7 @@ export default function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white focus:shadow-lg">
           Skip to main content
         </a>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main id="main-content" className="flex-1">{children}</main>
-          <Footer />
-          <FloatingSimulator />
-          <WhatsAppButton
-            label="Hubungi BisaPrint via WhatsApp"
-            variant="floating"
-            size="md"
-          />
-        </div>
+        {children}
       </body>
     </html>
   );

@@ -11,13 +11,13 @@ const guidelines: { icon: LucideIcon; title: string; desc: string; status: "ok" 
   {
     icon: FileText,
     title: "Format File",
-    desc: "PDF, PNG, JPG, CDR, AI, PSD — pastikan file bisa dibuka",
+    desc: "PDF, PNG, JPG, CDR, AI, PSD – pastikan file bisa dibuka",
     status: "ok",
   },
   {
     icon: ImageIcon,
     title: "Resolusi Minimal",
-    desc: "300 dpi untuk hasil cetak tajam — hindari gambar pecah",
+    desc: "300 dpi untuk hasil cetak tajam – hindari gambar pecah",
     status: "ok",
   },
   {
@@ -29,7 +29,7 @@ const guidelines: { icon: LucideIcon; title: string; desc: string; status: "ok" 
   {
     icon: Ruler,
     title: "Ukuran Sesuai Cetak",
-    desc: "Desain harus sesuai ukuran cetak final — jangan pakai ukuran asal",
+    desc: "Desain harus sesuai ukuran cetak final – jangan pakai ukuran asal",
     status: "ok",
   },
   {
@@ -154,7 +154,7 @@ export function PanduanFile() {
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6">
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
             <strong className="text-[var(--color-text-primary)]">Masih bingung?</strong>{" "}
-            Gak usah khawatir — kirim aja file kamu, admin kami bakal cek dan kasih tahu kalau ada yang perlu diperbaiki.{" "}
+            Gak usah khawatir – kirim aja file kamu, admin kami bakal cek dan kasih tahu kalau ada yang perlu diperbaiki.{" "}
             <span className="font-display font-bold text-[var(--color-primary)]">Gratis!</span>
           </p>
         </div>

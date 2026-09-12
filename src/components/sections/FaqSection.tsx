@@ -44,7 +44,7 @@ export function FaqSection() {
       <ScrollReveal className="relative flex flex-col items-center text-center">
         <h2 className="font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl">
           Sering Ditanya
-          <span className="ml-2 inline-flex size-10 items-center justify-center rounded-full bg-[var(--color-bg-soft)] align-middle">
+          <span className="ml-2 inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] align-middle">
             <HelpCircle className="size-[22px] text-[var(--color-primary)]" aria-hidden="true" />
           </span>
         </h2>

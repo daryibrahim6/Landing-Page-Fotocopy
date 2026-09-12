@@ -15,7 +15,7 @@ export function FloatingSimulator() {
       href="/simulator"
       aria-label="Buka Simulasi Cetak"
       className={cn(
-        "group fixed bottom-24 right-6 z-50 flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/30 transition hover:scale-110 hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40 animate-pulse-sim",
+        "group fixed bottom-24 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/30 transition hover:scale-110 hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-accent animate-pulse-sim sm:size-14",
       )}
     >
       <Calculator className="size-6" aria-hidden="true" />

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 
-// ponytail: opacity stays 1 in `hidden` — h1/paragraf adalah kandidat LCP;
+// ponytail: opacity stays 1 in `hidden` – h1/paragraf adalah kandidat LCP;
 // Chrome abaikan elemen opacity:0 sebagai LCP, jadi animasi entry hanya geser (y).
 const headlineVariants = {
   hidden: { opacity: 1, y: 40 },
@@ -237,7 +237,7 @@ export function HeroSection() {
             <div className="relative aspect-[4/3] w-full">
               <Image
                 src="/assets/illustrations/print-team.svg"
-                alt="BisaPrint — Percetakan Digital"
+                alt="BisaPrint – Percetakan Digital"
                 fill
                 className="object-contain"
                 priority

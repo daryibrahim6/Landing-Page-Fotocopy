@@ -62,6 +62,8 @@ export function FormKonsultasi() {
               type="text"
               required
               aria-required="true"
+              autoComplete="name"
+              maxLength={200}
               placeholder="Masukkan nama kamu"
               value={fields.nama}
               onChange={(e) => handleChange("nama", e.target.value)}
@@ -145,6 +147,7 @@ export function FormKonsultasi() {
             <textarea
               id="form-catatan"
               rows={3}
+              maxLength={1000}
               placeholder="Tambah catatan atau permintaan khusus"
               value={fields.catatan}
               onChange={(e) => handleChange("catatan", e.target.value)}
@@ -161,7 +164,7 @@ export function FormKonsultasi() {
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d]"
+              className="inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1ebe5d]"
               onClick={(e) => {
                 if (!isConsultationFormComplete(fields)) {
                   e.preventDefault();
@@ -180,7 +183,7 @@ export function FormKonsultasi() {
               <p role="alert" className="mt-2 text-sm font-semibold text-red-500">{error}</p>
             )}
             <p className="mt-2 text-xs text-[var(--color-text-muted)]">
-              Gratis konsultasi — admin kami siap bantu
+              Gratis konsultasi – admin kami siap bantu
             </p>
           </motion.div>
         </motion.div>
