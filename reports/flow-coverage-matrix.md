@@ -18,7 +18,7 @@ masuk rencana re-audit. Saat ini 5 file = 5 flow (`landing-page-flow.md`,
 | Flow | Tier | Batch (re-audit) | Prioritas | Status Final | Next Action |
 |------|------|------------------|-----------|--------------|-------------|
 | `landing-page-flow` | Core | — | P1 | LEGACY (audit 2026-09-08, pre-v2) | Re-audit v2 per-flow + E2E spec |
-| `checkout-flow` | Core | — | P0 | LEGACY (audit 2026-09-08, pre-v2) | Re-audit v2 + E2E spec (money path — prioritas tertinggi) |
+| `checkout-flow` | Core | Track A Tahap 1 (2026-09-12) | P0 | ADA ISU — 19 OPEN (P0 CF-A-11 price tampering, P1×4) | Tahap 2: fix approved findings (rekomendasi: CF-A-11,12,13,14,15 dulu) |
 | `whatsapp-notification-flow` | Core | — | P1 | LEGACY (audit 2026-09-08, pre-v2) | Re-audit v2 + E2E spec |
 | `design-simulator-flow` | Core | — | P2 | LEGACY (audit 2026-09-08, pre-v2) | Re-audit v2 + E2E spec |
 | `production-dashboard-flow` | Supporting | — | P3 | BACKLOG | Belum dibangun — bukan scope audit sampai v2 dibangun |
