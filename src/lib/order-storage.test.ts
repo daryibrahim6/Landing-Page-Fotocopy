@@ -4,6 +4,8 @@ import {
   getOrder,
   getOrderByMidtransOrderId,
   updateOrderStatus,
+  updateProductionStatus,
+  listOrders,
   type StoredOrder,
 } from "./order-storage";
 
@@ -75,5 +77,62 @@ describe("updateOrderStatus — monotonic guard", () => {
 
   it("returns null for unknown midtrans order ids", async () => {
     expect(await updateOrderStatus("BSP-MISSING", "paid")).toBeNull();
+  });
+});
+
+describe("listOrders — newest-first pagination", () => {
+  it("returns orders newest-first", async () => {
+    const old = makeOrder("BSP-L1-OLD");
+    old.createdAt = "2024-01-01T00:00:00.000Z";
+    const newer = makeOrder("BSP-L1-NEW");
+    newer.createdAt = "2024-06-01T00:00:00.000Z";
+    await saveOrder(old);
+    await saveOrder(newer);
+    const { orders } = await listOrders(50, 0);
+    const idxOld = orders.findIndex((o) => o.id === "BSP-L1-OLD");
+    const idxNew = orders.findIndex((o) => o.id === "BSP-L1-NEW");
+    expect(idxNew).toBeGreaterThanOrEqual(0);
+    expect(idxNew).toBeLessThan(idxOld);
+  });
+
+  it("paginates via cursor with no overlap between pages", async () => {
+    // Future dates guarantee these are the newest 3 regardless of earlier tests.
+    for (let i = 0; i < 3; i++) {
+      const o = makeOrder(`BSP-L2-${String(i).padStart(3, "0")}`);
+      o.createdAt = `2099-03-0${i + 1}T00:00:00.000Z`;
+      await saveOrder(o);
+    }
+    const page1 = await listOrders(2, 0);
+    expect(page1.orders.map((o) => o.id)).toEqual(["BSP-L2-002", "BSP-L2-001"]);
+    expect(page1.nextCursor).toBe(2);
+    const page2 = await listOrders(2, page1.nextCursor!);
+    expect(page2.orders[0]?.id).toBe("BSP-L2-000");
+    const ids1 = new Set(page1.orders.map((o) => o.id));
+    expect(page2.orders.every((o) => !ids1.has(o.id))).toBe(true); // no overlap
+  });
+
+  it("clamps limit to [1, 100]", async () => {
+    await saveOrder(makeOrder("BSP-L3-AAA"));
+    const huge = await listOrders(9999, 0);
+    expect(huge.orders.length).toBeLessThanOrEqual(100);
+    const zero = await listOrders(0, 0);
+    expect(zero.orders.length).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("updateProductionStatus", () => {
+  it("sets production.status without touching payment.status", async () => {
+    const o = makeOrder("BSP-P1-AAA");
+    await saveOrder(o);
+    await updateOrderStatus("BSP-P1-AAA", "paid");
+    const updated = await updateProductionStatus("BSP-P1-AAA", "diproses");
+    expect(updated?.production?.status).toBe("diproses");
+    expect(updated?.payment.status).toBe("paid"); // state machine untouched
+    const persisted = await getOrder("BSP-P1-AAA");
+    expect(persisted?.production?.status).toBe("diproses");
+  });
+
+  it("returns null for unknown order ids", async () => {
+    expect(await updateProductionStatus("BSP-NOPE", "selesai")).toBeNull();
   });
 });

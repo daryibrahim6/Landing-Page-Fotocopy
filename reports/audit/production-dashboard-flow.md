@@ -1,9 +1,9 @@
 # Audit — production-dashboard-flow
 
 **Tier:** Supporting | **Prefix ID:** `PD`
-**Status:** Track A Tahap 0+1 selesai — **flow belum dibangun** (BACKLOG). Audit ini = kontrak scope + temuan interim + build contract.
+**Status:** Track A Tahap 0+1+2 selesai — **dashboard sudah dibangun** (Basic Auth MVP). Tahap 3 (Unit Test + Track Gate) menyusul.
 
-**Catatan penting:** Tidak ada `/admin` route, tidak ada list-orders API, tidak ada auth admin. Yang ada: order persist di `order-storage.ts`, notify admin via `notification.ts`, customer lihat order di `/checkout/success?orderId=`.
+**Implementasi (Tahap 2):** `/admin` → `/admin/orders` (server component + `OrderTable` client untuk status/paginasi). API: `GET /api/admin/orders` (paginated), `PATCH /api/admin/orders/[id]` (production status). Auth: Basic Auth via `src/lib/admin-auth.ts` — dicek di `src/proxy.ts` (Next 16: middleware→proxy) **dan** ulang di tiap route handler (defense in depth). Fail-closed: `ADMIN_USERNAME`/`ADMIN_PASSWORD` kosong → 401.
 
 ---
 
@@ -55,7 +55,7 @@
 
 | ID | Sev | Status |
 |---|---|---|
-| PD-A-01 tidak ada production dashboard | P0 | **OPEN-BACKLOG** — fitur sengaja ditunda (MVP), mitigasi = WA notification |
+| PD-A-01 tidak ada production dashboard | P0 | **FIXED** — `/admin/orders` + `/api/admin/orders` dibangun (Tahap 2) |
 
 ### Temuan Baru
 
@@ -85,7 +85,7 @@
   - (b) Build dashboard → fix permanen.
 - **Rekomendasi Devin:** (a) sekarang + (b) backlog — bukan mutually exclusive.
 - **Future gap tag:** monitoring, infra
-- **Status:** OPEN — actionable tanpa build (isi env)
+- **Status:** FIXED — opsi (b) dieksekusi: dashboard = jalur visibilitas permanen yang tidak bergantung env webhook. Catatan: notifikasi push proaktif tetap butuh `ADMIN_NOTIFY_WEBHOOK_URL` (tracked di whatsapp-notification-flow sebagai non-blocking ops).
 
 ---
 
@@ -100,7 +100,11 @@
 - **Bukti:** `src/lib/order-storage.ts` — hanya `saveOrder`, `getOrder`, `getOrderByMidtransOrderId`, `updateOrderStatus`; tidak ada list.
 - **Rekomendasi Devin:** Simpan sebagai contract; tiap item jadi temuan kalau dilanggar saat build.
 - **Future gap tag:** security, scale
-- **Status:** OPEN — build contract
+- **Status:** FIXED — kontrak terpenuhi saat build (Tahap 2):
+  1. ✅ Proxy matcher `["/admin/:path*", "/api/admin/:path*"]` + re-check `isAdminRequest` di tiap handler → live-verified 401 untuk `/admin`, `/admin/orders`, `/api/admin/orders`.
+  2. ✅ `listOrders(limit, cursor)` — Redis sorted-set `order:index` (score=createdAt) + in-memory fallback, clamp 1–100, offset cursor.
+  3. ✅ `production.status` (`baru/diproses/selesai/diambil`) terpisah dari `payment.status`; `updateProductionStatus` tidak menyentuh state machine webhook.
+  4. ✅ fileUrl dirender sebagai link `rel="noopener noreferrer"` — Blob public URL (accepted: URL unguessable, sama dengan pola PD-A-05).
 
 ---
 
@@ -143,12 +147,22 @@
 
 ---
 
+## Fix Log (Tahap 2)
+
+| Gap | Fix |
+|---|---|
+| PD-A-01 | `/admin` → redirect `/admin/orders`; `src/app/admin/orders/page.tsx` (force-dynamic, SSR first page via `listOrders`); `src/components/admin/OrderTable.tsx` (status select → PATCH, optimistic update + rollback, "Muat lebih" cursor pagination) |
+| PD-A-03 | Dashboard menghilangkan single-point-of-failure webhook env; push-alert tetap opsional |
+| PD-A-04 | Auth: `src/lib/admin-auth.ts` (`isAdminRequest` Basic Auth, Edge-safe `atob`, fail-closed) dipakai `src/proxy.ts` + kedua route handler. Storage: `order:index` sorted set + `listOrders` + `updateProductionStatus`. API: `GET /api/admin/orders`, `PATCH /api/admin/orders/[id]` (Zod: `adminListQuerySchema`, `adminProductionPatchSchema`). Env: `ADMIN_USERNAME`/`ADMIN_PASSWORD` ditambah ke `.env.local.example` |
+
+**Files:** `src/lib/admin-auth.ts`, `src/proxy.ts`, `src/lib/order-storage.ts` (+index/list/production), `src/lib/schemas.ts`, `src/app/api/admin/orders/route.ts`, `src/app/api/admin/orders/[id]/route.ts`, `src/app/admin/page.tsx`, `src/app/admin/orders/page.tsx`, `src/components/admin/OrderTable.tsx`, `.env.local.example`. Tests: `admin-auth.test.ts` (9), `order-storage.test.ts` (+6), `api/admin/orders` route tests (7).
+
+**Verified:** `tsc` clean · `eslint` 0 · vitest 139/139 · `next build` hijau (`ƒ Proxy` registered, `/admin/orders` dynamic) · live curl: `/` 200, `/admin` 401 + `WWW-Authenticate`, `/admin/orders` 401, `/api/admin/orders` 401.
+
 ## Rekap
 
 | Severity | Count | IDs |
 |---|---|---|
-| P0 | 1 | PD-A-01 (OPEN-BACKLOG — fitur belum dibangun) |
-| P2 | 2 | PD-A-03 (interim visibility — actionable via env), PD-A-04 (build contract) |
+| P0 | 1 | PD-A-01 (FIXED — dashboard built) |
+| P2 | 2 | PD-A-03 (FIXED — visibility via dashboard; push-alert env tetap opsional), PD-A-04 (FIXED — contract fulfilled) |
 | P4 | 2 | PD-A-02 (FIXED — dead dir dihapus), PD-A-05 (ACK — accepted surface) |
-
-**Catatan:** PD-A-01/PD-A-04 bukan bug — keduanya kontrak untuk build masa depan. Yang actionable hari ini tanpa build: **PD-A-03** (isi `ADMIN_NOTIFY_WEBHOOK_URL`).

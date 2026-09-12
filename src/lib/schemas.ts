@@ -46,3 +46,15 @@ export const midtransWebhookBodySchema = z.object({
 export const orderIdSchema = z
   .string()
   .regex(/^BSP-[A-Z0-9-]+$/i, "Invalid order ID format");
+
+// Admin: list pagination (query params arrive as strings → coerce).
+export const adminListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  cursor: z.coerce.number().int().min(0).default(0),
+});
+
+// Admin: production-status mutation — separate from payment.status by contract
+// (PD-A-04): admin workflow must never touch the Midtrans state machine.
+export const adminProductionPatchSchema = z.object({
+  productionStatus: z.enum(["baru", "diproses", "selesai", "diambil"]),
+});
