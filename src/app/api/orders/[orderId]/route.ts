@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOrder } from "@/lib/order-storage";
+import { orderIdSchema } from "@/lib/schemas";
 
 export async function GET(
   _request: Request,
@@ -7,8 +8,8 @@ export async function GET(
 ) {
   const { orderId } = await params;
 
-  if (!orderId) {
-    return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+  if (!orderIdSchema.safeParse(orderId).success) {
+    return NextResponse.json({ error: "Invalid order ID format" }, { status: 400 });
   }
 
   const order = await getOrder(orderId);

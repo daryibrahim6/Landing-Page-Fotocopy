@@ -1,7 +1,7 @@
 # Audit — whatsapp-notification-flow
 
 **Tier:** Core | **Prefix ID:** `WA`
-**Scope IN:** `src/lib/wa.ts` (URL builder), `src/lib/notification.ts` (admin notif), `WhatsAppButton`/`FormKonsultasi` (WA CTA), notifikasi dari webhook Midtrans
+**Scope IN:** `src/lib/wa.ts` (URL builder), `src/lib/constants.ts` (WA_NUMBER/waUrl — shared dengan landing), `src/lib/notification.ts` (admin notif), `src/components/shared/WhatsAppButton.tsx`, `src/components/sections/FormKonsultasi.tsx` (WA CTA), notifikasi dari webhook Midtrans
 **Scope OUT:** rendering landing sections, checkout form logic
 **Last audit:** 2026-09-08 (gabungan) → di-split ke file ini 2026-09-12. Re-audit v2 belum dijalankan.
 

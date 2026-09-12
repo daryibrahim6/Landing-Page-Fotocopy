@@ -2,16 +2,20 @@ import { NextResponse } from "next/server";
 import { getMidtransBaseUrl, getMidtransServerKey, generateOrderId } from "@/lib/midtrans";
 import { saveOrder, type StoredOrder } from "@/lib/order-storage";
 import { notifyAdminNewOrder, logNotification } from "@/lib/notification";
+import { createTokenBodySchema } from "@/lib/schemas";
 import type { MidtransCreateTokenBody, MidtransItem } from "@/types";
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as MidtransCreateTokenBody;
-    const { items, customerDetails, grossAmount } = body;
-
-    if (!items?.length || !customerDetails || !grossAmount) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const parsed = createTokenBodySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request body", details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
+    const body = parsed.data as MidtransCreateTokenBody;
+    const { items, customerDetails, grossAmount } = body;
 
     const orderId = generateOrderId();
     const serverKey = getMidtransServerKey();

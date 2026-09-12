@@ -32,13 +32,13 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 
 ## Recently Completed
 
-- **12 Sep 2026** — Migrasi workflow infra dari project lain: rules `.devin/` di-sync, `reports/` di-rebuild untuk flow BisaPrint, Playwright config terpasang (spec belum ada), konten referensi project lama diarsipkan ke `_archive/`.
+- **12 Sep 2026** — Migrasi workflow infra dari project lain: rules `.devin/` di-sync, `reports/` di-rebuild untuk flow BisaPrint, Playwright config terpasang (spec belum ada), konten referensi project lama diarsipkan ke `_archive/`. Audit di-split per-flow (5 file). **CF-A-10 FIXED**: Zod schemas di semua API routes (`src/lib/schemas.ts`). Coverage: `@vitest/coverage-v8` + config — `src/lib` 88.19% (46 tests pass).
 - Audit per-flow di `reports/audit/` (5 file). Audit gabungan historis di `reports/archive/`.
 
 ## Open Items
 
-1. **Payment flow Wave 1** — order storage, WA admin notif, file upload, pricing matrix, form validation, Snap.js load.
-2. **UI/UX Hybrid cleanup** — font display tweak, logo fallback, remove decorative assets, product images.
-3. **Enable checkout** untuk lebih banyak produk.
-4. **E2E Playwright** — infra ter-setup (`@playwright/test`, `playwright.config.ts`, `e2e/smoke.spec.ts`, chromium terinstall). Spec per-flow ditulis di sesi E2E tersendiri — **belum pernah di-run**.
-5. **Production dashboard** — backlog v2.
+1. **E2E Playwright** — infra ter-setup (`@playwright/test`, `playwright.config.ts`, `e2e/smoke.spec.ts`, chromium terinstall). Spec per-flow ditulis di sesi E2E tersendiri — **belum pernah di-run**.
+2. **Production dashboard** — backlog v2 (`PD-A-01`).
+3. **Pricing matrix depth** — multipliers ada (`src/lib/pricing.ts`), tapi belum per-produk granular untuk semua finishing; admin konfirmasi via WA tetap jalur final.
+4. **WA Business API** — notifikasi otomatis ke customer (sekarang WA click-to-chat URL ke admin via `logNotification`).
+5. **Design simulator ekspansi** — preflight/print layout untuk produk non-stiker (`DS-A-01`, RESOLVED-BY-DESIGN untuk MVP).

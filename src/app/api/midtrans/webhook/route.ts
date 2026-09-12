@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { updateOrderStatus } from "@/lib/order-storage";
 import { notifyAdminNewOrder, notifyAdminPaidOrder, logNotification } from "@/lib/notification";
+import { midtransWebhookBodySchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const parsed = midtransWebhookBodySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid webhook payload" }, { status: 400 });
+    }
 
-    const { order_id, transaction_status, status_code, gross_amount, signature_key } = body;
+    const { order_id, transaction_status, status_code, gross_amount, signature_key } = parsed.data;
 
     const serverKey = process.env.MIDTRANS_SERVER_KEY ?? "";
 

@@ -1,7 +1,7 @@
 # Audit — checkout-flow
 
 **Tier:** Core | **Prefix ID:** `CF`
-**Scope IN:** `/checkout`, `/checkout/success`, `CheckoutForm`, `/api/midtrans/create-token`, `/api/midtrans/webhook`, `/api/orders/[orderId]`, `/api/upload`, `src/lib/order-storage.ts`, `src/lib/pricing.ts`, `src/lib/midtrans.ts`
+**Scope IN:** `src/app/checkout/*` (page + success), `CheckoutForm`, `/api/midtrans/create-token`, `/api/midtrans/webhook`, `/api/orders/[orderId]`, `/api/upload`, `src/lib/order-storage.ts`, `src/lib/pricing.ts`, `src/lib/midtrans.ts`, `src/lib/schemas.ts`, `src/data/products.ts` (shared read: harga/opsi)
 **Scope OUT:** konten landing page, simulator canvas, dashboard admin
 **Last audit:** 2026-09-08 (gabungan) → di-split ke file ini 2026-09-12. Re-audit v2 belum dijalankan.
 
@@ -23,7 +23,7 @@
 
 | ID | Sev | Temuan | Bukti | Status |
 |---|---|---|---|---|
-| CF-A-10 | P2 | **API routes tidak pakai Zod.** `create-token` hanya cek field required manual; tidak ada schema validation untuk shape/tipe body. Melanggar `feature-architecture.md` ("API routes WAJIB validasi input (Zod)"). | `src/app/api/midtrans/create-token/route.ts` line 8-13; `zod` tidak ada di `package.json` (diverifikasi 12 Sep) | 🔴 OPEN |
+| CF-A-10 | P2 | **API routes tidak pakai Zod.** `create-token` hanya cek field required manual; tidak ada schema validation untuk shape/tipe body. Melanggar `feature-architecture.md` ("API routes WAJIB validasi input (Zod)"). | `src/app/api/midtrans/create-token/route.ts` line 8-13; `zod` tidak ada di `package.json` (diverifikasi 12 Sep) | ✅ FIXED (12 Sep) — `src/lib/schemas.ts` (createTokenBodySchema, midtransWebhookBodySchema, orderIdSchema) diterapkan di `create-token`, `webhook`, `orders/[orderId]`; `zod` terinstall; 9 schema tests di `schemas.test.ts`. `/api/upload` tetap manual — allowlist MIME + size check sudah strict; Zod tidak menambah value pada `File` object. |
 
 ## Catatan
 

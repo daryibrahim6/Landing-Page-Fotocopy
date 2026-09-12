@@ -1,7 +1,7 @@
 # Audit — landing-page-flow
 
 **Tier:** Core | **Prefix ID:** `LP`
-**Scope IN:** `/` (semua section: Hero, KategoriProduk, ProductCatalog, WhyBisaPrint, CaraOrder, PanduanFile, PortfolioGallery, Testimonials, FormKonsultasi, FaqSection, ContactSection), Header, Footer, floating buttons
+**Scope IN:** `src/app/page.tsx` + global shell (`layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`), semua `src/components/sections/*`, `src/components/layout/*` (Header, Footer), `src/components/shared/*`, `src/components/ui/*`, `src/components/tracking/*` (GA/MetaPixel), `src/data/*` (products, faq, portfolio, testimonials), `src/lib/constants.ts` (contact/URL), `src/lib/tracking.ts`, `src/lib/utils.ts`, `src/types/*`
 **Scope OUT:** `/checkout`, `/simulator`, API routes
 **Last audit:** 2026-09-08 (gabungan) → di-split ke file ini 2026-09-12. Re-audit v2 belum dijalankan.
 

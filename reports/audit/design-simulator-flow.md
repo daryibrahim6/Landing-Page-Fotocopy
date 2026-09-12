@@ -1,7 +1,7 @@
 # Audit — design-simulator-flow
 
 **Tier:** Core | **Prefix ID:** `DS`
-**Scope IN:** `/simulator`, `src/components/design-simulator/` (DesignSimulator, DesignCanvas, FloatingSimulator, UploadZone), `src/lib/paper-sizes.ts`, export PNG/PDF (jsPDF)
+**Scope IN:** `src/app/simulator/page.tsx`, `src/components/design-simulator/` (DesignSimulator, DesignCanvas, FloatingSimulator, UploadZone), `src/lib/paper-sizes.ts`, export PNG/PDF (jsPDF)
 **Scope OUT:** checkout, produk non-simulator
 **Last audit:** 2026-09-08 (gabungan) → di-split ke file ini 2026-09-12. Re-audit v2 belum dijalankan.
 
