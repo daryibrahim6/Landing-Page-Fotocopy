@@ -22,6 +22,7 @@ import {
   type ImpositionResult,
 } from "@/lib/paper-sizes";
 import { cn } from "@/lib/utils";
+import { waCustomUrl } from "@/lib/wa";
 
 interface Preset {
   name: string;
@@ -130,7 +131,10 @@ export function DesignSimulator() {
     setAiLoading(true);
     setAiError(null);
     try {
-      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&model=flux&seed=${Math.floor(Math.random() * 1e6)}`;
+      // Prompt template khusus stiker — output diarahkan ke style yang
+      // cocok untuk cetak (flat, clean edge, background polos).
+      const stickerPrompt = `die-cut sticker design, ${prompt}, bold flat vector illustration style, clean sharp edges, centered on plain white background`;
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(stickerPrompt)}?width=1024&height=1024&model=flux&seed=${Math.floor(Math.random() * 1e6)}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const blob = await res.blob();
@@ -142,6 +146,97 @@ export function DesignSimulator() {
       setAiLoading(false);
     }
   }, [aiPrompt, aiLoading, applyImageSource]);
+
+  // Export PDF siap cetak (upload mode): gambar asli per cell + cutline +
+  // register marks siku — sesuai visi owner: customer pulang dengan file
+  // yang bisa langsung naik mesin cetak.
+  const handleExportPrintPdf = useCallback(async () => {
+    if (!imageDataUrl || !uploadImposition || uploadImposition.total <= 0) return;
+    setExportError(null);
+    try {
+      const { default: jsPDF } = await import("jspdf");
+
+      // Normalisasi sumber gambar (data:/blob:) → data URL untuk jsPDF
+      const blob = await (await fetch(imageDataUrl)).blob();
+      let src = await new Promise<string>((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result as string);
+        fr.onerror = () => reject(new Error("read fail"));
+        fr.readAsDataURL(blob);
+      });
+
+      const gap = GAP_KISS_CUT_MM; // upload mode = kiss cut gap
+      const dw = uploadImposition.rotated ? uploadImposition.designHeightMm : uploadImposition.designWidthMm;
+      const dh = uploadImposition.rotated ? uploadImposition.designWidthMm : uploadImposition.designHeightMm;
+
+      // Layout terotasi → pre-rotate bitmap sekali di canvas (lebih
+      // predictable dibanding rotation param jsPDF addImage)
+      if (uploadImposition.rotated) {
+        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const i = new window.Image();
+          i.onload = () => resolve(i);
+          i.onerror = () => reject(new Error("img load fail"));
+          i.src = src;
+        });
+        const c = document.createElement("canvas");
+        c.width = img.height;
+        c.height = img.width;
+        const cx = c.getContext("2d");
+        if (!cx) throw new Error("no ctx");
+        cx.translate(img.height / 2, img.width / 2);
+        cx.rotate(Math.PI / 2);
+        cx.drawImage(img, -img.width / 2, -img.height / 2);
+        src = c.toDataURL("image/png");
+      }
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [BISA_PRINT_A3_WIDTH, BISA_PRINT_A3_HEIGHT],
+      });
+      const totalW = uploadImposition.cols * (dw + gap) - gap;
+      const totalH = uploadImposition.rows * (dh + gap) - gap;
+      const ox = (BISA_PRINT_A3_WIDTH - totalW) / 2;
+      const oy = (BISA_PRINT_A3_HEIGHT - totalH) / 2;
+
+      const format = src.startsWith("data:image/jpeg") ? "JPEG" : "PNG";
+      for (let r = 0; r < uploadImposition.rows; r++) {
+        for (let c = 0; c < uploadImposition.cols; c++) {
+          const x = ox + c * (dw + gap);
+          const y = oy + r * (dh + gap);
+          pdf.addImage(src, format, x, y, dw, dh);
+          pdf.setDrawColor(222, 18, 122);
+          pdf.setLineWidth(0.2);
+          pdf.rect(x, y, dw, dh, "S");
+        }
+      }
+
+      // Register marks: siku (corners) — sama dengan export kalkulator
+      pdf.setDrawColor(0, 0, 0);
+      const m = 5;
+      const w = BISA_PRINT_A3_WIDTH;
+      const h = BISA_PRINT_A3_HEIGHT;
+      pdf.line(m + 5, m, m + 5, m + 15);
+      pdf.line(m, m + 5, m + 15, m + 5);
+      pdf.line(w - m - 5, m, w - m - 5, m + 15);
+      pdf.line(w - m, m + 5, w - m - 15, m + 5);
+      pdf.line(m + 5, h - m, m + 5, h - m - 15);
+      pdf.line(m, h - m - 5, m + 15, h - m - 5);
+      pdf.line(w - m - 5, h - m, w - m - 5, h - m - 15);
+      pdf.line(w - m, h - m - 5, w - m - 15, h - m - 5);
+
+      pdf.save(`${fileName || "stiker-siap-cetak"}-a3.pdf`);
+    } catch {
+      setExportError("Gagal membuat PDF siap cetak. Coba lagi.");
+    }
+  }, [imageDataUrl, uploadImposition, fileName]);
+
+  // Pesan order WA dengan ringkasan layout — customer kirim file PDF-nya
+  // manual di chat (wa.me tidak bisa attach file).
+  const waOrderMessage = useMemo(() => {
+    if (!uploadImposition || uploadImposition.total <= 0) return null;
+    return `Halo Admin Bisa Print, saya mau order Cetak Stiker.\nUkuran design: ${uploadImposition.designWidthMm} × ${uploadImposition.designHeightMm} mm\nIsi per lembar A3: ${uploadImposition.total} pcs\nFile siap cetak (PDF) saya lampirkan di chat ini.\nJumlah pesanan: \nNama:`;
+  }, [uploadImposition]);
 
   const resetCalculator = useCallback(() => {
     setDesignW("50");
@@ -872,6 +967,34 @@ export function DesignSimulator() {
                   </div>
                 </div>
               </motion.div>
+            )}
+
+            {uploadImposition && uploadImposition.total > 0 && (
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={handleExportPrintPdf}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border-2 border-accent bg-accent px-4 py-2.5 text-sm font-bold text-white transition hover:bg-accent/90"
+                >
+                  <FileText className="size-4" />
+                  Simpan PDF Siap Cetak
+                </button>
+                {exportError && (
+                  <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
+                    {exportError}
+                  </p>
+                )}
+                {waOrderMessage && (
+                  <a
+                    href={waCustomUrl(waOrderMessage)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border-2 border-[#25D366] bg-[#25D366] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#1fb858]"
+                  >
+                    Pesan via WhatsApp
+                  </a>
+                )}
+              </div>
             )}
 
             <div className="rounded-2xl border-2 border-dashed border-[var(--color-border)] bg-white p-4">
