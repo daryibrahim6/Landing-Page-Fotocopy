@@ -13,7 +13,7 @@ trigger: always_on
 
 Setiap kali menyusun rencana eksekusi/re-audit/reprompt, jalankan gate ini:
 
-1. **Enumerate `reports/audit/*.md`.** Jumlah file = **kontrak coverage** saat ini. Jika berubah, update `reports/flow-coverage-matrix.md`. (Saat ini audit gabungan ada di `full-project-audit.md`; pecah per-flow saat re-audit.)
+1. **Enumerate `reports/audit/*.md`.** Jumlah file = **kontrak coverage** saat ini (BisaPrint: 5 file = 5 flow). Jika berubah, update `reports/flow-coverage-matrix.md`.
 2. **Bandingkan dengan tabel `Flow Tracker` di `reports/status.md`.** Setiap file audit WAJIB punya 1 baris. Jika tidak, update status.md atau audit file-nya.
 3. **Setiap flow, termasuk yang `Distributed`, WAJIB muncul di rencana batch** dengan `Next Action` eksplisit.
 4. **Distributed flow** dengan status `DISTRIBUTED (CLEAR / IN PROGRESS)` WAJIB dijelaskan:

@@ -80,7 +80,7 @@
 
 ## Flow Taxonomy
 
-Flow BisaPrint (5). Detail status: `reports/status.md`. Audit gabungan saat ini: `reports/audit/full-project-audit.md` — pecah per-flow saat re-audit v2.
+Flow BisaPrint (5). Detail status: `reports/status.md`. Audit per-flow: `reports/audit/<flow>.md` (5 file = kontrak coverage). Audit gabungan historis: `reports/archive/full-project-audit-2026-09-08.md`.
 
 | # | Flow | Tier | Fokus |
 |---|------|------|-------|
@@ -116,7 +116,7 @@ Flow BisaPrint (5). Detail status: `reports/status.md`. Audit gabungan saat ini:
 |---|---|
 | `reports/status.md` | Single source of truth status per flow |
 | `reports/flow-coverage-matrix.md` | Matrix flow → status, next action, prioritas |
-| `reports/audit/` | Audit per flow (`full-project-audit.md` = audit gabungan existing) |
+| `reports/audit/` | Audit per flow — kontrak coverage (5 file = 5 flow) |
 | `reports/test-scenarios/` | Skenario test per flow (dibuat saat flow masuk sesi testing) |
 | `reports/test-results/` | Hasil eksekusi test per flow |
 | `reports/cross-audits/` | Audit lintas-flow (dibuat saat sweep) |

@@ -6,7 +6,7 @@ description: Workflow cepat untuk eksekusi E2E Playwright (headless, targeted, m
 
 Tujuan: menjalankan E2E secara cepat, default headless, dan menghindari re-run penuh yang sia-sia.
 
-> **Status:** spec belum ada — file ini menyiapkan perintah baku untuk sesi E2E nanti. Flow aktif: `landing-page-flow`, `checkout-flow`, `whatsapp-notification-flow`, `design-simulator-flow`. Konvensi ID skenario: `<FLOW>-NNN` (contoh `CHK-001`, `SIM-003`).
+> **Status:** spec belum ada — file ini menyiapkan perintah baku untuk sesi E2E nanti. Flow aktif: `landing-page-flow`, `checkout-flow`, `whatsapp-notification-flow`, `design-simulator-flow`. Konvensi ID skenario: prefix audit flow + `-NNN` (contoh `CF-001`, `DS-003`) — prefix sama dengan audit: `LP`, `CF`, `WA`, `DS`, `PD`.
 
 ## Prinsip
 
@@ -27,7 +27,7 @@ npx playwright test e2e/checkout-flow --project=chromium
 ### Verifikasi targeted 1 skenario
 
 ```bash
-npx playwright test e2e/checkout-flow/checkout.spec.ts --grep "CHK-001" --project=chromium
+npx playwright test e2e/checkout-flow/checkout.spec.ts --grep "CF-001" --project=chromium
 ```
 
 ### Verifikasi final beberapa spec sekaligus

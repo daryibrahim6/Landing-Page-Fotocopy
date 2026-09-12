@@ -28,12 +28,12 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 | design-simulator-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | CLEAR | 2026-09-08 | Build, lint, test clean (`paper-sizes.test.ts`). |
 | production-dashboard-flow | Supporting | Done | Done | Belum | Belum | N/A | N/A | N/A | BACKLOG | 2026-09-08 | v2 — belum dibangun. |
 
-**Kontrak coverage:** jumlah file di `reports/audit/*.md` = jumlah flow yang wajib tercover dalam rencana re-audit. Saat ini audit terdokumentasi lewat `reports/audit/full-project-audit.md` (audit gabungan); pecah per-flow saat re-audit v2 dimulai.
+**Kontrak coverage:** jumlah file di `reports/audit/*.md` = jumlah flow terdaftar. Saat ini 5 file = 5 flow (sudah di-split per-flow 12 Sep). Audit gabungan historis: `reports/archive/full-project-audit-2026-09-08.md`.
 
 ## Recently Completed
 
 - **12 Sep 2026** — Migrasi workflow infra dari project lain: rules `.devin/` di-sync, `reports/` di-rebuild untuk flow BisaPrint, Playwright config terpasang (spec belum ada), konten referensi project lama diarsipkan ke `_archive/`.
-- Full project audit di `reports/audit/full-project-audit.md`.
+- Audit per-flow di `reports/audit/` (5 file). Audit gabungan historis di `reports/archive/`.
 
 ## Open Items
 

@@ -5,8 +5,9 @@ Update setiap kali status flow berubah di `reports/status.md`, distributed flow
 terverifikasi, atau cross-audit/page-audit selesai.
 
 **Kontrak coverage:** jumlah file di `reports/audit/*.md` = flow yang wajib
-masuk rencana re-audit. Saat ini audit gabungan di `full-project-audit.md`;
-pecah per-flow saat re-audit v2 dimulai.
+masuk rencana re-audit. Saat ini 5 file = 5 flow (`landing-page-flow.md`,
+`checkout-flow.md`, `whatsapp-notification-flow.md`, `design-simulator-flow.md`,
+`production-dashboard-flow.md`). Audit gabungan historis di `reports/archive/`.
 
 **Last updated:** 12 September 2026
 
