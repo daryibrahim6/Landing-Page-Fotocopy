@@ -16,3 +16,8 @@
 
 - Notifikasi saat ini = generate WA click-to-chat URL + `logNotification` (bukan kirim otomatis). WA Business API = backlog.
 - E2E: spec belum ada.
+
+## Cross-flow touch (2026-09-12, dari checkout-flow Tahap 2)
+
+- `templates.adminNewOrder` signature +1 arg `file` — pesan kini `File: <url>` (sebelumnya nyebut "cek dashboard" yang belum ada). Caller `notifyAdminNewOrder` di `notification.ts` pass `order.fileUrl ?? "-"`.
+- Diverifikasi: `notification.test.ts` pass, build hijau.

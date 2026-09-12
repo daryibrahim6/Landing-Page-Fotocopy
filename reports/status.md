@@ -24,7 +24,7 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 | Flow | Tier | Scope | Audit | Fix | Vitest | E2E | Track B | Track C | Final | Last Update | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | landing-page-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | UI/UX overhaul: logo, navbar, hero, product images, layout. Audit pre-v2 — Track A v2 upgrade ke CLEAR. |
-| checkout-flow | Core | Done | Done (v2) | Done | Done | N/A | N/A | Done | CLEAR | 2026-09-12 | Track A v2 selesai: 19 temuan FIXED (P0 CF-A-11 server recompute, P1 webhook hardening + Snap button, P2-P4 hardening). Verifikasi: tsc/lint/vitest 53 pass/build. E2E N/A — belum authored. |
+| checkout-flow | Core | Done | Done (v2) | Done | Done | N/A | Track B (opsional: component test) | N/A | CLEAR | 2026-09-12 | Track A v2 lengkap (Tahap 0-3): 19 temuan FIXED + route-level unit tests (72 pass total). Track Gate: E2E=Nanti (money path, kandidat #1), Track C tidak perlu, cross-flow whatsapp-notification diverifikasi. |
 | whatsapp-notification-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Notification helper + unit tests (`notification.test.ts`, `wa.test.ts`). Re-audit v2 pending. |
 | design-simulator-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Build, lint, test clean (`paper-sizes.test.ts`). Re-audit v2 pending. |
 | production-dashboard-flow | Supporting | Done | Done | Belum | Belum | N/A | N/A | N/A | BACKLOG | 2026-09-08 | v2 — belum dibangun. |

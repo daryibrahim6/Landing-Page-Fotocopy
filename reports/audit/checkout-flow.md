@@ -256,3 +256,33 @@ Keputusan user (all recommended): scope semua 19 · CF-A-11 server recompute · 
 | Tests | `schemas.test.ts` ditulis ulang (12 tests); `order-storage.test.ts` baru (8 tests) — termasuk regression paid→expired |
 
 **Re-check:** `tsc --noEmit` clean · `eslint` clean · `vitest` **53/53 pass** (46→53) · `npm run build` hijau — `/api/orders/[orderId]` hilang dari route table.
+
+## Unit Test Coverage (Tahap 3, 2026-09-12)
+
+| Logic/path | File test | Kasus yang di-cover |
+|---|---|---|
+| `calculatePrice` (pricing engine) | `pricing.test.ts` | unknown product → 0 · multiplier size/material/finishing · integer total |
+| `createTokenBodySchema` / `phoneSchema` / webhook schema / `orderIdSchema` | `schemas.test.ts` | valid accept · phone normalisasi `62` · field harga client di-strip · reject nama kosong/phone invalid/qty 0 & 99999/pickup enum salah · reject missing webhook fields · orderId malformed |
+| `POST create-token` (route) | `create-token/route.test.ts` | 400 invalid body · 400 unknown product/spec · **total selalu `calculatePrice` hasil — client `grossAmount`/`items` diabaikan (P0 regression guard)** · phone tersimpan normalized + `fileUrl` http-only · fetch ke Midtrans membawa `gross_amount` server-computed (fetch di-mock & diverifikasi) |
+| `POST webhook` (route) | `webhook/route.test.ts` | settlement valid → paid (+paidAt) · signature forged → 403 · **tanpa server key → 500 fail-closed** · `capture`+`fraud_status=challenge` → diabaikan · `gross_amount` mismatch → `discrepancy` flag, tetap pending · status tak dikenal (`refund`) → ignored, no mutation · **late `expire` setelah `settlement` tidak me-regresi order paid** |
+| `updateOrderStatus` monotonic guard | `order-storage.test.ts` | pending→paid ok · paid→expired blocked · cancelled→paid blocked · same-status idempotent (paidAt stabil) · unknown id → null |
+| `POST /api/upload` (route) | `upload/route.test.ts` | no file → 400 · MIME non-allowlist → 400 · >10MB → 400 · valid PNG → 200 data URL (lokal tanpa blob token). Rate limit tidak di-unit-test (butuh Redis mock) — perilaku diverifikasi manual di code |
+| `isMidtransConfigured` / `getMidtransBaseUrl` / `generateOrderId` | `midtrans.test.ts` | sandbox/prod URL · false saat tanpa key · **true dengan client-key saja (CF-A-12 regression guard)** · format BSP + 100 id unik |
+| `buildWAUrl`/`buildWAFormUrl`/`buildAdminWAUrl` + notif | `wa.test.ts`, `notification.test.ts` | template URL benar · arg orderId/produk masuk · admin notification URL terbentuk |
+| `formatRupiah`/`cn`, `waUrl`/`WA_NUMBER`, tracking | `utils.test.ts`, `constants.test.ts`, `tracking.test.ts` | format IDR, class merge · wa.me URL + encoding · SSR no-op + arg gtag/fbq |
+| Imposition (`paper-sizes`) | `paper-sizes.test.ts` | layout square/round, gap kiss/die cut, oversized→0, rotasi, sheet count |
+
+**Sengaja tidak di-unit-test (alasan eksplisit):**
+- `CheckoutForm` UI interactions (state/react) — butuh jsdom+RTL; behavior kritisnya (error handling, onClose, body baru) adalah glue tipis ke route yang kini ter-test. Kandidat Track B kalau mau component test.
+- Rate limiter upload — butuh Redis mock; logic-nya 6 baris conditional.
+- `snap.pay` callbacks — wrapper vendor; verifikasi manual/visual.
+- `logNotification` — `console.log` wrapper trivial.
+
+## Track Gate (Tahap 3)
+
+| Pertanyaan | Keputusan |
+|---|---|
+| User-facing dan butuh E2E? | **Nanti** — money path = kandidat E2E #1, tapi sengaja diskip per keputusan user (E2E sesi tersendiri) |
+| Test terlihat shallow/lemah? | **Tidak** — route-level tests ada untuk money path; assertion verify state & side-effect (fetch body, stored order), bukan sekadar exercise |
+| Temuan UI/UX belum fix? | **Tidak** — CF-A-29 (status label) FIXED di Tahap 2; sisa UX review = Track C terpisah |
+| Fix berdampak ke flow lain? | **Ya → cross-flow: `whatsapp-notification-flow`** — signature `adminNewOrder` +1 arg (`file`), diverifikasi: `notification.test.ts` pass + build hijau. Tidak ada consumer lain (grep `buildAdminWAUrl` hanya `notification.ts`). |

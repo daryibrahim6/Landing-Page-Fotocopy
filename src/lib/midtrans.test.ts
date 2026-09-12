@@ -49,11 +49,22 @@ describe("isMidtransConfigured", () => {
     process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY = "client-key";
     expect(isMidtransConfigured()).toBe(true);
   });
+
+  it("returns true with only the client key (server key is server-only)", () => {
+    delete process.env.MIDTRANS_SERVER_KEY;
+    process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY = "client-key";
+    expect(isMidtransConfigured()).toBe(true);
+  });
 });
 
 describe("generateOrderId", () => {
   it("generates a BSP order id", () => {
     const orderId = generateOrderId();
     expect(orderId).toMatch(/^BSP-[A-Z0-9-]+$/);
+  });
+
+  it("generates unique ids", () => {
+    const ids = new Set(Array.from({ length: 100 }, () => generateOrderId()));
+    expect(ids.size).toBe(100);
   });
 });
