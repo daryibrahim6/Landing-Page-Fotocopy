@@ -118,7 +118,7 @@ export default function OrderTable({
                     {o.fileUrl && (
                       <a
                         // blob: keys resolve through the admin signed-URL redirect;
-                        // http(s) URLs (Vercel Blob) are opened directly.
+                        // http(s) URLs (legacy records) are opened directly.
                         href={
                           o.fileUrl.startsWith("blob:")
                             ? `/api/admin/files?key=${encodeURIComponent(o.fileUrl.slice(5))}`

@@ -95,8 +95,8 @@ export async function POST(request: Request) {
         status: "pending",
         midtransOrderId: orderId,
       },
-      // Only persist real file references: http(s) URLs (Vercel Blob) or
-      // blob: keys (Upstash Blob — resolved via /api/admin/files). Local-dev
+      // Only persist real file references: blob: keys (Upstash Blob —
+      // resolved via /api/admin/files) or legacy http(s) URLs. Local-dev
       // data: URLs are dropped.
       fileUrl:
         fileUrl && (fileUrl.startsWith("http") || fileUrl.startsWith("blob:"))
