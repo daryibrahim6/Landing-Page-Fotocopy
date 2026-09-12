@@ -978,7 +978,7 @@ Criticality dimension di-upgrade menjadi full risk-based tier system (TestRail, 
 8 pattern spesifik Vitest yang cause flaky tests. Ini detail dari kategori 8 (Test Order Dependency) dan 9 (Shared State Leakage):
 
 **Kategori 8 sub-patterns (Test Order Dependency):**
-- 8a. **Thread-pool state leakage** — module-scope mutable state survive between tests in same worker thread. Fix: `pool: 'forks'` di vitest.config.ts atau reset di `beforeEach`
+- 8a. **Thread-pool state leakage** — module-scope mutable state survive between tests in same worker thread. Fix: `pool: 'forks'` di vitest.config.mts atau reset di `beforeEach`
 - 8b. **`isolate: false` module cache** — top-level side effects survive into next file. Fix: keep `isolate: true` (default)
 - 8c. **`globals: true` config drift** — setup file yang disagree dengan config silently breaks tests. Fix: audit setup file consistency
 - 8d. **Watch vs CI cache divergence** — test pass di watch mode, fail di CI. Fix: CI harus run dari clean cache
@@ -991,7 +991,7 @@ Criticality dimension di-upgrade menjadi full risk-based tier system (TestRail, 
 
 ### Alur Eksekusi
 
-1. **VB-0 (One-time sweep):** Inventarisasi semua vitest file, klasifikasi per kategori + tag criticality + risk score + tier + catat execution time, simpan ke `reports/cross-audits/vitest-quality-sweep.md`. Coverage config sudah di vitest.config.ts (coverage 0% = candidate 📝 MISSING).
+1. **VB-0 (One-time sweep):** Inventarisasi semua vitest file, klasifikasi per kategori + tag criticality + risk score + tier + catat execution time, simpan ke `reports/cross-audits/vitest-quality-sweep.md`. Coverage config sudah di vitest.config.mts (coverage 0% = candidate 📝 MISSING).
 2. **VB-1 (Per-flow deep dive):** Untuk file prioritas (Tier × Quality matrix), baca test + function berdampingan, jalankan mutation testing (manual sampling atau StrykerJS per-file), cek duplicasi, cek test maintainability, cek 12 kategori gap + 8 Vitest flaky sub-patterns, cek Next.js App Router boundary compliance, cek Server Action test matrix coverage
 3. **VB-2 (Fix):** Hapus useless/outdated, rewrite shallow menjadi deep, tambah missing, sederhanakan duplicative, perbaiki unmaintainable, tambah Server Action test matrix untuk protected actions
 4. **VB-3 (Verify):** Confirm fix benar-benar meningkatkan kualitas — StrykerJS mutation score untuk T1 files (target sesuai criticality), atau manual mutation testing dengan dokumentasi mutation yang di-test, test isolation check (--shuffle), execution time comparison
@@ -1009,7 +1009,7 @@ VB-0 dianggap selesai kalau:
 - 9 Test Suite Health Indicators sudah dipantau (I0-I8, termasuk trade-off awareness)
 - Next.js App Router boundary compliance sudah dicek (async RSC tidak di-test dengan Vitest, Server Actions punya test matrix)
 - Execution time per file sudah dicatat (target: full suite < 60 detik)
-- Coverage config sudah di vitest.config.ts dan coverage report sudah di-generate
+- Coverage config sudah di vitest.config.mts dan coverage report sudah di-generate
 - Function penting yang missing vitest sudah teridentifikasi
 - Priority list sudah dibuat berdasarkan Tier × Quality matrix
 - Laporan tersimpan di `reports/cross-audits/vitest-quality-sweep.md`

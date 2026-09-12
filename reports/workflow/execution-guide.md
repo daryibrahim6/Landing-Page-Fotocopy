@@ -217,7 +217,7 @@ Untuk flow [NAMA_FLOW], kerjain Tahap 3 (Unit Test + Track Gate).
    - Jangan skip tanpa alasan.
 
 3. Lokasi file unit test:
-   - Buka `vitest.config.ts`, cek `test.include`.
+   - Buka `vitest.config.mts`, cek `test.include`.
    - Default: `.test.ts` bersebelahan source.
    - TIDAK BOLEH di folder `e2e/`.
 

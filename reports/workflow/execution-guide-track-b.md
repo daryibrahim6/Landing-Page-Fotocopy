@@ -92,7 +92,7 @@ Lakukan Vitest Quality Sweep untuk seluruh project BisaPrint:
    - Total suite time = baseline untuk tracking
    - Target: full `npx vitest run` < 60 detik
 
-8. COVERAGE CONFIG — coverage config sudah ada di vitest.config.ts.
+8. COVERAGE CONFIG — coverage config sudah ada di vitest.config.mts.
    Jalankan `npx vitest run --coverage` dan catat file dengan 0% coverage
    sebagai candidate 📝 MISSING.
 
