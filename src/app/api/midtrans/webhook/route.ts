@@ -86,12 +86,19 @@ export async function POST(request: Request) {
       }
     }
 
+    // Capture BEFORE updateOrderStatus: the in-memory store returns live object
+    // references, so `existing` is mutated by the update — must snapshot first.
+    const prevStatus = existing?.payment.status;
     const order = await updateOrderStatus(order_id, orderStatus);
 
-    if (order) {
+    // Notify only when the transition actually applied and changed state —
+    // duplicate webhooks and blocked regressions must not spam admin.
+    const applied =
+      order && order.payment.status === orderStatus && prevStatus !== orderStatus;
+    if (applied) {
       const notification = orderStatus === "paid" ? notifyAdminPaidOrder(order) : notifyAdminNewOrder(order);
       logNotification(notification);
-    } else {
+    } else if (!order) {
       console.log(`[Midtrans Webhook] Order ${order_id}: ${transaction_status} → ${orderStatus}`);
     }
 

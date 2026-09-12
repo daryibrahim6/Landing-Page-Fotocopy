@@ -9,7 +9,13 @@ vi.hoisted(() => {
   delete process.env.UPSTASH_REDIS_REST_TOKEN;
 });
 
+vi.mock("@/lib/notification", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@/lib/notification")>();
+  return { ...mod, logNotification: vi.fn() };
+});
+
 import { POST } from "./route";
+import { logNotification } from "@/lib/notification";
 import { saveOrder, getOrderByMidtransOrderId } from "@/lib/order-storage";
 
 const SERVER_KEY = "test-server-key";
@@ -124,5 +130,22 @@ describe("POST /api/midtrans/webhook", () => {
     await postJson(signedPayload("BSP-W7-GGG", "settlement"));
     await postJson(signedPayload("BSP-W7-GGG", "expire"));
     expect((await getOrderByMidtransOrderId("BSP-W7-GGG"))?.payment.status).toBe("paid");
+  });
+
+  it("does not re-notify admin when a webhook carries the same status twice", async () => {
+    vi.mocked(logNotification).mockClear();
+    await saveOrder(makeOrder("BSP-W8-HHH"));
+    await postJson(signedPayload("BSP-W8-HHH", "settlement"));
+    await postJson(signedPayload("BSP-W8-HHH", "settlement"));
+    expect(vi.mocked(logNotification).mock.calls.length).toBe(1);
+  });
+
+  it("does not notify when a regression is blocked", async () => {
+    vi.mocked(logNotification).mockClear();
+    await saveOrder(makeOrder("BSP-W9-III"));
+    await postJson(signedPayload("BSP-W9-III", "settlement"));
+    await postJson(signedPayload("BSP-W9-III", "expire"));
+    // settlement notifies once; the blocked expire must not fire another notification
+    expect(vi.mocked(logNotification).mock.calls.length).toBe(1);
   });
 });
