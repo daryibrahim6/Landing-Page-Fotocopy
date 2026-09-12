@@ -12,7 +12,7 @@ Landing page + checkout untuk Bisa Print, percetakan digital di Bekasi yang mela
 - **Animation**: Framer Motion
 - **Validation**: Zod v4 (semua API routes — `src/lib/schemas.ts`)
 - **Payment**: Midtrans Snap (Snap.js di `checkout/layout.tsx` + REST `/v1/transactions` via fetch)
-- **File Upload**: Vercel Blob di production; data-URL fallback di dev
+- **File Upload**: Upstash Blob private bucket di production (baca via signed URL `/api/admin/files`); data-URL fallback di dev
 - **Image**: `next/image` wajib, output WebP
 - **Icons**: lucide-react
 - **Testing**: Vitest (unit, `src/lib/*.test.ts` + route tests) + Playwright (E2E — config + smoke spec, spec per-flow belum ditulis)
@@ -92,10 +92,11 @@ src/
     api/
       midtrans/create-token/route.ts  # Create Midtrans snap token (rate-limited)
       midtrans/webhook/route.ts       # Midtrans payment notification
-      upload/route.ts                 # File upload (Vercel Blob, rate-limited)
+      upload/route.ts                 # File upload (Upstash Blob, rate-limited)
       admin/orders/route.ts           # GET list order (paginated)
       admin/orders/[id]/route.ts      # PATCH status produksi
       admin/orders/export/route.ts    # GET export CSV semua order
+      admin/files/route.ts            # GET signed redirect untuk file blob:
     error.tsx, not-found.tsx, loading.tsx
   proxy.ts                    # Next 16 middleware — Basic Auth gate /admin + /api/admin
 
@@ -158,8 +159,8 @@ MIDTRANS_IS_PRODUCTION=false
 UPSTASH_REDIS_REST_URL=""
 UPSTASH_REDIS_REST_TOKEN=""
 
-# File upload (wajib di production — Vercel Blob)
-BLOB_READ_WRITE_TOKEN=""
+# File upload (wajib di production — Upstash Blob, private bucket)
+UPSTASH_BLOB_TOKEN=""
 
 # Tracking
 META_PIXEL_ID=""

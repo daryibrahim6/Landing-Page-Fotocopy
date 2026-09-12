@@ -25,7 +25,7 @@
 | Midtrans Snap integration | ✅ Done | `snap.js` via `next/script` di `layout.tsx`, `/api/midtrans/create-token` |
 | Midtrans webhook | ✅ Done | `/api/midtrans/webhook` — signature verify (SHA512), status mapping, idempotent |
 | Order storage | ✅ Done | `src/lib/order-storage.ts` — Upstash Redis + in-memory fallback |
-| File upload | ✅ Done | `/api/upload` (Vercel Blob, max 10MB, PDF/PNG/JPG/WEBP) + input di CheckoutForm |
+| File upload | ✅ Done | `/api/upload` (Upstash Blob private bucket, max 10MB, PDF/PNG/JPG/WEBP; baca via signed URL `/api/admin/files`) + input di CheckoutForm |
 | Admin notification | ✅ Done | `src/lib/notification.ts` — `notifyAdminNewOrder`/`notifyAdminPaidOrder` (WA URL) |
 | Order lookup | ✅ Done | Halaman `checkout/success` baca `getOrder` langsung (server-side; endpoint `/api/orders/[orderId]` dihapus — CF-A-18) |
 

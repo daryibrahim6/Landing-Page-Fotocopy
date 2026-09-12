@@ -30,7 +30,7 @@
 - Midtrans Snap
 - `next/image` wajib, WebP preferred
 - `next/font` (Plus Jakarta Sans display, Poppins body)
-- Upstash Redis (order persistence; pending TTL 30d, terminal permanen) + Vercel Blob (file upload)
+- Upstash Redis (order persistence; pending TTL 30d, terminal permanen) + Upstash Blob private bucket (file upload; baca via signed URL `/api/admin/files`)
 
 ## Folder Conventions
 

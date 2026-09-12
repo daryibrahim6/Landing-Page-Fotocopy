@@ -198,4 +198,12 @@
 |---|---|---|
 | P0 | 1 | PD-A-01 (FIXED — dashboard built) |
 | P2 | 3 | PD-A-03 (FIXED — visibility via dashboard; push-alert env tetap opsional), PD-A-04 (FIXED — contract fulfilled), PD-A-06 (FIXED — export CSV) |
+| P3 | 1 | PD-A-07 (FIXED — client-bundle leak via OrderTable import) |
 | P4 | 2 | PD-A-02 (FIXED — dead dir dihapus), PD-A-05 (ACK — accepted surface) |
+
+#### PD-A-07 — Modul storage server ikut ter-bundle ke client via OrderTable
+
+- **Skenario:** `OrderTable.tsx` (client component) mengimport `PRODUCTION_STATUSES` dari `src/lib/order-storage.ts` → seluruh modul (termasuk koneksi Upstash Redis + warning env) ikut ke bundle browser. Terlihat di dev log: warning `[browser] UPSTASH_REDIS_* not set` dari copy modul sisi client.
+- **Risiko:** bundle bloat + warning menyesatkan; secara keamanan tidak bocor (env server tidak terisi di client), tapi arsitektur client/server boundary rusak.
+- **Solusi diterapkan:** `PRODUCTION_STATUSES` + `ProductionStatus` dipindah ke `src/types/index.ts` (zero-dependency, aman client+server); `order-storage.ts` me-re-export untuk caller server; `OrderTable` import dari `@/types`.
+- **Status:** FIXED (12 Sep malam).

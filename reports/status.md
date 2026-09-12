@@ -45,6 +45,6 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 4. **Design simulator ekspansi** — preflight/print layout untuk produk non-stiker (`DS-A-01`, RESOLVED-BY-DESIGN untuk MVP).
 5. **Consent banner + privacy page** (LP-A-23, DEFERRED) — Pixel/GA fire tanpa opt-in; implement saat scale/mulai ads.
 6. **Foto portfolio asli** (LP-A-09, ACK) — section tetap tampil dengan placeholder; user supply foto nanti.
-7. **Env produksi** — `UPSTASH_REDIS_*`, `BLOB_READ_WRITE_TOKEN`, `MIDTRANS_*`, `ADMIN_*` wajib diisi di environment deploy; lokal sudah ada kredensial admin dev.
+7. **Env produksi** — `UPSTASH_REDIS_*`, `UPSTASH_BLOB_TOKEN`, `MIDTRANS_*`, `ADMIN_*` wajib diisi di environment deploy; lokal sudah ada kredensial admin dev + Upstash Redis/Blob nyata (terverifikasi live 12 Sep).
 8. **Backup order → Google Sheets** (opsional) — `ADMIN_NOTIFY_WEBHOOK_URL` → n8n/Make → Sheets; env ada, butuh setup external.
 9. **Migrasi DB relasional** (Supabase/dsb) — ditunda; re-evaluasi saat butuh order history multi-tahun / customer account / CMS produk.

@@ -37,7 +37,7 @@
 |---|---|---|---|---|
 | CF-A-01 (ex PMT-A-001) | P0 | Tidak ada order storage — webhook cuma log | ✅ FIXED | `src/lib/order-storage.ts` — Upstash Redis + in-memory fallback; `updateOrderStatus` dipanggil webhook |
 | CF-A-02 (ex PMT-A-002) | P0 | Webhook tidak kirim WA notif admin | ✅ FIXED | `src/lib/notification.ts` — `notifyAdminNewOrder`/`notifyAdminPaidOrder` dipanggil di `webhook/route.ts` |
-| CF-A-03 (ex PMT-A-003) | P1 | Tidak ada file upload di checkout | ✅ FIXED | `/api/upload` (Vercel Blob) + input file di `CheckoutForm.tsx` (PDF/PNG/JPG/WEBP, max 10MB) |
+| CF-A-03 (ex PMT-A-003) | P1 | Tidak ada file upload di checkout | ✅ FIXED | `/api/upload` (Upstash Blob private bucket; admin baca via `/api/admin/files` signed redirect) + input file di `CheckoutForm.tsx` (PDF/PNG/JPG/WEBP, max 10MB) |
 | CF-A-04 (ex PMT-A-004) | P1 | Kalkulasi harga cuma `priceFrom * quantity` | ✅ FIXED | `src/lib/pricing.ts` — SIZE_MULTIPLIERS + MATERIAL_MULTIPLIERS |
 | CF-A-05 (ex PMT-A-005) | P1 | Hanya 3/12 produk bisa checkout | ✅ FIXED | 11/12 produk `isCheckoutEnabled: true` di `src/data/products.ts` |
 | CF-A-06 (ex PMT-A-006) | P2 | Checkout tidak ada validasi input | ✅ FIXED | Validasi inline di `CheckoutForm.tsx` (errors object, `text-red-500`) |
@@ -123,7 +123,7 @@
 - **Future gap tag:** security | **Status:** FIXED (Tahap 2, 12 Sep) — route `GET /api/orders/[orderId]` dihapus (0 caller, expose PII). Re-add nanti dengan access token saat halaman tracking dibuat.
 
 ### CF-A-19 — P2 — `/api/upload` publik tanpa rate limit/auth
-- **Skenario:** siapapun bisa POST file ≤10MB ke Vercel Blob berulang kali → cost/abuse, storage penuh file liar tidak terikat order.
+- **Skenario:** siapapun bisa POST file ≤10MB ke Blob storage berulang kali → cost/abuse, storage penuh file liar tidak terikat order.
 - **Bukti:** `src/app/api/upload/route.ts` — tidak ada auth, rate limit, atau binding ke order/session.
 - **Risiko:** abuse finansial (Blob storage+bandwidth), file orphan.
 - **Opsi A — Rate limit IP** via Upstash Ratelimit (infra sudah ada untuk order storage). Kecil.
@@ -324,3 +324,11 @@ Keputusan user (all recommended): scope semua 19 · CF-A-11 server recompute · 
 
 - Status lama: warn-once saja. **Sekarang:** `saveOrder` throw saat `NODE_ENV === "production" && !redis` — order tidak bisa "sukses tapi hilang"; CheckoutForm menangkap error → pesan inline + WA fallback tetap jalan. Read paths (`getOrder`, `listOrders`) tetap graceful (null/empty). Banner peringatan in-memory ditambahkan di `/admin/orders`.
 - **Status:** FIXED upgraded (12 Sep sore) — test `refuses writes when Redis is unconfigured in production` + `still writes to memory store outside production`.
+
+### CF-A-34 — P1 — `getOrder`/`listOrders` crash di Redis nyata (serde ganda)
+
+- **Skenario:** `redis.get`/`mget` di `@upstash/redis` **auto-deserialize** nilai JSON — mengembalikan object, bukan string. Kode lama `JSON.parse(data)` melempar `SyntaxError: "[object Object]" is not valid JSON` → halaman success error; `listOrders` memfilter hasil object sebagai non-string → daftar admin kosong.
+- **Bukti:** live verification 12 Sep — order nyata di Upstash membuat `/checkout/success?orderId=…` crash dengan digest error; dev log menunjukkan stack di `order-storage.ts:104`.
+- **Kenapa lolos test:** bug laten — path Redis tidak pernah dieksekusi sebelum env `UPSTASH_REDIS_*` diisi (semua test/dev jalan di memory fallback).
+- **Solusi diterapkan:** serahkan serde ke client — `set` mengirim object (bukan `JSON.stringify`), `get<StoredOrder>`/`mget<(StoredOrder|null)[]>` membaca object langsung. Format wire di Redis identik (JSON string).
+- **Status:** FIXED (12 Sep malam) — diverifikasi live: success page 200, admin list menampilkan order, CSV export berisi order nyata.
