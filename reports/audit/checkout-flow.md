@@ -39,7 +39,7 @@
 | CF-A-02 (ex PMT-A-002) | P0 | Webhook tidak kirim WA notif admin | ✅ FIXED | `src/lib/notification.ts` — `notifyAdminNewOrder`/`notifyAdminPaidOrder` dipanggil di `webhook/route.ts` |
 | CF-A-03 (ex PMT-A-003) | P1 | Tidak ada file upload di checkout | ✅ FIXED | `/api/upload` (Upstash Blob private bucket; admin baca via `/api/admin/files` signed redirect) + input file di `CheckoutForm.tsx` (PDF/PNG/JPG/WEBP, max 10MB) |
 | CF-A-04 (ex PMT-A-004) | P1 | Kalkulasi harga cuma `priceFrom * quantity` | ✅ FIXED | `src/lib/pricing.ts` — SIZE_MULTIPLIERS + MATERIAL_MULTIPLIERS |
-| CF-A-05 (ex PMT-A-005) | P1 | Hanya 3/12 produk bisa checkout | ✅ FIXED | 11/12 produk `isCheckoutEnabled: true` di `src/data/products.ts` |
+| CF-A-05 (ex PMT-A-005) | P1 | Hanya 3/12 produk bisa checkout | ✅ FIXED | 11/12 produk `isCheckoutEnabled: true` di `src/data/products.ts`. **Update Sep 2026:** etalase dipangkas ke 7 produk — sekarang 6/7 enabled; `packaging` sengaja `false` (custom quote via admin, jadi fixture test). Link `?product=` ke id lama (dtf-kaos, banner) → fallback "Produk Tidak Ditemukan" gracefully |
 | CF-A-06 (ex PMT-A-006) | P2 | Checkout tidak ada validasi input | ✅ FIXED | Validasi inline di `CheckoutForm.tsx` (errors object, `text-red-500`) |
 | CF-A-07 (ex PMT-A-007) | P2 | snap.js tidak di-load via `next/script` | ✅ FIXED | `src/app/layout.tsx` — Script `midtrans-snap` global |
 | CF-A-08 (ex BLU-A-002) | P0 | Tidak ada flow upload design → preview | ✅ FIXED | Upload inline di checkout (preview = file name + URL tersimpan) |

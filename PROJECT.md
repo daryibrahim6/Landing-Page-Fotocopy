@@ -190,12 +190,14 @@ npm test           # vitest run (unit tests di src/lib/*.test.ts)
 ```
 
 ## Product Catalog
-Produk yang ditampilkan (sementara dari `src/data/products.ts`):
-- Digital Printing: Brosur, Flyer, Poster, Banner, Voucher
-- Print Dokumen: Print hitam putih/warna, jilid, laminating, skripsi, fotocopy
-- Stiker & Label: Chromo, vinyl matte/glossy, transparan, label UMKM, kartu nama
-- DTF & Apparel: Kaos DTF, totebag, hoodie
-- Produk Custom: Undangan, souvenir, packaging, label nama
+Etalase dipangkas ke 7 produk sesuai arahan owner (Sep 2026), data di `src/data/products.ts`:
+- Digital Printing: Brosur & Flyer, Poster
+- Print Dokumen: Print HB/warna, jilid, buku, skripsi, fotocopy
+- Stiker & Label: Cetak Stiker, Kartu Nama
+- Produk Custom: Undangan, Packaging & Box
+
+Produk di luar etalase (DTF/kaos, banner/spanduk, totebag, merchandise, dll)
+ditampung card "Produk Lainnya" → diarahkan chat admin via WA.
 
 Katalog awal di `docs/ketentuan-produk-bisaprint.docx` akan dimigrasikan ke `src/data/products.ts` secara bertahap.
 

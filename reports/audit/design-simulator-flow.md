@@ -48,7 +48,7 @@
 |---|---|
 | Export broken | PNG/PDF unusable → fitur utama sia-sia |
 | Preview menyesatkan | Ghost grid ≠ posisi drag user → salah ekspektasi cetak |
-| Harga palsu | `BASE_SHEET_PRICE` placeholder tampil sebagai "Estimasi harga" |
+| Harga palsu | `STICKER_SHEET_TIERS` (per-lembar tier, placeholder pasar) tampil sebagai "Estimasi harga" — disclaimer tetap ada; angka final tunggu price list owner |
 
 **Vitest vs E2E:** imposition math + estimateSheets → Vitest (sudah 7 tests). Drag/canvas/export → E2E/manual (skipped).
 
@@ -106,6 +106,7 @@
 - **Rekomendasi Devin:** (b) sekarang + (a) backlog saat pricing stiker per-lembar ada. **Butuh keputusan user** — apakah Rp15.000/lembar itu angka yang valid di lapangan?
 - **Future gap tag:** cross-flow
 - **Status:** FIXED (opsi disclaimer) — label "Estimasi harga*" + catatan "*Indikatif per lembar A3 — harga final dikonfirmasi admin via WhatsApp." Wire ke pricing.ts = backlog.
+- **Update Sep 2026 (milestone 7):** `BASE_SHEET_PRICE` digantikan `STICKER_SHEET_TIERS` di `src/lib/pricing.ts` — model per-lembar tier ala kompetitor (Xpress/PrimaGraphia). Hasil Simulasi kini tampil "Harga per lembar*" + total. Angka masih placeholder pasar — ganti saat owner kirim price list.
 
 ---
 
@@ -122,6 +123,7 @@
 - **Rekomendasi Devin:** (a) — drag punya fungsi palsu; hapus lebih jujur. Resize tetap via Transformer.
 - **Future gap tag:** none
 - **Status:** FIXED — `draggable` + `dragBoundFunc` + `onDragEnd` dihapus dari KonvaImage; design fixed center, ghost grid = single truth. Tips upload diperbarui.
+- **Update Sep 2026 (milestone 7):** evolusi lebih jauh — ghost pink dihapus total; design upload kini **ke-render di semua cell** (Komplain owner: "apply design yg di upload di semua cell"). Cell-0 transformable (resize), sisanya copy statis mengikuti ukuran. Preview = imposisi real.
 
 ---
 

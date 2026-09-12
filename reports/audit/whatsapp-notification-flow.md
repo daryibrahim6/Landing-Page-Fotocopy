@@ -120,6 +120,7 @@
 - **Rekomendasi Devin:** (a) — 5 baris, hilangkan duplikasi encode logic.
 - **Future gap tag:** none
 - **Status:** FIXED — `waCustomUrl(message)` helper baru di `wa.ts`; `CheckoutForm.tsx:222` pakai helper, split-hack dihapus.
+- **Update Sep 2026 (milestone 7):** pesan wa-only checkout kini menyertakan **Kode Order `BSP-XXXX`** (random base36) di baris awal — zero-cost matching mutasi transfer manual oleh admin (alternatif sampai cek-mutasi otomatis/Midtrans aktif). Simulator upload-mode juga punya CTA "Pesan via WhatsApp" via `waCustomUrl` dengan ringkasan layout.
 
 ---
 

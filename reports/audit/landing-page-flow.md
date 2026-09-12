@@ -65,7 +65,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 | LP-A-01 design direction conflict | P1 | FIXED (keputusan desain — Plus Jakarta Sans/Poppins terpasang di `layout.tsx`) |
 | LP-A-02 font terlalu luas | P1 | FIXED (font-display vs body sudah dipisah via CSS var) |
 | LP-A-03 logo transparency | P1 | FIXED (`logo-bisaprint.svg`+`webp` ada di `public/assets/brand/`) |
-| LP-A-04 duplikasi product imagery | P2 | FIXED (12 SVG produk unik di `public/assets/products/`) |
+| LP-A-04 duplikasi product imagery | P2 | FIXED (12 SVG produk unik di `public/assets/products/`). **Update Sep 2026:** etalase dipangkas 12→7 produk — 4 SVG kini orphan (banner-spanduk, dtf-kaos, jilid-skripsi, print-dokumen-warna), file dibiarkan |
 | LP-A-05 decorative asset berlebih | P2 | FIXED (folder `decoratives/` tidak ada lagi — lihat LP-A-10 untuk residu) |
 | LP-A-06 ProductCard `<a>` vs `next/link` | P2 | **FIXED — verified** (`ProductCard.tsx:105` pakai `<Link>` untuk `/checkout?product=…`) |
 | LP-A-07 pink tint WavyDivider | P3 | FIXED (keputusan desain) |

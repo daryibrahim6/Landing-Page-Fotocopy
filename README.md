@@ -1,6 +1,6 @@
 # Bisa Print
 
-Landing page + checkout untuk Bisa Print — jasa digital printing di Bekasi. Melayani cetak brosur, flyer, poster, dokumen, stiker, kartu nama, undangan, DTF, dan produk custom. Order via WhatsApp atau checkout langsung dengan Midtrans.
+Landing page + checkout untuk Bisa Print — jasa digital printing di Bekasi. Etalase: brosur & flyer, poster, print dokumen, cetak stiker, kartu nama, undangan, packaging & box — kebutuhan lain via admin. Order via WhatsApp (default) atau Midtrans Snap saat env payment diaktifkan.
 
 ## Tech Stack
 

@@ -167,13 +167,14 @@ Website adalah **single landing page** dengan navigasi anchor ke setiap section.
 **Tujuan:** Navigasi cepat ke kategori — anchor atau filter.
 
 **4 Kategori:**
+> **Update Sep 2026 (feedback owner):** etalase dipangkas ke **7 produk** — Digital Printing (Brosur & Flyer, Poster), Print Dokumen (gabungan, incl. buku/skripsi), Stiker & Label (Cetak Stiker, Kartu Nama), Produk Custom (Undangan, Packaging & Box). DTF/Apparel & Banner keluar etalase; kebutuhan di luar list diarahkan ke card "Produk Lainnya" → chat admin. Source of truth: `src/data/products.ts`.
+
 | Kategori | Ikon / Visual | Contoh Produk |
 |---|---|---|
-| Digital Printing | — | Brosur, Flyer, Poster, Banner, Voucher |
-| Print Dokumen | — | Print HB/Warna, Jilid, Laminating, Skripsi, Fotocopy |
-| Stiker & Label | — | Vinil, Chromo, Transparan, Label UMKM, Kartu Nama, Sertifikat |
-| DTF & Apparel | — | Kaos DTF, Totebag, Hoodie, Merchandise |
-| Produk Custom | — | Undangan, Souvenir, Packaging, Label Nama, Produk Event |
+| Digital Printing | — | Brosur & Flyer, Poster |
+| Print Dokumen | — | Print HB/Warna, Jilid, Buku, Skripsi, Fotocopy |
+| Stiker & Label | — | Cetak Stiker, Label UMKM, Kartu Nama |
+| Produk Custom | — | Undangan, Packaging & Box, produk lainnya via admin |
 
 **Component spec:** Sticker-like card, hover = slight lift + scale via Framer Motion spring. Click = scroll ke bagian produk kategori tersebut.
 

@@ -31,3 +31,18 @@ Ringkasan perubahan yang menyentuh lebih dari satu flow. Update setiap ada perub
 **Impact cross-flow:** checkout-flow (upload contract berubah: `blob:` key, bukan URL publik), production-dashboard (file link → signed redirect; bundle client bersih).
 
 **Keamanan:** bucket tetap private; token `UPSTASH_BLOB_TOKEN` server-only (BUKAN `NEXT_PUBLIC_`). Token Redis+Blob yang dipaste di chat = ter-expose → WAJIB di-rotate di dashboard Upstash setelah verifikasi.
+
+## 2026-09-12 — Milestone 7: batch feedback owner + visi pipeline v1
+
+**Shared file:** `src/data/products.ts` (landing katalog, checkout `?product=`, FormKonsultasi dropdown, create-token validation) · `src/lib/paper-sizes.ts` (kalkulator + upload canvas + export PDF) · `src/lib/pricing.ts` (checkout total + simulator estimasi).
+
+| Perubahan | Dampak ke flow | Bukti/test |
+|---|---|---|
+| Etalase 12→7 produk + card "Produk Lainnya"; kategori `dtf-apparel` dihapus dari union type | landing-page (grid+tabs+kategori), checkout (fixture `packaging` jadi isCheckoutEnabled=false), konsultasi (dropdown auto) | integrity.test 10/10; create-token test fixture diupdate |
+| `calculateImposition`: gap hanya antar-cell (`floor((W+g)/(d+g))`) | design-simulator (kalkulator, upload canvas, export PDF semua pakai fungsi ini) — boundary size kini benar (305mm→1pcs, dulu 0) | paper-sizes.test.ts 15 tests incl. boundary baru |
+| DesignCanvas: design upload tile ke semua cell (bukan ghost), cell-0 transformable | design-simulator upload mode — preview = imposisi real | visual verify screenshot `verify-upload-tiled-desktop.png` |
+| Export PDF siap-cetak (gambar asli per cell + cutline + siku) | design-simulator — output langsung naik cetak | Playwright: download valid `%PDF-` 24KB |
+| `STICKER_SHEET_TIERS` + `sheetUnitPrice`/`sheetTotalPrice` | design-simulator estimasi harga kini tier per-lembar; checkout `calculatePrice` tak berubah | pricing.test.ts +4 tier tests |
+| AI draft (Pollinations, tanpa key) + kode order `BSP-XXXX` di WA checkout | design-simulator (panel Coba AI), checkout-flow + whatsapp-flow (pesan wa-only ada kode matching mutasi) | manual verify; error path `role=alert` |
+
+**Cross-check:** vitest 157/157 · tsc clean · eslint clean · build hijau · live routes 200 · link `?product=` lama → fallback graceful.
