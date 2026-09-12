@@ -1,6 +1,6 @@
 # Audit: Landing Page Flow
 
-**Status:** Track A Tahap 0-2 selesai (re-audit v2) — **14 temuan FIXED, 1 ACK, 1 DEFERRED**. 0 OPEN.
+**Status:** Track A Tahap 0-3 selesai (re-audit v2) — **14 temuan FIXED, 1 ACK, 1 DEFERRED, 0 OPEN. 100 unit tests pass.**
 
 **Tanggal re-audit:** sesi terbaru — audit formal penuh pertama untuk flow ini (temuan LP-A-01..07 di bawah adalah carry-over dari audit gabungan lama, sudah di-verifikasi ulang terhadap kode saat ini).
 
@@ -385,3 +385,30 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 | LP-A-23 | DEFERRED — dicatat di Open Items status.md | — |
 
 **Re-check:** `tsc --noEmit` clean · `eslint` 0 problems · `vitest` 76/76 · `build` hijau (sitemap.xml + robots.txt tergenerate, /checkout jalan dengan layout snap scoped).
+
+---
+
+## Unit Test Coverage (Tahap 3)
+
+| Function/path | File test | Kasus yang di-cover |
+|---|---|---|
+| `sitemap()` | `src/app/sitemap.test.ts` | homepage priority 1, public-only routes (no /checkout//api), absolute https URLs |
+| `robots()` | `src/app/robots.test.ts` | allow `/`, disallow `/api/` + `/checkout`, sitemap URL benar |
+| `formatWaDisplay()` (extract Footer→utils) | `src/lib/utils.test.ts` | format 62→+62 dashed, non-62 passthrough, empty string |
+| `isConsultationFormComplete()` (extract FormKonsultasi→wa) | `src/lib/wa.test.ts` | nama kosong/whitespace, produk kosong, jumlah 0/negatif/non-numeric/empty ditolak; positif+desimal diterima |
+| `waUrl`/`buildWAUrl`/`buildWAFormUrl`/`templates` | `wa.test.ts`, `constants.test.ts` | template URL encode, prefill fields |
+| `formatRupiah`, `cn` | `utils.test.ts` | format IDR, merge class |
+| `trackEvent`/`trackPurchase` | `tracking.test.ts` | gtag/fbq dispatch, SSR-safe |
+| **Data integrity** (products/faq/testimonials/portfolio) | `src/data/integrity.test.ts` | unique ids, category valid, priceFrom>0, **image paths exist on disk** (guard permanen kelas LP-A-10), checkout-enabled punya spec options, rating 1-5 |
+| `calculatePrice` + spec validation | `pricing.test.ts`, `schemas.test.ts` | pricing matrix, Zod contract |
+
+**Sengaja tidak di-test (alasan eksplisit):** komponen UI glue (nav fallback Header, marquee pause, CatalogSection wiring, ProductCard branch, mobile menu) — butuh jsdom/RTL; kandidat Track B, preseden sama dengan CheckoutForm. Metadata/JSON-LD di layout.tsx — object literal, `next/font` tidak testable di node env; diverifikasi via build output.
+
+## Track Gate (Tahap 3)
+
+| Pertanyaan | Keputusan |
+|---|---|
+| User-facing butuh E2E? | **Nanti** — journey landing→WA/checkout kandidat E2E; skipped per keputusan user |
+| Test shallow/lemah? | **Tidak** — data integrity test verify file on disk (fail nyata kalau asset hilang), validasi edge-case covered |
+| Temuan UI/UX belum fix? | **Tidak blocking** — LP-A-19 residue (focus trap menu) + polish visual → Track C opsional |
+| Dampak ke flow lain? | **Ya** — snap.js pindah ke checkout layout (checkout-flow); diverifikasi build hijau + route tetap jalan. WhatsAppButton tracking source baru → event Lead lebih lengkap (whatsapp-notification-flow tidak terpengaruh — beda layer) |

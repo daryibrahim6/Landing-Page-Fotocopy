@@ -23,6 +23,18 @@ export function buildWAUrl(template: WATemplate, ...args: string[]): string {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
+export function isConsultationFormComplete(fields: {
+  nama: string;
+  produk: string;
+  jumlah: string;
+}): boolean {
+  return (
+    fields.nama.trim().length > 0 &&
+    fields.produk.length > 0 &&
+    Number(fields.jumlah) > 0
+  );
+}
+
 export function buildWAFormUrl(fields: {
   nama: string;
   produk: string;

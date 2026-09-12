@@ -5,14 +5,7 @@ import Link from "next/link";
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { WA_NUMBER, waUrl, IG_URL, SHOPEE_URL } from "@/lib/constants";
-
-function formatWaDisplay(number: string): string {
-  if (number.startsWith("62")) {
-    const local = number.slice(2);
-    return `+62 ${local.slice(0, 3)}-${local.slice(3, 7)}-${local.slice(7)}`;
-  }
-  return number;
-}
+import { formatWaDisplay } from "@/lib/utils";
 
 export function Footer() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildWAUrl, buildWAFormUrl, templates } from "./wa";
+import { buildWAUrl, buildWAFormUrl, isConsultationFormComplete, templates } from "./wa";
 
 describe("buildWAUrl", () => {
   it("builds general template URL", () => {
@@ -32,5 +32,33 @@ describe("buildWAFormUrl", () => {
     expect(url).toMatch(/^https:\/\/wa\.me\/6281299435019/);
     expect(url).toContain("Budi");
     expect(url).toContain("100");
+  });
+});
+
+describe("isConsultationFormComplete", () => {
+  const base = { nama: "Budi", produk: "Stiker", jumlah: "10" };
+
+  it("accepts a complete form", () => {
+    expect(isConsultationFormComplete(base)).toBe(true);
+  });
+
+  it("rejects empty/whitespace nama", () => {
+    expect(isConsultationFormComplete({ ...base, nama: "" })).toBe(false);
+    expect(isConsultationFormComplete({ ...base, nama: "   " })).toBe(false);
+  });
+
+  it("rejects missing produk", () => {
+    expect(isConsultationFormComplete({ ...base, produk: "" })).toBe(false);
+  });
+
+  it("rejects jumlah zero, negative, and non-numeric", () => {
+    for (const jumlah of ["0", "-5", "abc", "", "  "]) {
+      expect(isConsultationFormComplete({ ...base, jumlah })).toBe(false);
+    }
+  });
+
+  it("accepts positive numeric jumlah including decimals/exponents", () => {
+    expect(isConsultationFormComplete({ ...base, jumlah: "1" })).toBe(true);
+    expect(isConsultationFormComplete({ ...base, jumlah: "2.5" })).toBe(true);
   });
 });

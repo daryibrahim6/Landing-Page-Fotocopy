@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
-import { buildWAFormUrl } from "@/lib/wa";
+import { buildWAFormUrl, isConsultationFormComplete } from "@/lib/wa";
 import { trackEvent } from "@/lib/tracking";
 import { products } from "@/data/products";
 
@@ -163,7 +163,7 @@ export function FormKonsultasi() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d]"
               onClick={(e) => {
-                if (!fields.nama.trim() || !fields.produk || !(Number(fields.jumlah) > 0)) {
+                if (!isConsultationFormComplete(fields)) {
                   e.preventDefault();
                   setError("Mohon isi nama, produk, dan jumlah (minimal 1) dulu ya!");
                   return;
