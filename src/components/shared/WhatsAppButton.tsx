@@ -11,6 +11,7 @@ interface WhatsAppButtonProps {
   variant: "primary" | "outline" | "floating";
   size: "sm" | "md" | "lg";
   className?: string;
+  trackingSource?: string;
 }
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -68,8 +69,11 @@ export function WhatsAppButton({
   variant,
   size,
   className,
+  trackingSource,
 }: WhatsAppButtonProps) {
   const href = resolveHref(message);
+  const source = trackingSource ?? `wa-${variant}`;
+  const handleClick = () => trackEvent("Lead", { source });
 
   if (variant === "floating") {
     return (
@@ -79,7 +83,7 @@ export function WhatsAppButton({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          onClick={() => trackEvent("Lead", { source: "floating-wa" })}
+          onClick={handleClick}
           whileHover={{ scale: 1.1 }}
           className={cn(
             "group relative inline-flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition hover:bg-[#1ebe5d] hover:shadow-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#25D366]/40 animate-pulse-wa",
@@ -104,6 +108,7 @@ export function WhatsAppButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       className={cn(
         "inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/30",
         isPrimary

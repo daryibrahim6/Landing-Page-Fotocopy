@@ -72,10 +72,22 @@ export function Header() {
         element.scrollIntoView({ behavior: "smooth" });
         window.history.replaceState(null, "", href);
         closeMenu();
+      } else {
+        closeMenu();
+        router.push(`/${href}`);
       }
     },
     [closeMenu, router],
   );
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isMenuOpen, closeMenu]);
 
   useEffect(() => {
     const elements = OBSERVED_SECTIONS.map((id) =>

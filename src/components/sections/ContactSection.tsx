@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MapPin, Clock, Printer } from "lucide-react";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { IG_URL, waUrl, EMAIL_URL, MAPS_EMBED_URL } from "@/lib/constants";
+import { trackEvent } from "@/lib/tracking";
 
 const socialLinks = [
   {
@@ -138,6 +139,7 @@ export function ContactSection() {
                 href={waUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("Lead", { source: "contact-wa-cta" })}
                 className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-8 py-3.5 text-base font-bold text-white shadow-lg shadow-[#25D366]/25 transition hover:bg-[#1ebe5d] hover:shadow-xl"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">

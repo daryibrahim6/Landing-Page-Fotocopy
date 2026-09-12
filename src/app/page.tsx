@@ -1,8 +1,7 @@
 import dynamic from "next/dynamic";
 import { WavyDivider } from "@/components/shared/WavyDivider";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { KategoriProduk } from "@/components/sections/KategoriProduk";
-import { ProductCatalog } from "@/components/sections/ProductCatalog";
+import { CatalogSection } from "@/components/sections/CatalogSection";
 
 const WhyBisaPrint = dynamic(() => import("@/components/sections/WhyBisaPrint").then((m) => m.WhyBisaPrint));
 const CaraOrderSection = dynamic(() => import("@/components/sections/CaraOrderSection").then((m) => m.CaraOrderSection));
@@ -19,10 +18,7 @@ export default function HomePage() {
       <HeroSection />
       <WavyDivider color="#FFFFFF" flip={false} />
 
-      <KategoriProduk />
-      <WavyDivider color="#F8FAFC" flip />
-
-      <ProductCatalog />
+      <CatalogSection />
       <WavyDivider color="#F8FAFC" flip />
 
       <WhyBisaPrint />

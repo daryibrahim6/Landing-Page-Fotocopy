@@ -1,6 +1,6 @@
 # Audit: Landing Page Flow
 
-**Status:** Track A Tahap 0+1 selesai (re-audit v2) — **12 temuan OPEN** menunggu approval untuk Tahap 2.
+**Status:** Track A Tahap 0-2 selesai (re-audit v2) — **14 temuan FIXED, 1 ACK, 1 DEFERRED**. 0 OPEN.
 
 **Tanggal re-audit:** sesi terbaru — audit formal penuh pertama untuk flow ini (temuan LP-A-01..07 di bawah adalah carry-over dari audit gabungan lama, sudah di-verifikasi ulang terhadap kode saat ini).
 
@@ -86,7 +86,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (c) Selalu `router.push` ke `/${href}` kecuali sudah di `/` — lebih eksplisit, sedikit lebih verbose.
 - **Rekomendasi Devin:** (a) — satu baris fallback di handler existing, tidak mengubah perilaku di home, menutup semua route.
 - **Future gap tag:** cross-flow (Header/Footer shared semua flow), a11y
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -102,7 +102,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (c) Pertahankan tapi ubah copy jadi "contoh kategori produk" — kompromi.
 - **Rekomendasi Devin:** (b) — remove section dari render sampai user supply foto asli. Placeholder yang mengklaim hasil nyata lebih buruk daripada tidak ada section. **Butuh keputusan user** (konten/aset).
 - **Future gap tag:** none
-- **Status:** OPEN — product decision
+- **Status:** ACK — user memutuskan tetap tampil; supply foto asli nanti
 
 ---
 
@@ -117,7 +117,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Buat asset wavy-divider yang sebenarnya.
 - **Rekomendasi Devin:** (a) — komponen `WavyDivider` SVG sudah ada dan dipakai di page.tsx; blok footer ini duplikat/residu.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -133,7 +133,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (c) URL-param approach: klik kategori → `/#produk?cat=…` — lebih kompleks, shareable.
 - **Rekomendasi Devin:** (a) — intent desain jelas untuk memfilter (prop sudah disiapkan); bridge client wrapper tipis di page.tsx agar kategori klik → filter katalog.
 - **Future gap tag:** cross-flow (interaksi antar section)
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -149,7 +149,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (c) Terima LCP hit — tidak direkomendasikan untuk landing page.
 - **Rekomendasi Devin:** (a) — elemen hero tampil segera; animasi masih bisa jalan pada transform/badge non-LCP. Consistent dengan `ScrollReveal` yang sudah respect `useReducedMotion`.
 - **Future gap tag:** scale (traffic mobile lambat), a11y
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -164,7 +164,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Hapus field sampai nilai asli ada.
 - **Rekomendasi Devin:** (a) — pattern env yang sama dengan `META_PIXEL_ID`/`GA_ID` yang sudah benar.
 - **Future gap tag:** monitoring (SEO verification)
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -179,7 +179,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Hardcode ok kalau tidak ada staging — rapuh.
 - **Rekomendasi Devin:** (a) — konsisten dengan env-driven constants lain.
 - **Future gap tag:** infra (deploy non-prod)
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -194,7 +194,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Static `public/robots.txt` + `sitemap.xml` — manual, rawan basi.
 - **Rekomendasi Devin:** (a) — native, typed, zero maintenance untuk 4-5 route.
 - **Future gap tag:** monitoring (SEO)
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -209,7 +209,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Pause on `focus-within` + touchstart — minimal, tanpa tombol.
 - **Rekomendasi Devin:** (a) — tombol pause kecil + focus pause = paling accessible dan jelas.
 - **Future gap tag:** a11y
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -224,7 +224,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Biarkan global — snap perlu ready sebelum user klik bayar; tapi checkout sudah dedicated page, bisa load di sana.
 - **Rekomendasi Devin:** (a) — scope script ke route yang pakai; fix preconnect ke env. Perlu verifikasi snap ready saat user tiba di checkout (afterInteractive cukup).
 - **Future gap tag:** scale/perf, infra
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -237,7 +237,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 - **Opsi:** (a) Hapus ketiganya. (b) Archive ke `_archive/`. 
 - **Rekomendasi Devin:** (a) — tidak ada plan reuse; ContactSection sudah punya embed jalan.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -254,7 +254,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 - **Opsi:** (a) Bundle fix kecil per item. (b) Defer ke Track C polish.
 - **Rekomendasi Devin:** (a) untuk Escape + `aria-pressed` (murah); defer sisanya ke Track C kalau mau.
 - **Future gap tag:** a11y
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -267,7 +267,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 - **Opsi:** (a) Import dari constants di JSON-LD. (b) Biarkan — rapuh.
 - **Rekomendasi Devin:** (a) — single source of truth.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -284,7 +284,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Terima undercount — data tetap salah.
 - **Rekomendasi Devin:** (a) bagian tracking — murah (`trackEvent` sudah ada); error reporting = backlog monitoring (dokumentasikan).
 - **Future gap tag:** monitoring
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -297,7 +297,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 - **Opsi:** (a) Validasi `Number(jumlah) > 0` + `role="alert"` + bungkus `<form>`. (b) Defer Track C.
 - **Rekomendasi Devin:** (a) — murah, sejalan validasi checkout `phoneSchema` pattern.
 - **Future gap tag:** a11y
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -312,7 +312,7 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
   - (b) Dokumentasikan sebagai known gap, defer ke roadmap.
 - **Rekomendasi Devin:** (b) — defer sadar; UU PDP enforcement untuk site skala ini rendah, tapi catat supaya tidak lupa saat scale.
 - **Future gap tag:** security/compliance, monitoring
-- **Status:** OPEN — defer kandidat
+- **Status:** DEFERRED — keputusan user: dokumentasikan, implement saat scale/ads
 
 ---
 
@@ -357,6 +357,31 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 | P3 | 5 | LP-A-13, LP-A-14, LP-A-15, LP-A-16, LP-A-17 |
 | P4 | 6 | LP-A-18, LP-A-19, LP-A-20, LP-A-21, LP-A-22, LP-A-23 |
 
-**Total temuan OPEN: 16** (carry-over 01-07 semua FIXED/verified).
+**Total: 16 temuan — 14 FIXED, LP-A-09 ACK (tetap tampil per user), LP-A-23 DEFERRED (per user).** Carry-over 01-07 semua FIXED/verified.
 
-**Butuh keputusan user:** LP-A-09 (portfolio placeholder — butuh aset asli atau sembunyikan section), LP-A-23 (consent — defer disarankan). Sisanya fixable langsung.
+**Keputusan user (Tahap 2):** LP-A-09 → tetap tampil (user supply foto asli nanti); LP-A-23 → DEFERRED + dicatat di Open Items status.md.
+
+---
+
+## Tahap 2 — Fix Log
+
+| ID | Fix | File |
+|---|---|---|
+| LP-A-08 | Fallback `router.push("/#id")` saat section tidak ada di halaman | Header.tsx, Footer.tsx |
+| LP-A-09 | ACK — tetap tampil per keputusan user | — |
+| LP-A-10 | Hapus blok Image dead (`decoratives/wavy-divider.webp`) | Footer.tsx |
+| LP-A-11 | `CatalogSection` client wrapper — `onSelect` → `activeCategory` shared | CatalogSection.tsx (baru), page.tsx, ProductCatalog.tsx (controlled props) |
+| LP-A-12 | Variant `hidden` opacity→1 (transform-only animasi) — LCP paint langsung | HeroSection.tsx |
+| LP-A-13 | `verification.google` env-driven (`GOOGLE_SITE_VERIFICATION`, omit kalau kosong) | layout.tsx |
+| LP-A-14 | `metadataBase` → `SITE_URL` env (`NEXT_PUBLIC_SITE_URL` fallback bisaprint.com) | layout.tsx, constants.ts |
+| LP-A-15 | `src/app/sitemap.ts` + `src/app/robots.ts` (disallow /api, /checkout) | baru — muncul di route table |
+| LP-A-16 | Tombol pause/play visible + aria-pressed pada marquee | Testimonials.tsx |
+| LP-A-17 | snap.js + preconnect pindah ke `checkout/layout.tsx`, preconnect env-aware | layout.tsx, checkout/layout.tsx (baru) |
+| LP-A-18 | Hapus GoogleMap/DecorativeImage/BlobDecoration (0 refs verified) | 3 file dihapus |
+| LP-A-19 | Escape-close mobile menu, `aria-pressed` tabs, hero `useReducedMotion`, `min-h-svh` | Header, ProductCatalog, HeroSection |
+| LP-A-20 | JSON-LD pakai SITE_URL/WA_NUMBER/EMAIL_URL/IG_URL dari constants | layout.tsx |
+| LP-A-21 | `trackEvent("Lead")` semua variant WA CTA + source param; error.tsx copy jujur | WhatsAppButton, ProductCatalog, ContactSection, FormKonsultasi, error.tsx |
+| LP-A-22 | Validasi `Number(jumlah)>0` + `role="alert"` + `aria-required` | FormKonsultasi.tsx |
+| LP-A-23 | DEFERRED — dicatat di Open Items status.md | — |
+
+**Re-check:** `tsc --noEmit` clean · `eslint` 0 problems · `vitest` 76/76 · `build` hijau (sitemap.xml + robots.txt tergenerate, /checkout jalan dengan layout snap scoped).

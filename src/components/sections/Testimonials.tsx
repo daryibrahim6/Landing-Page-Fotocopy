@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { Star, Building2, BookOpen, Landmark, ShoppingBag } from "lucide-react";
+import { Star, Building2, BookOpen, Landmark, ShoppingBag, Pause, Play } from "lucide-react";
 import { testimonials, clientBadges } from "@/data/testimonials";
 import type { Testimonial, TestimonialSource, ClientBadge } from "@/data/testimonials";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
@@ -206,12 +206,13 @@ export function Testimonials() {
       </div>
 
       {autoScrollDuration > 0 ? (
-        <div
-          ref={containerRef}
-          className="relative overflow-hidden"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
+        <div className="relative">
+          <div
+            ref={containerRef}
+            className="relative overflow-hidden"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
           <div
             className="flex gap-6 px-4 animate-scroll-x"
             style={{
@@ -226,6 +227,20 @@ export function Testimonials() {
               </div>
             ))}
           </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsPaused((p) => !p)}
+            aria-pressed={isPaused}
+            aria-label={isPaused ? "Lanjutkan testimoni otomatis" : "Jeda testimoni otomatis"}
+            className="absolute right-2 top-2 z-10 inline-flex size-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white/90 text-[var(--color-text-secondary)] shadow-sm transition hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          >
+            {isPaused ? (
+              <Play className="size-4" aria-hidden="true" />
+            ) : (
+              <Pause className="size-4" aria-hidden="true" />
+            )}
+          </button>
         </div>
       ) : (
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

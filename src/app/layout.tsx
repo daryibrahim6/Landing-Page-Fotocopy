@@ -9,7 +9,7 @@ import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { FloatingSimulator } from "@/components/design-simulator/FloatingSimulator";
 import { MetaPixel } from "@/components/tracking/MetaPixel";
 import { GoogleAnalytics } from "@/components/tracking/GoogleAnalytics";
-import { getMidtransClientKey, getMidtransBaseUrl } from "@/lib/midtrans";
+import { EMAIL_URL, IG_URL, SITE_URL, WA_NUMBER } from "@/lib/constants";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -27,7 +27,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://bisaprint.com"),
+  metadataBase: new URL(SITE_URL),
   title: "Bisa Print — Percetakan Digital Bekasi, Stiker, DTF, Kartu Nama & Lebih",
   description:
     "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp. 10.000+ customer. Cepat, custom, harga terjangkau.",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title: "Bisa Print — Percetakan Digital Bekasi",
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
-    url: "https://bisaprint.com",
+    url: SITE_URL,
     images: [{ url: "/assets/brand/og-image.webp", width: 1200, height: 630 }],
   },
   twitter: {
@@ -62,20 +62,20 @@ export const metadata: Metadata = {
     images: ["/assets/brand/og-image.webp"],
   },
   robots: { index: true, follow: true },
-  verification: {
-    google: "YOUR_GOOGLE_SITE_VERIFICATION",
-  },
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: "Bisa Print",
-  image: "https://bisaprint.com/assets/brand/logo-bisaprint.webp",
-  telephone: "+6281299435019",
-  email: "bisadigitalprint@gmail.com",
-  url: "https://bisaprint.com",
-  sameAs: ["https://instagram.com/bisaprintshop"],
+  image: `${SITE_URL}/assets/brand/logo-bisaprint.webp`,
+  telephone: `+${WA_NUMBER}`,
+  email: EMAIL_URL.replace("mailto:", ""),
+  url: SITE_URL,
+  sameAs: [IG_URL],
   priceRange: "Rp",
   openingHours: "Mo-Sa 08:00-17:00",
   address: {
@@ -109,17 +109,12 @@ export default function RootLayout({
 }>) {
   const metaPixelId = process.env.META_PIXEL_ID ?? "";
   const gaId = process.env.GOOGLE_ANALYTICS_ID ?? "";
-  const midtransClientKey = getMidtransClientKey();
-  const midtransSnapUrl = midtransClientKey
-    ? `${getMidtransBaseUrl().replace("api", "app")}/snap/snap.js?client-key=${midtransClientKey}`
-    : null;
 
   return (
     <html lang="id" className={`scroll-smooth ${plusJakartaSans.variable} ${poppins.variable}`}>
       <body className="min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         <link rel="preconnect" href="https://connect.facebook.net" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://app.sandbox.midtrans.com" />
         <MetaPixel pixelId={metaPixelId} />
         <GoogleAnalytics gaId={gaId} />
         <Script
@@ -128,13 +123,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           strategy="afterInteractive"
         />
-        {midtransSnapUrl && (
-          <Script
-            id="midtrans-snap"
-            src={midtransSnapUrl}
-            strategy="afterInteractive"
-          />
-        )}
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white focus:shadow-lg">
           Skip to main content
         </a>

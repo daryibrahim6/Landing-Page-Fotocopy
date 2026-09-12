@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 
+// ponytail: opacity stays 1 in `hidden` — h1/paragraf adalah kandidat LCP;
+// Chrome abaikan elemen opacity:0 sebagai LCP, jadi animasi entry hanya geser (y).
 const headlineVariants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 1, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
@@ -14,7 +16,7 @@ const headlineVariants = {
 };
 
 const subtextVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 1, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
@@ -93,10 +95,12 @@ function BadgeIcon({ icon }: { icon: string }) {
 }
 
 export function HeroSection() {
+  const prefersReduced = useReducedMotion();
+
   return (
     <section
       id="hero"
-      className="relative flex h-screen items-center overflow-hidden bg-white"
+      className="relative flex min-h-svh items-center overflow-hidden bg-white"
     >
       <div className="absolute inset-0 z-0">
         <div
@@ -128,7 +132,7 @@ export function HeroSection() {
 
       <motion.div
         className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-10 xl:px-16"
-        initial="hidden"
+        initial={prefersReduced ? "visible" : "hidden"}
         animate="visible"
       >
         <div className="flex flex-col justify-center py-8 lg:py-0">

@@ -23,7 +23,7 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 
 | Flow | Tier | Scope | Audit | Fix | Vitest | E2E | Track B | Track C | Final | Last Update | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| landing-page-flow | Core | Done (v2) | Done (v2) | Belum | Done | N/A | Track B (opsional: component test) | Track C (opsional: polish a11y) | ADA ISU | 2026-09-12 | Track A v2 Tahap 0+1: scope frozen + 16 temuan OPEN (P1×1 nav dead-link non-home, P2×4, P3×5, P4×6). LP-A-09 butuh keputusan konten (portfolio placeholder). Menunggu approval Tahap 2. |
+| landing-page-flow | Core | Done (v2) | Done (v2) | Done | Done | N/A | Track B (opsional: component test) | Track C (opsional: polish) | CLEAR | 2026-09-12 | Track A v2 Tahap 0-2: 16 temuan — 14 FIXED, LP-A-09 ACK (portfolio tetap tampil, foto asli nanti), LP-A-23 DEFERRED (consent). Nav dead-link, footer 404, kategori↔filter, hero LCP, sitemap/robots, marquee pause, snap scoping — semua ditutup. 76 tests pass, build hijau. |
 | checkout-flow | Core | Done | Done (v2) | Done | Done | N/A | Track B (opsional: component test) | N/A | CLEAR | 2026-09-12 | Track A v2 lengkap (Tahap 0-3): 19 temuan FIXED + route-level unit tests (72 pass total). Track Gate: E2E=Nanti (money path, kandidat #1), Track C tidak perlu, cross-flow whatsapp-notification diverifikasi. |
 | whatsapp-notification-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Notification helper + unit tests (`notification.test.ts`, `wa.test.ts`). Re-audit v2 pending. |
 | design-simulator-flow | Core | Done | Done | Done | Done | N/A | N/A | Done | LEGACY | 2026-09-08 | Build, lint, test clean (`paper-sizes.test.ts`). Re-audit v2 pending. |
@@ -43,3 +43,5 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 3. **Pricing matrix depth** — multipliers ada (`src/lib/pricing.ts`), tapi belum per-produk granular untuk semua finishing; admin konfirmasi via WA tetap jalur final.
 4. **WA Business API** — notifikasi otomatis ke customer (sekarang WA click-to-chat URL ke admin via `logNotification`).
 5. **Design simulator ekspansi** — preflight/print layout untuk produk non-stiker (`DS-A-01`, RESOLVED-BY-DESIGN untuk MVP).
+6. **Consent banner + privacy page** (LP-A-23, DEFERRED) — Pixel/GA fire tanpa opt-in; implement saat scale/mulai ads.
+7. **Foto portfolio asli** (LP-A-09, ACK) — section tetap tampil dengan placeholder; user supply foto nanti.

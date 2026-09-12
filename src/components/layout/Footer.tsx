@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { WA_NUMBER, waUrl, IG_URL, SHOPEE_URL } from "@/lib/constants";
 
 function formatWaDisplay(number: string): string {
@@ -14,6 +15,7 @@ function formatWaDisplay(number: string): string {
 }
 
 export function Footer() {
+  const router = useRouter();
   const waDisplay = formatWaDisplay(WA_NUMBER);
 
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -23,22 +25,13 @@ export function Footer() {
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
       window.history.replaceState(null, "", href);
+    } else {
+      router.push(`/${href}`);
     }
-  }, []);
+  }, [router]);
 
   return (
     <>
-      <div className="relative h-[60px] w-full overflow-hidden">
-        <Image
-          src="/assets/decoratives/wavy-divider.webp"
-          alt=""
-          width={1440}
-          height={60}
-          className="-mt-1 block h-full w-full object-cover"
-          style={{ transform: "rotate(180deg)" }}
-        />
-      </div>
-
       <footer className="relative overflow-hidden border-t border-[var(--color-border)] bg-slate-900 text-slate-300">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"

@@ -19,7 +19,7 @@ export default function Error({
           Ada yang Error
         </h1>
         <p className="mt-3 text-[var(--color-text-secondary)]">
-          Maaf, terjadi kesalahan yang tidak terduga. Tim kami sudah diberitahu.
+          Maaf, terjadi kesalahan yang tidak terduga. Coba muat ulang halaman ini.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <button

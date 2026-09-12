@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { buildWAFormUrl } from "@/lib/wa";
+import { trackEvent } from "@/lib/tracking";
 import { products } from "@/data/products";
 
 const fieldVariants = {
@@ -59,6 +60,8 @@ export function FormKonsultasi() {
             <input
               id="form-nama"
               type="text"
+              required
+              aria-required="true"
               placeholder="Masukkan nama kamu"
               value={fields.nama}
               onChange={(e) => handleChange("nama", e.target.value)}
@@ -72,6 +75,8 @@ export function FormKonsultasi() {
             </label>
             <select
               id="form-produk"
+              required
+              aria-required="true"
               value={fields.produk}
               onChange={(e) => handleChange("produk", e.target.value)}
               className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition focus-visible:border-[var(--color-primary)]"
@@ -95,6 +100,8 @@ export function FormKonsultasi() {
                 id="form-jumlah"
                 type="number"
                 min={1}
+                required
+                aria-required="true"
                 placeholder="Contoh: 50"
                 value={fields.jumlah}
                 onChange={(e) => handleChange("jumlah", e.target.value)}
@@ -156,10 +163,12 @@ export function FormKonsultasi() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d]"
               onClick={(e) => {
-                if (!fields.nama || !fields.produk || !fields.jumlah) {
+                if (!fields.nama.trim() || !fields.produk || !(Number(fields.jumlah) > 0)) {
                   e.preventDefault();
-                  setError("Mohon isi nama, produk, dan jumlah dulu ya!");
+                  setError("Mohon isi nama, produk, dan jumlah (minimal 1) dulu ya!");
+                  return;
                 }
+                trackEvent("Lead", { source: "form-konsultasi" });
               }}
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="size-6" aria-hidden="true">
@@ -168,7 +177,7 @@ export function FormKonsultasi() {
               Konsultasi via WhatsApp
             </a>
             {error && (
-              <p className="mt-2 text-sm font-semibold text-red-500">{error}</p>
+              <p role="alert" className="mt-2 text-sm font-semibold text-red-500">{error}</p>
             )}
             <p className="mt-2 text-xs text-[var(--color-text-muted)]">
               Gratis konsultasi — admin kami siap bantu

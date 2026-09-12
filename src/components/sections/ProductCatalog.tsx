@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/shared/ProductCard";
 import { categories, products } from "@/data/products";
 import { cn } from "@/lib/utils";
 import { buildWAUrl } from "@/lib/wa";
+import { trackEvent } from "@/lib/tracking";
 import type { ProductCategory } from "@/types";
 
 const categoryTabs: { id: ProductCategory | "all"; label: string }[] = [
@@ -15,8 +16,18 @@ const categoryTabs: { id: ProductCategory | "all"; label: string }[] = [
   ...categories.map((c) => ({ id: c.id as ProductCategory, label: c.name })),
 ];
 
-export function ProductCatalog() {
-  const [activeCategory, setActiveCategory] = useState<ProductCategory | "all">("all");
+interface ProductCatalogProps {
+  activeCategory?: ProductCategory | "all";
+  onCategoryChange?: (category: ProductCategory | "all") => void;
+}
+
+export function ProductCatalog({
+  activeCategory: controlledCategory,
+  onCategoryChange,
+}: ProductCatalogProps = {}) {
+  const [internalCategory, setInternalCategory] = useState<ProductCategory | "all">("all");
+  const activeCategory = controlledCategory ?? internalCategory;
+  const setActiveCategory = onCategoryChange ?? setInternalCategory;
 
   const filtered =
     activeCategory === "all"
@@ -41,6 +52,7 @@ export function ProductCatalog() {
           <button
             key={tab.id}
             type="button"
+            aria-pressed={activeCategory === tab.id}
             onClick={() => setActiveCategory(tab.id)}
             className={cn(
               "rounded-full px-5 py-2 text-sm font-bold transition-colors",
@@ -86,6 +98,7 @@ export function ProductCatalog() {
           href={buildWAUrl("general")}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackEvent("Lead", { source: "catalog-chat-admin" })}
           className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 font-bold text-white shadow-lg transition hover:bg-[var(--color-primary-muted)]"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden="true">
