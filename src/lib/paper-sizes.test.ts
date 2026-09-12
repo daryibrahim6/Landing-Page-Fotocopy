@@ -2,9 +2,12 @@ import { describe, it, expect } from "vitest";
 import {
   calculateImposition,
   estimateSheets,
+  mmToPx,
+  pxToMm,
   GAP_KISS_CUT_MM,
   GAP_DIE_CUT_MM,
   PRINT_AREA_MM,
+  MM_TO_PX,
 } from "./paper-sizes";
 
 describe("calculateImposition", () => {
@@ -42,11 +45,57 @@ describe("calculateImposition", () => {
   });
 
   it("rotates design when it yields more pieces", () => {
-    // A long rectangle (e.g. 40x25) may fit better rotated
-    const result = calculateImposition(40, 25, "kiss", "square");
-    if (result.total > 0) {
-      expect(result.rotated).toBeTypeOf("boolean");
+    // 200×20 on 305×460 (kiss gap 2): normal = 1×20 = 20, rotated = 13×2 = 26
+    const result = calculateImposition(200, 20, "kiss", "square");
+    expect(result.rotated).toBe(true);
+    expect(result.total).toBe(26);
+    expect(result.cols).toBe(13);
+    expect(result.rows).toBe(2);
+  });
+
+  it("does not rotate when rotation yields fewer pieces", () => {
+    const result = calculateImposition(50, 50, "kiss", "square");
+    expect(result.rotated).toBe(false);
+  });
+
+  it("returns zero layout for non-positive dimensions", () => {
+    for (const [w, h] of [[0, 50], [50, 0], [0, 0], [-10, 50]]) {
+      const result = calculateImposition(w, h, "kiss", "square");
+      expect(result.total).toBe(0);
+      expect(result.cols).toBe(0);
+      expect(result.rows).toBe(0);
+      expect(result.utilization).toBe(0);
     }
+  });
+
+  it("fits exactly one piece at the printable boundary", () => {
+    // 303×458 + 2mm kiss gap = exactly 305×460 → 1 piece
+    const result = calculateImposition(303, 458, "kiss", "square");
+    expect(result.total).toBe(1);
+  });
+
+  it("returns zero when design exceeds printable area by gap", () => {
+    // 305×460 design + 2mm gap > printable → 0
+    const result = calculateImposition(305, 460, "kiss", "square");
+    expect(result.total).toBe(0);
+  });
+});
+
+describe("mmToPx / pxToMm", () => {
+  it("converts mm to px at 96 DPI", () => {
+    expect(mmToPx(25.4)).toBeCloseTo(96);
+    expect(mmToPx(0)).toBe(0);
+  });
+
+  it("round-trips mm → px → mm", () => {
+    for (const mm of [10, 50, 305, 460]) {
+      expect(pxToMm(mmToPx(mm))).toBeCloseTo(mm);
+    }
+  });
+
+  it("respects scale factor", () => {
+    expect(mmToPx(10, 2)).toBeCloseTo(10 * MM_TO_PX * 2);
+    expect(pxToMm(mmToPx(10, 2), 2)).toBeCloseTo(10);
   });
 });
 

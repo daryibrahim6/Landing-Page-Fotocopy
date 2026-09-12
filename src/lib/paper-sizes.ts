@@ -73,6 +73,18 @@ export function calculateImposition(
   const printableW = PRINT_AREA_MM.width;
   const printableH = PRINT_AREA_MM.height;
 
+  // Guard: non-positive dimensions must not produce a phantom layout.
+  if (designW <= 0 || designH <= 0) {
+    return {
+      cols: 0, rows: 0, total: 0,
+      sheetWidthMm: printableW, sheetHeightMm: printableH,
+      designWidthMm: designW, designHeightMm: designH,
+      rotated: false, shape, cut,
+      effectiveDesignAreaMm2: 0, printableAreaMm2: printableW * printableH,
+      utilization: 0,
+    };
+  }
+
   // For round stickers, the design is a circle; use diameter as the cell size.
   const cellW = shape === "round" ? designW + gap : designW + gap;
   const cellH = shape === "round" ? designH + gap : designH + gap;

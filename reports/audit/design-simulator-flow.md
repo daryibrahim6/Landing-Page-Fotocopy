@@ -1,7 +1,7 @@
 # Audit — design-simulator-flow
 
 **Tier:** Core | **Prefix ID:** `DS`
-**Status:** Track A Tahap 2 selesai — **10 temuan** (9 FIXED, 1 ACK).
+**Status:** Track A lengkap (Tahap 0–3) — **CLEAR**. 9 FIXED, 1 ACK, 0 OPEN, 118/118 tests.
 
 **Tanggal fix:** sesi terbaru — DS-A-05 diputuskan opsi disclaimer (user delegation), DS-A-08 di-ACK sebagai batasan MVP (user delegation).
 
@@ -226,11 +226,21 @@
 | Partial Failure multi-step | **DS-A-07** (export gagal cross-browser), DS-A-09 (FileReader tanpa onerror); export catch → alert ✓ |
 | Cross-User Cache/State | N/A — semua state local |
 
-## Test Coverage (catatan Tahap 1)
+## Unit Test Coverage (Tahap 3)
 
-- `paper-sizes.test.ts` — 7 tests: imposition square/round, gap kiss vs die, oversized→0, rotation, estimateSheets. **Cukup untuk math.**
-- Gap: tidak ada test untuk export path (DOM-dependent → E2E/manual) dan `handleTransformEnd` mm conversion — Track B opsional.
-- E2E: skipped per keputusan user.
+- `calculateImposition` → `paper-sizes.test.ts` → square/round layout, gap kiss vs die, oversized→0, **deterministic rotation** (200×20 → rotated, 13×2=26), no-rotate case, **non-positive dims → 0** (guard baru), boundary exact-fit (303×458→1), gap-overflow→0
+- `estimateSheets` → `paper-sizes.test.ts` → ceil math, pieces=0→0
+- `mmToPx`/`pxToMm` → `paper-sizes.test.ts` → 96DPI conversion, round-trip, scale factor
+- UploadZone validation, drag/transform, export path → DOM-dependent → **Track B/E2E** (skipped)
+
+## Track Gate
+
+| Pertanyaan | Keputusan |
+|---|---|
+| E2E? | **Nanti** — canvas drag/export butuh browser real; skip per keputusan user |
+| Test shallow? | **Tidak** — rotation test kini deterministic assertion (bukan conditional), guard ≤0 di-test eksplisit |
+| UI/UX sisa? | Tidak blocking — canvas UX polish → Track C opsional |
+| Cross-flow? | Tidak — semua perubahan client-local ke simulator; `paper-sizes` guard backward-compatible |
 
 ---
 
