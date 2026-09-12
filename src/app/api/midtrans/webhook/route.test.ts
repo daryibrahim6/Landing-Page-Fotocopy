@@ -148,4 +148,15 @@ describe("POST /api/midtrans/webhook", () => {
     // settlement notifies once; the blocked expire must not fire another notification
     expect(vi.mocked(logNotification).mock.calls.length).toBe(1);
   });
+
+  it("does not send a 'new order' notification for expire transitions", async () => {
+    vi.mocked(logNotification).mockClear();
+    await saveOrder(makeOrder("BSP-W10-JJJ"));
+    const res = await postJson(signedPayload("BSP-W10-JJJ", "expire"));
+    expect(res.status).toBe(200);
+    expect((await getOrderByMidtransOrderId("BSP-W10-JJJ"))?.payment.status).toBe("expired");
+    // expire is logged server-side, but admin gets no notification (new-order
+    // was already sent at create-token; there is no expire template)
+    expect(vi.mocked(logNotification).mock.calls.length).toBe(0);
+  });
 });

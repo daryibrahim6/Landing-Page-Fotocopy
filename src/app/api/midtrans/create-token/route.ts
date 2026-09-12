@@ -29,6 +29,12 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json({ error: "Unknown product or spec option" }, { status: 400 });
     }
+    if (!product.isCheckoutEnabled) {
+      return NextResponse.json(
+        { error: "Produk ini belum tersedia untuk checkout online. Hubungi admin via WhatsApp." },
+        { status: 400 },
+      );
+    }
 
     const pricing = calculatePrice(productId, size, material, finishing, quantity);
     if (pricing.total <= 0) {

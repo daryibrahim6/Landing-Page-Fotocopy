@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getOrderByMidtransOrderId, saveOrder, updateOrderStatus } from "@/lib/order-storage";
-import { notifyAdminNewOrder, notifyAdminPaidOrder, logNotification } from "@/lib/notification";
+import { notifyAdminPaidOrder, logNotification } from "@/lib/notification";
 import { midtransWebhookBodySchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
@@ -93,11 +93,14 @@ export async function POST(request: Request) {
 
     // Notify only when the transition actually applied and changed state —
     // duplicate webhooks and blocked regressions must not spam admin.
+    // Only "paid" gets a notification: new-order is already notified at
+    // create-token, and expire/cancel have no dedicated admin template.
     const applied =
       order && order.payment.status === orderStatus && prevStatus !== orderStatus;
-    if (applied) {
-      const notification = orderStatus === "paid" ? notifyAdminPaidOrder(order) : notifyAdminNewOrder(order);
-      logNotification(notification);
+    if (applied && orderStatus === "paid") {
+      logNotification(notifyAdminPaidOrder(order));
+    } else if (applied) {
+      console.log(`[Midtrans Webhook] Order ${order_id}: status changed to ${orderStatus}`);
     } else if (!order) {
       console.log(`[Midtrans Webhook] Order ${order_id}: ${transaction_status} → ${orderStatus}`);
     }

@@ -244,6 +244,38 @@ export function CheckoutForm() {
     );
   }
 
+  if (!product.isCheckoutEnabled) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-20 text-center">
+        <ShoppingCart className="mx-auto mb-4 size-12 text-[var(--color-text-muted)]" />
+        <h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+          Checkout Online Belum Tersedia
+        </h1>
+        <p className="mt-2 text-[var(--color-text-secondary)]">
+          Produk {product.name} belum bisa dipesan lewat checkout online. Pesan langsung via WhatsApp.
+        </p>
+        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <a
+            href={buildWAUrl("fromProduct", product.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white transition hover:bg-primary/90"
+          >
+            <MessageCircle className="size-4" />
+            Order via WhatsApp
+          </a>
+          <Link
+            href="/#produk"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)] transition hover:text-primary"
+          >
+            <ArrowLeft className="size-4" />
+            Lihat Produk Lain
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (submitted) {
     return (
       <div className="mx-auto max-w-lg px-4 py-20 text-center">

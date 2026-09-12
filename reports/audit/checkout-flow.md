@@ -259,6 +259,18 @@ Keputusan user (all recommended): scope semua 19 · CF-A-11 server recompute · 
 
 **Post-Tahap-2 polish (12 Sep):** webhook kini dedup notifikasi — notify hanya saat transisi applied dan berubah state (duplicate webhook / blocked regression tidak spam admin). Selama implementasi tertangkap bug aliasing: `getOrderByMidtransOrderId` mengembalikan referensi live di in-memory store sehingga `updateOrderStatus` me-mutate `existing` sebelum dicek — diperbaiki dengan snapshot `prevStatus` sebelum mutate (commit `f31f2b9`, +2 test).
 
+### CF-A-30 — P3 — `isCheckoutEnabled` tidak ditegakkan di boundary (deep recheck 12 Sep)
+- **Skenario:** `products.poster` diset `isCheckoutEnabled: false` dan `ProductCard` menyembunyikan CTA, tapi `/checkout?product=poster` tetap render form dan `create-token` tetap membuat order. Flag hanya di level katalog, bukan gate.
+- **Bukti:** `create-token/route.ts` tidak cek `isCheckoutEnabled`; `CheckoutForm` tidak gate.
+- **Solusi:** reject di `create-token` (400 + pesan WA fallback) + `CheckoutForm` early-state "belum tersedia" dengan CTA WA. Satu-satunya gate yang benar.
+- **Future gap tag:** security | **Status:** FIXED (12 Sep) — test `rejects products with isCheckoutEnabled=false`.
+
+### CF-A-31 — P3 — Transisi expire/cancel mengirim notif "Order Baru" (deep recheck 12 Sep)
+- **Skenario:** webhook `expire` pada order pending → transisi applied → admin terima "🔔 Order Baru #X" padahal order kedaluwarsa. Label salah, bisa bikin admin proses order mati.
+- **Bukti:** webhook memakai `notifyAdminNewOrder` untuk semua transisi non-paid.
+- **Solusi:** notify hanya saat `paid` (order baru sudah dinotifikasi di `create-token`; expire/cancel cukup log server — belum ada template khusus). Tunggal.
+- **Future gap tag:** none | **Status:** FIXED (12 Sep) — test `does not send a 'new order' notification for expire transitions`.
+
 ## Unit Test Coverage (Tahap 3, 2026-09-12)
 
 | Logic/path | File test | Kasus yang di-cover |

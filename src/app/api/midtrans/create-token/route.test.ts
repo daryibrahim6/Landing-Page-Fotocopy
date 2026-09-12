@@ -51,6 +51,18 @@ describe("POST /api/midtrans/create-token", () => {
     expect((await postJson({ ...VALID_BODY, material: "Kertas Gaib" })).status).toBe(400);
   });
 
+  it("rejects products with isCheckoutEnabled=false", async () => {
+    const res = await postJson({
+      ...VALID_BODY,
+      productId: "poster", // isCheckoutEnabled: false in products.ts
+      size: "A3",
+      material: "Art Paper 120gsm",
+      finishing: "Glossy",
+    });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toContain("WhatsApp");
+  });
+
   it("computes the total server-side — client-sent amounts are ignored", async () => {
     const res = await postJson({ ...VALID_BODY, grossAmount: 1000, items: [{ price: 1 }] });
     expect(res.status).toBe(200);
