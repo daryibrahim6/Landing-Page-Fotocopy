@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -138,14 +138,7 @@ export function Header() {
           onClick={() => setIsMenuOpen(false)}
           aria-label="BisaPrint — kembali ke beranda"
         >
-          <Image
-            src="/assets/brand/logo-bisaprint.svg"
-            alt="BisaPrint"
-            width={160}
-            height={35}
-            className="h-8 w-auto sm:h-9"
-            priority
-          />
+          <BrandLogo />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">

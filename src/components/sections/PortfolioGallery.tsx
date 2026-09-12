@@ -1,9 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 
 import { portfolioItems } from "@/data/portfolio";
 import type { PortfolioItem } from "@/data/portfolio";
+import { waUrl } from "@/lib/constants";
+import { trackEvent } from "@/lib/tracking";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { cn } from "@/lib/utils";
@@ -19,10 +22,6 @@ const gradients = [
   "from-gray-700 to-gray-500",
 ];
 
-
-
-
-
 // ─── Portfolio tile ──────────────────────────────────────────────────────────
 
 function PortfolioTile({
@@ -33,26 +32,17 @@ function PortfolioTile({
   index: number;
 }) {
   const hasImage = item.image.trim().length > 0;
-  const aspects = ["aspect-square", "aspect-[4/5]", "aspect-[3/4]", "aspect-square", "aspect-[4/5]", "aspect-[3/4]"];
-  const aspect = aspects[index % aspects.length];
 
   return (
-    <div
-      className="group relative mb-5 break-inside-avoid transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_16px_40px_-8px_rgba(15,23,42,0.12),0_6px_16px_-4px_rgba(0,0,0,0.08)]"
-    >
-      <div
-        className={cn(
-          "relative w-full overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white shadow-sm transition-shadow duration-300",
-          aspect,
-        )}
-      >
+    <div className="group relative transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_16px_40px_-8px_rgba(15,23,42,0.12),0_6px_16px_-4px_rgba(0,0,0,0.08)]">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white shadow-sm transition-shadow duration-300">
         {hasImage ? (
           <Image
             src={item.image}
             alt={item.title}
             fill
             className="object-cover"
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           />
         ) : (
           <div className={cn("flex h-full w-full flex-col items-center justify-center gap-2 p-6 text-center bg-gradient-to-br", gradients[index % gradients.length])}>
@@ -72,6 +62,9 @@ function PortfolioTile({
           </div>
         </div>
       </div>
+      <p className="mt-2.5 text-center text-sm font-semibold text-[var(--color-text-secondary)]">
+        {item.title}
+      </p>
     </div>
   );
 }
@@ -92,11 +85,40 @@ export function PortfolioGallery() {
         </p>
       </ScrollReveal>
 
-      {/* Masonry-like CSS columns grid */}
-      <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3">
+      {/* Grid seragam — 7 item + 1 tile CTA = 8 tile rapi, tanpa bolong masonry */}
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {portfolioItems.map((item, index) => (
           <PortfolioTile key={item.id} item={item} index={index} />
         ))}
+
+        {/* Tile CTA ke-8 — nutup grid sekaligus conversion point */}
+        <a
+          href={waUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent("Lead", { source: "portfolio-cta" })}
+          className="group relative flex aspect-[4/5] w-full flex-col justify-between gap-4 overflow-hidden rounded-2xl p-6 text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+          style={{
+            background:
+              "linear-gradient(150deg, #EE3B97 0%, #DE127A 55%, #A50D5F 100%)",
+          }}
+        >
+          <div
+            className="pointer-events-none absolute -right-10 -top-10 size-36 rounded-full bg-white/15"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-14 -left-8 size-36 rounded-full bg-black/10"
+            aria-hidden="true"
+          />
+          <h3 className="relative font-display text-xl font-bold leading-snug md:text-2xl">
+            Produk kamu selanjutnya di sini.
+          </h3>
+          <span className="relative mt-auto inline-flex items-center gap-1.5 text-sm font-bold text-white">
+            Order via WhatsApp
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          </span>
+        </a>
       </div>
     </SectionWrapper>
   );

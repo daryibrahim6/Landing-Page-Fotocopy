@@ -43,7 +43,7 @@ export function KategoriProduk({ onSelect }: KategoriProdukProps) {
               </h2>
             </div>
             <p className="max-w-sm text-base text-[var(--color-text-secondary)] md:text-right">
-              Pilih kategori yang kamu butuhkan, lalu scroll ke produknya
+              Klik kategori yang kamu butuhkan &mdash; langsung lompat ke daftar produknya
             </p>
           </div>
         </ScrollReveal>

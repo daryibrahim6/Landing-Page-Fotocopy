@@ -114,7 +114,7 @@ export function ContactSection() {
         {/* Kartu CTA WhatsApp — gradient hijau, bukan kartu putih flat */}
         <div className="flex flex-col gap-8">
           <div
-            className="relative flex h-full min-h-[320px] flex-col justify-between gap-8 overflow-hidden rounded-3xl p-8 text-white shadow-xl shadow-[#0b3d2e]/25 sm:p-10"
+            className="relative flex h-full min-h-[320px] flex-col justify-center gap-7 overflow-hidden rounded-3xl p-8 text-white shadow-xl shadow-[#0b3d2e]/25 sm:p-10"
             style={{ background: "linear-gradient(150deg, #2BD97B 0%, #1EBE5D 45%, #128C4B 100%)" }}
           >
             <div
@@ -143,6 +143,26 @@ export function ContactSection() {
               <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/85 md:text-base">
                 Hubungi kami untuk konsultasi, tanya harga, atau langsung pesan.
               </p>
+            </div>
+
+            {/* Chat preview — ngisi ruang kartu dengan konten bermakna,
+                bukan void kosong */}
+            <div
+              className="relative space-y-2.5 rounded-2xl bg-black/15 p-4 backdrop-blur-[2px]"
+              aria-hidden="true"
+            >
+              <div className="w-fit max-w-[85%] rounded-2xl rounded-bl-sm bg-white px-3.5 py-2 shadow-sm">
+                <p className="text-xs font-semibold text-slate-700">
+                  Kak, bisa cetak stiker label 500 pcs?
+                </p>
+                <span className="mt-0.5 block text-right text-[10px] text-slate-400">10.24</span>
+              </div>
+              <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-[#0b5a34] px-3.5 py-2 shadow-sm">
+                <p className="text-xs font-semibold text-white">
+                  Bisa kak! Kirim detail ukuran + jumlahnya, admin hitungkan estimasinya.
+                </p>
+                <span className="mt-0.5 block text-right text-[10px] text-white/70">10.25 &#10003;&#10003;</span>
+              </div>
             </div>
 
             <ul className="relative space-y-2.5">

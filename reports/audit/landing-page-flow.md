@@ -442,3 +442,19 @@ Catatan cross-flow: `isCheckoutEnabled` enforcement sudah diverifikasi di checko
 - `tsc --noEmit` clean, `eslint` clean, `vitest` 161/161, `next build` hijau.
 - Catatan: halaman non-landing di `(public)` (checkout, success, simulator) diberi `pt-24/28` karena navbar sekarang `fixed` overlay.
 - Tablet 768: tidak di-screenshot terpisah — breakpoint sm/lg sudah tercover di dua viewport yang dicek; grid bento `sm:grid-cols-2` dijamin konsisten.
+
+## UX Walkthrough — Round 2 Polish (Sesi 12 Sep 2026, lanjutan)
+
+Feedback user dari screenshot round 1 → fix:
+
+| Keluhan | Root cause | Fix |
+|---|---|---|
+| Logo belum remove-bg | `logo-bisaprint.svg` adalah mark berbeda (kotak pink generik), bukan logo brand asli | `logo-bisaprint.webp` di-remove-bg via flood-fill edge (putih interior huruf P/strip utuh) → `logo-bisaprint-mark.png` 966×975 transparan; wordmark pindah ke HTML (`BrandLogo.tsx`) karena SVG `<text>` di `<img>` tidak bisa akses font halaman |
+| Copy kategori janggal | "lalu scroll ke produknya" — padahal klik kartu sudah auto-scroll | "Klik kategori yang kamu butuhkan — langsung lompat ke daftar produknya" |
+| Portfolio bolong | `columns-3` masonry + aspect bervariasi → kolom tidak seimbang, ada lubang | Grid seragam `sm:grid-cols-2 lg:grid-cols-4` aspect-[4/5] + tile CTA ke-8 ("Produk kamu selanjutnya di sini.") + caption judul selalu terlihat (hover-only → aksesibel di mobile) |
+| WA card ada gap | `justify-between` di kartu setinggi kolom kiri (map) → void di tengah | `justify-center` + mini chat-preview bubble di tengah kartu (konten bermakna, tema WA) |
+| Footer logo + ikon janky | logo webp/SVG lama; Shopee = kotak "S" merah | `BrandLogo light`; ikon brand resmi Simple Icons (CC0): Shopee path asli, IG/WA diekstrak ke konstanta — semua monochrome konsisten di lingkaran bordered |
+
+**Cleanup:** 17 file orphan diarsip ke `_archive/` — hero/*.webp (6), machines/*.webp (2), icon/instagram.webp, products orphan (5: banner-spanduk, dtf-kaos, jilid-skripsi, print-dokumen-warna, totebag), brand/logo-bisaprint.svg + -light.svg, illustrations/underline-accent.svg. `public/` tersisa 21 file, semua tereferensi.
+
+**Verifikasi:** tsc clean, eslint clean, vitest 161/161, build hijau. Screenshot verified: navbar logo (mark asli transparan di pill putih), portfolio grid 4×2 tanpa bolong + tile CTA, kontak WA card dengan chat preview, footer logo light + ikon Shopee proper, mobile 375px 1 kolom.
