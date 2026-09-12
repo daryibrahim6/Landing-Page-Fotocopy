@@ -4,6 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB — keeps dataURL memory sane
+
 interface UploadZoneProps {
   onFileUpload: (file: File, dataUrl: string) => void;
   className?: string;
@@ -25,10 +27,18 @@ export function UploadZone({ onFileUpload, className }: UploadZoneProps) {
         return;
       }
 
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        alert("File terlalu besar. Maksimal 10 MB untuk simulasi.");
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
         onFileUpload(file, dataUrl);
+      };
+      reader.onerror = () => {
+        alert("Gagal membaca file. Coba file lain.");
       };
       reader.readAsDataURL(file);
     },

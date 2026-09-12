@@ -9,6 +9,7 @@ import {
 import { UploadZone } from "./UploadZone";
 import { DesignCanvas } from "./DesignCanvas";
 import {
+  BISA_PRINT_A3,
   PRINT_AREA_MM,
   GAP_KISS_CUT_MM,
   GAP_DIE_CUT_MM,
@@ -44,12 +45,13 @@ const BASE_SHEET_PRICE = 15000;
 export function DesignSimulator() {
   const [mode, setMode] = useState<"calculator" | "upload">("calculator");
 
-  // Calculator state
-  const [designW, setDesignW] = useState(50);
-  const [designH, setDesignH] = useState(50);
+  // Calculator state — kept as strings so inputs can be cleared while typing;
+  // parsed to numbers at the point of use (<= 0 → no result).
+  const [designW, setDesignW] = useState("50");
+  const [designH, setDesignH] = useState("50");
   const [shape, setShape] = useState<StickerShape>("round");
   const [cut, setCut] = useState<CutType>("kiss");
-  const [quantity, setQuantity] = useState(100);
+  const [quantity, setQuantity] = useState("100");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [fileName, setFileName] = useState("layout-stiker-umkm");
   const [zoom, setZoom] = useState(100);
@@ -61,15 +63,19 @@ export function DesignSimulator() {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const sw = useMemo(() => {
-    if (shape === "round") return designW;
-    if (orientation === "landscape") return designH;
-    return designW;
+    const w = Number(designW) || 0;
+    const h = Number(designH) || 0;
+    if (shape === "round") return w;
+    if (orientation === "landscape") return h;
+    return w;
   }, [designW, designH, orientation, shape]);
 
   const sh = useMemo(() => {
-    if (shape === "round") return designH;
-    if (orientation === "landscape") return designW;
-    return designH;
+    const w = Number(designW) || 0;
+    const h = Number(designH) || 0;
+    if (shape === "round") return h;
+    if (orientation === "landscape") return w;
+    return h;
   }, [designW, designH, orientation, shape]);
 
   const result: ImpositionResult | null = useMemo(() => {
@@ -79,7 +85,7 @@ export function DesignSimulator() {
 
   const sheets = useMemo(() => {
     if (!result || result.total <= 0) return 0;
-    return estimateSheets(quantity, result.total);
+    return estimateSheets(Number(quantity) || 0, result.total);
   }, [quantity, result]);
 
   const estimatedPrice = useMemo(() => {
@@ -87,8 +93,8 @@ export function DesignSimulator() {
   }, [sheets]);
 
   const applyPreset = useCallback((preset: Preset) => {
-    setDesignW(preset.w);
-    setDesignH(preset.h);
+    setDesignW(String(preset.w));
+    setDesignH(String(preset.h));
     setShape(preset.shape);
     setOrientation("portrait");
   }, []);
@@ -98,11 +104,11 @@ export function DesignSimulator() {
   }, []);
 
   const resetCalculator = useCallback(() => {
-    setDesignW(50);
-    setDesignH(50);
+    setDesignW("50");
+    setDesignH("50");
     setShape("round");
     setCut("kiss");
-    setQuantity(100);
+    setQuantity("100");
     setOrientation("portrait");
     setFileName("layout-stiker-umkm");
     setZoom(100);
@@ -112,7 +118,13 @@ export function DesignSimulator() {
     if (!svgRef.current) return;
     try {
       const svg = svgRef.current;
-      const svgData = new XMLSerializer().serializeToString(svg);
+      // Clone + inject explicit width/height — SVGs with only a viewBox have no
+      // intrinsic size, so canvas drawImage produces blank/degraded output
+      // (Firefox fails silently; spec falls back to canvas size).
+      const clone = svg.cloneNode(true) as SVGSVGElement;
+      clone.setAttribute("width", String(BISA_PRINT_A3_WIDTH));
+      clone.setAttribute("height", String(BISA_PRINT_A3_HEIGHT));
+      const svgData = new XMLSerializer().serializeToString(clone);
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
@@ -176,13 +188,13 @@ export function DesignSimulator() {
           pdf.setFillColor(222, 18, 122);
           pdfWithGState.setGState(new pdfWithGState.GState({ opacity: isFirst ? 0.6 : 0.12 }));
           if (shape === "round") {
-            pdf.circle(x + cellW / 2, y + cellH / 2, cellW / 2, "F");
+            pdf.circle(x + cellW / 2, y + cellH / 2, (cellW - gap) / 2, "F");
           } else {
             pdf.rect(x, y, cellW, cellH, "F");
           }
           pdfWithGState.setGState(new pdfWithGState.GState({ opacity: 1 }));
           if (shape === "round") {
-            pdf.circle(x + cellW / 2, y + cellH / 2, cellW / 2, "S");
+            pdf.circle(x + cellW / 2, y + cellH / 2, (cellW - gap) / 2, "S");
           } else {
             pdf.rect(x, y, cellW, cellH, "S");
           }
@@ -220,6 +232,7 @@ export function DesignSimulator() {
         <button
           type="button"
           onClick={() => setMode("calculator")}
+          aria-pressed={mode === "calculator"}
           className={cn(
             "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition",
             mode === "calculator"
@@ -233,6 +246,7 @@ export function DesignSimulator() {
         <button
           type="button"
           onClick={() => setMode("upload")}
+          aria-pressed={mode === "upload"}
           className={cn(
             "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition",
             mode === "upload"
@@ -278,6 +292,7 @@ export function DesignSimulator() {
                 <button
                   type="button"
                   onClick={() => setShape("round")}
+                  aria-pressed={shape === "round"}
                   className={cn(
                     "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     shape === "round"
@@ -291,6 +306,7 @@ export function DesignSimulator() {
                 <button
                   type="button"
                   onClick={() => setShape("square")}
+                  aria-pressed={shape === "square"}
                   className={cn(
                     "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     shape === "square"
@@ -305,28 +321,30 @@ export function DesignSimulator() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
+                  <label htmlFor="ds-width" className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
                     {shape === "round" ? "Diameter (mm)" : "Lebar (mm)"}
                   </label>
                   <input
+                    id="ds-width"
                     type="number"
                     min={1}
                     max={500}
                     value={designW}
-                    onChange={(e) => setDesignW(Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => setDesignW(e.target.value)}
                     className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
+                  <label htmlFor="ds-height" className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
                     {shape === "round" ? "Diameter (mm)" : "Tinggi (mm)"}
                   </label>
                   <input
+                    id="ds-height"
                     type="number"
                     min={1}
                     max={500}
                     value={designH}
-                    onChange={(e) => setDesignH(Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => setDesignH(e.target.value)}
                     disabled={shape === "round"}
                     className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary disabled:opacity-50"
                   />
@@ -338,6 +356,7 @@ export function DesignSimulator() {
                   <button
                     type="button"
                     onClick={() => setOrientation("portrait")}
+                    aria-pressed={orientation === "portrait"}
                     className={cn(
                       "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                       orientation === "portrait"
@@ -351,6 +370,7 @@ export function DesignSimulator() {
                   <button
                     type="button"
                     onClick={() => setOrientation("landscape")}
+                    aria-pressed={orientation === "landscape"}
                     className={cn(
                       "flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                       orientation === "landscape"
@@ -374,6 +394,7 @@ export function DesignSimulator() {
                 <button
                   type="button"
                   onClick={() => setCut("kiss")}
+                  aria-pressed={cut === "kiss"}
                   className={cn(
                     "rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     cut === "kiss"
@@ -386,6 +407,7 @@ export function DesignSimulator() {
                 <button
                   type="button"
                   onClick={() => setCut("die")}
+                  aria-pressed={cut === "die"}
                   className={cn(
                     "rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
                     cut === "die"
@@ -400,15 +422,16 @@ export function DesignSimulator() {
 
             {/* Quantity */}
             <div className="rounded-2xl border-2 border-[var(--color-border)] bg-white p-4">
-              <label className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+              <label htmlFor="ds-quantity" className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
                 Jumlah Pesanan
               </label>
               <input
+                id="ds-quantity"
                 type="number"
                 min={1}
                 max={100000}
                 value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setQuantity(e.target.value)}
                 className="mt-2 w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
               />
             </div>
@@ -479,7 +502,7 @@ export function DesignSimulator() {
                           const x = ox + c * (cellW + gap);
                           const y = oy + r * (cellH + gap);
                           const isFirst = r === 0 && c === 0;
-                          const radius = shape === "round" ? cellW / 2 : 0.5;
+                          const radius = shape === "round" ? (cellW - gap) / 2 : 0.5;
                           return (
                             <rect
                               key={`${r}-${c}`}
@@ -519,6 +542,7 @@ export function DesignSimulator() {
                   <div className="mt-3 space-y-3">
                     <input
                       type="text"
+                      aria-label="Nama file cetak"
                       value={fileName}
                       onChange={(e) => setFileName(e.target.value)}
                       className="w-full rounded-xl border-2 border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-text-primary)] outline-none transition focus-visible:border-primary"
@@ -620,12 +644,15 @@ export function DesignSimulator() {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-bold text-[var(--color-text-primary)]">
-                      Estimasi harga
+                      Estimasi harga*
                     </span>
                     <span className="font-display text-lg font-black text-accent">
                       Rp {estimatedPrice.toLocaleString("id-ID")}
                     </span>
                   </div>
+                  <p className="text-[11px] italic text-[var(--color-text-muted)]">
+                    *Indikatif per lembar A3 — harga final dikonfirmasi admin via WhatsApp.
+                  </p>
                   {result.rotated && (
                     <p className="text-xs italic text-accent">
                       * Design diputar untuk hasil optimal
@@ -737,8 +764,8 @@ export function DesignSimulator() {
                 <p className="text-xs font-semibold text-[var(--color-text-primary)]">Tips</p>
               </div>
               <ul className="mt-2 space-y-1 text-xs text-[var(--color-text-secondary)]">
-                <li>&bull; Drag design untuk posisi</li>
                 <li>&bull; Resize dari corner handles</li>
+                <li>&bull; Atau isi ukuran L × T di pojok kanan atas</li>
                 <li>&bull; Default A3 BisaPrint</li>
                 <li>&bull; Gap antar design: 2 mm</li>
               </ul>
@@ -761,5 +788,5 @@ export function DesignSimulator() {
   );
 }
 
-const BISA_PRINT_A3_WIDTH = 325;
-const BISA_PRINT_A3_HEIGHT = 485;
+const BISA_PRINT_A3_WIDTH = BISA_PRINT_A3.widthMm;
+const BISA_PRINT_A3_HEIGHT = BISA_PRINT_A3.heightMm;

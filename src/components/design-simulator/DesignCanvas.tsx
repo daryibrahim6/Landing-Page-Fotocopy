@@ -260,19 +260,7 @@ export function DesignCanvas({
                 image={loadedImage}
                 width={designPxW}
                 height={designPxH}
-                draggable
-                dragBoundFunc={(pos) => ({
-                  x: Math.max(
-                    (containerSize.width - paperWidthPx) / 2,
-                    Math.min(pos.x, (containerSize.width + paperWidthPx) / 2 - designPxW),
-                  ),
-                  y: Math.max(
-                    (containerSize.height - paperHeightPx) / 2,
-                    Math.min(pos.y, (containerSize.height + paperHeightPx) / 2 - designPxH),
-                  ),
-                })}
                 onTransformEnd={handleTransformEnd}
-                onDragEnd={handleTransformEnd}
               />
               <Transformer
                 ref={transformerRef}
@@ -281,7 +269,7 @@ export function DesignCanvas({
                 enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
                 borderStroke="#DE127A"
                 anchorFill="#DE127A"
-                anchorSize={8}
+                anchorSize={14}
                 anchorCornerRadius={2}
                 boundBoxFunc={(_oldBox, newBox) => {
                   if (newBox.width < 20 || newBox.height < 20) return _oldBox;
@@ -295,6 +283,37 @@ export function DesignCanvas({
 
       <div className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)] shadow-sm backdrop-blur-sm">
         {paperSize.name}
+      </div>
+
+      {/* Keyboard-accessible size controls — canvas drag/resize is not operable
+          by keyboard, so provide numeric inputs as the alternative path. */}
+      <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] shadow-sm backdrop-blur-sm">
+        <label htmlFor="dc-width">L</label>
+        <input
+          id="dc-width"
+          type="number"
+          min={10}
+          value={designMm.width}
+          onChange={(e) =>
+            setDesignMm((d) => ({ ...d, width: Math.max(10, Number(e.target.value) || 10) }))
+          }
+          className="w-14 rounded-md border border-[var(--color-border)] px-1.5 py-0.5 text-center outline-none focus-visible:border-primary"
+          aria-label="Lebar design (mm)"
+        />
+        <span aria-hidden="true">×</span>
+        <label htmlFor="dc-height">T</label>
+        <input
+          id="dc-height"
+          type="number"
+          min={10}
+          value={designMm.height}
+          onChange={(e) =>
+            setDesignMm((d) => ({ ...d, height: Math.max(10, Number(e.target.value) || 10) }))
+          }
+          className="w-14 rounded-md border border-[var(--color-border)] px-1.5 py-0.5 text-center outline-none focus-visible:border-primary"
+          aria-label="Tinggi design (mm)"
+        />
+        <span className="text-[var(--color-text-muted)]">mm</span>
       </div>
     </div>
   );

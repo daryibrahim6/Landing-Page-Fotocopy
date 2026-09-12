@@ -1,7 +1,9 @@
 # Audit — design-simulator-flow
 
 **Tier:** Core | **Prefix ID:** `DS`
-**Status:** Track A Tahap 0+1 selesai (re-audit v2) — **10 temuan** (9 OPEN, 1 butuh keputusan produk).
+**Status:** Track A Tahap 2 selesai — **10 temuan** (9 FIXED, 1 ACK).
+
+**Tanggal fix:** sesi terbaru — DS-A-05 diputuskan opsi disclaimer (user delegation), DS-A-08 di-ACK sebagai batasan MVP (user delegation).
 
 **Tanggal re-audit:** sesi terbaru — audit formal v2 pertama (carry-over DS-A-01/02 diverifikasi ulang).
 
@@ -74,7 +76,7 @@
 - **Opsi:** (a) Import `BISA_PRINT_A3` dan pakai `.widthMm/.heightMm` (hapus konstanta lokal). (b) Export `BISA_PRINT_A3_WIDTH/HEIGHT` dari paper-sizes sebagai alias.
 - **Rekomendasi Devin:** (a) — single source.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — konstanta lokal kini derive dari `BISA_PRINT_A3.widthMm/.heightMm` (single source paper-sizes.ts).
 
 ---
 
@@ -87,7 +89,7 @@
 - **Opsi:** (a) radius = `designW / 2` (atau cell dim tanpa gap). (b) Biarkan.
 - **Rekomendasi Devin:** (a) — 1-line fix di 3 tempat.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — radius lingkaran kini `(cellW - gap) / 2` di preview SVG (line ~494) dan PDF (lines ~190,196) — design size, bukan cell+gap.
 
 ---
 
@@ -103,7 +105,7 @@
   - (c) Sembunyikan estimasi harga sampai pricing real.
 - **Rekomendasi Devin:** (b) sekarang + (a) backlog saat pricing stiker per-lembar ada. **Butuh keputusan user** — apakah Rp15.000/lembar itu angka yang valid di lapangan?
 - **Future gap tag:** cross-flow
-- **Status:** OPEN — keputusan produk
+- **Status:** FIXED (opsi disclaimer) — label "Estimasi harga*" + catatan "*Indikatif per lembar A3 — harga final dikonfirmasi admin via WhatsApp." Wire ke pricing.ts = backlog.
 
 ---
 
@@ -119,7 +121,7 @@
   - (c) Biarkan + tooltip jelas.
 - **Rekomendasi Devin:** (a) — drag punya fungsi palsu; hapus lebih jujur. Resize tetap via Transformer.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — `draggable` + `dragBoundFunc` + `onDragEnd` dihapus dari KonvaImage; design fixed center, ghost grid = single truth. Tips upload diperbarui.
 
 ---
 
@@ -134,7 +136,7 @@
   - (b) Pakai `svg.getBoundingClientRect()` untuk dims lalu inject — sama saja.
 - **Rekomendasi Devin:** (a) — clone + inject width/height sebelum serialize.
 - **Future gap tag:** infra (browser compat)
-- **Status:** OPEN
+- **Status:** FIXED — PNG export clone node + inject `width`/`height` attrs (BISA_PRINT_A3 dims) sebelum serialize → intrinsic size eksplisit, conform Firefox+spec.
 
 ---
 
@@ -147,7 +149,7 @@
 - **Opsi:** (a) Tambah cut selector + export di upload mode (kerja sedang). (b) Biarkan — MVP limitation.
 - **Rekomendasi Devin:** (b) untuk sekarang — konsisten DS-A-01 ACK, tapi documented.
 - **Future gap tag:** none
-- **Status:** OPEN (ACK kandidat — MVP limitation)
+- **Status:** ACK — batasan MVP (konsisten DS-A-01): upload mode kiss+square saja, tanpa export. Backlog: cut selector + export di upload mode.
 
 ---
 
@@ -160,7 +162,7 @@
 - **Opsi:** (a) Batasi ~10MB + `reader.onerror` alert. (b) Biarkan.
 - **Rekomendasi Devin:** (a) — 5 baris.
 - **Future gap tag:** scale
-- **Status:** OPEN
+- **Status:** FIXED — cap 10MB (`MAX_FILE_SIZE_BYTES`) + `reader.onerror` alert di UploadZone.
 
 ---
 
@@ -173,7 +175,7 @@
 - **Opsi:** (a) htmlFor/id pairing + `aria-pressed` di semua toggle (pola landing). (b) Biarkan.
 - **Rekomendasi Devin:** (a) — pola sudah ada, konsisten.
 - **Future gap tag:** a11y
-- **Status:** OPEN
+- **Status:** FIXED — `htmlFor`/`id` di ds-width/ds-height/ds-quantity + `aria-label` fileName + `aria-pressed` di semua toggle (mode/shape/orientasi/cut).
 
 ---
 
@@ -186,7 +188,7 @@
 - **Opsi:** (a) anchorSize naik (mis. 14-16) + input numeric ukuran design di sidebar upload mode (keyboard path). (b) Biarkan.
 - **Rekomendasi Devin:** (a) bagian input numeric saja (a11y real); anchorSize optional polish.
 - **Future gap tag:** a11y
-- **Status:** OPEN
+- **Status:** FIXED — `anchorSize` 8→14 + input numeric L×T di pojok kanan atas canvas (keyboard path, sesuai rekomendasi Konva docs).
 
 ---
 
@@ -199,7 +201,7 @@
 - **Opsi:** (a) Simpan state string, clamp on blur. (b) Biarkan.
 - **Rekomendasi Devin:** (a) kalau mau polish; (b) acceptable.
 - **Future gap tag:** none
-- **Status:** OPEN
+- **Status:** FIXED — state designW/designH/quantity kini string; input bisa di-clear, parse Number() di useMemo (<=0 → result null).
 
 ---
 
@@ -234,11 +236,21 @@
 
 ## Rekap
 
-| Severity | Count | IDs |
-|---|---|---|
-| P1 | 1 | DS-A-07 (export PNG cross-browser) |
-| P2 | 2 | DS-A-05 (keputusan produk), DS-A-06 |
-| P3 | 3 | DS-A-03, DS-A-08 (ACK kandidat), DS-A-10 |
-| P4 | 3 | DS-A-04, DS-A-09, DS-A-11, DS-A-12 |
+| Severity | Count | IDs | Status |
+|---|---|---|---|
+| P1 | 1 | DS-A-07 | FIXED |
+| P2 | 2 | DS-A-05, DS-A-06 | FIXED |
+| P3 | 3 | DS-A-03, DS-A-08, DS-A-10 | FIXED / ACK (DS-A-08) |
+| P4 | 4 | DS-A-04, DS-A-09, DS-A-11, DS-A-12 | FIXED |
 
-**Total OPEN: 10** — 1 keputusan produk (DS-A-05 harga), 1 ACK kandidat (DS-A-08 MVP limit), sisanya fixable langsung.
+**Total: 9 FIXED, 1 ACK, 0 OPEN.**
+
+## Tahap 2 Fix Log
+
+| File | Perubahan |
+|---|---|
+| `src/components/design-simulator/DesignSimulator.tsx` | Dims derive dari `BISA_PRINT_A3` · PNG export clone+dims inject · radius bulat `- gap` (preview+PDF) · disclaimer harga indikatif · string-state inputs · `htmlFor`/`aria-pressed`/`aria-label` lengkap · tips upload disync |
+| `src/components/design-simulator/DesignCanvas.tsx` | `draggable`/`dragBoundFunc`/`onDragEnd` dihapus · `anchorSize` 8→14 · input numeric L×T keyboard-accessible |
+| `src/components/design-simulator/UploadZone.tsx` | Cap 10MB + `reader.onerror` |
+
+**Verifikasi Tahap 2:** `tsc` clean · `eslint` 0 problems · `vitest` **111/111** (paper-sizes math tidak berubah → tests tetap hijau).
