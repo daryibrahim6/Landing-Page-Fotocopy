@@ -115,7 +115,7 @@ Audit flow [NAMA_FLOW] (Tahap 1 Track A).
 Tujuan: cari gap functional, logic bug, missing edge case, incomplete flow — BUKAN fix.
 
 1. Baca `reports/audit/[NAMA_FLOW].md` kalau sudah ada.
-2. Trace flow end-to-end: user → UI → server action → DB → response/redirect/notifikasi.
+2. Trace flow end-to-end: user → UI → API route/client fetch → external service (Midtrans/Upstash/Blob) → response/redirect/notifikasi.
 3. Cek 5 Kelas Blind Spot Testing (lihat `.devin/rules/qa-qc-workflow-and-status-tracking.md`):
    - Stale Reference
    - Concurrent/Race Condition
@@ -128,12 +128,12 @@ Tujuan: cari gap functional, logic bug, missing edge case, incomplete flow — B
 7. **Future gap check** — untuk tiap bagian flow, tanyakan:
    - **Scale**: apa yang rusak kalau user/data 10x lipat?
    - **Concurrency**: apa yang rusak kalau 2 user/2 proses jalan bareng?
-   - **Infra/Failure**: apa yang rusak kalau DB timeout, pod crash, network drop, atau migration fail?
+   - **Infra/Failure**: apa yang rusak kalau Upstash down, Vercel Blob gagal, Midtrans timeout, webhook gagal callback, atau network drop?
    - **Security**: ada boundary/input finansial yang belum strict?
    - **A11y/Mobile**: keyboard, screen reader, touch target, responsive?
    - **Cross-flow**: efek ke flow lain (stale data, state propagation)?
    - **Monitoring**: kalau error di production, bisa ditangkep Sentry/log?
-8. **Riset eksternal WAJIB** — jangan cuma lihat ke dalam codebase. Untuk tiap area utama flow (auth, transaksi DB, real-time, upload, notifikasi, dst), lakukan web research: OWASP/ASVS, docs resmi framework/ORM yang dipakai, WCAG 2.2/NNg untuk UI. Bandingkan "current approach vs industry best practice" dan tulis di audit file sebagai tabel `Riset Eksternal`. Detail: `.devin/rules/qa-qc-workflow-and-status-tracking.md` → "Wajib: Riset Eksternal".
+8. **Riset eksternal WAJIB** — jangan cuma lihat ke dalam codebase. Untuk tiap area utama flow (payment/Midtrans, webhook security, upload file, notifikasi WA, UI/UX), lakukan web research: OWASP/ASVS, docs resmi framework/library yang dipakai (Next.js, Midtrans), WCAG 2.2/NNg untuk UI. Bandingkan "current approach vs industry best practice" dan tulis di audit file sebagai tabel `Riset Eksternal`. Detail: `.devin/rules/qa-qc-workflow-and-status-tracking.md` → "Wajib: Riset Eksternal".
 
 Format temuan:
 - ID: [FLOW]-A-NN

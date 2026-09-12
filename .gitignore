@@ -71,3 +71,6 @@ build.log
 /public/next.svg
 /public/vercel.svg
 /public/window.svg
+
+# QA screenshot evidence (binary artifacts, large)
+/reports/screenshots/

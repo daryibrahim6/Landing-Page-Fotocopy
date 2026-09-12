@@ -66,7 +66,7 @@ reports/
 2. Selector kelewat umum.
 3. Negative assertion sebagai bukti positif.
 4. Assertion parsial.
-5. Side effect nggak diverifikasi (DB, email, notif).
+5. Side effect nggak diverifikasi (order storage, notif WA, file upload).
 6. Fixed sleep/timeout.
 7. Assertion DOM untuk klaim visual/layout.
 
@@ -137,7 +137,7 @@ Simpan di `reports/screenshots/[flow]/` dan referensikan di audit.
 ## E2E Cepat
 
 - Default **headless**: `--project=chromium --workers=1`.
-- `workers=1` karena E2E money wipe DB dan serial.
+- `workers=1` hanya untuk skenario serial/shared-state (order yang sama lintas test); default parallel dari config.
 - `--headed` hanya untuk debug UI/layout/selector.
 - Verifikasi target pakai `--grep`.
 - Maksimal 2 re-run full per batch.

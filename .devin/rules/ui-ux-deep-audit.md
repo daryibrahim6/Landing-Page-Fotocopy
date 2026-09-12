@@ -8,6 +8,8 @@
 
 Untuk setiap halaman/komponen di flow, cek tiap pattern yang relevan. Kalau pattern tidak ada di halaman itu, catat "N/A" — jangan diam-diam skip.
 
+> **Konteks BisaPrint:** tidak ada auth/session dan realtime — baris "Auth & Session" dan "Realtime" default `N/A` sampai `production-dashboard-flow` dibangun (yang akan butuh auth admin). Baris lain tetap relevan (Forms di checkout/konsultasi, Lists di katalog, Media & Files di upload/simulator, Errors, dst).
+
 | Pattern | Yang dicek |
 |---|---|
 | **Forms** | validasi inline vs on-submit; pesan error per field bukan toast generik; data preservation saat submit gagal; disabled-submit dengan helper text; konfirmasi sebelum destructive action; autosave/dirty warning |
