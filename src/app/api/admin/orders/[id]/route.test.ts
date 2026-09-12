@@ -59,6 +59,18 @@ describe("PATCH /api/admin/orders/[id]", () => {
     expect(res.status).toBe(400);
   });
 
+  it("400 on malformed JSON body", async () => {
+    const res = await PATCH(
+      new Request("http://localhost/api/admin/orders/BSP-API-2", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", authorization: AUTH },
+        body: "{not json",
+      }),
+      { params: Promise.resolve({ id: "BSP-API-2" }) },
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("404 for unknown order ids", async () => {
     const res = await patch("BSP-NOPE", { productionStatus: "diproses" });
     expect(res.status).toBe(404);

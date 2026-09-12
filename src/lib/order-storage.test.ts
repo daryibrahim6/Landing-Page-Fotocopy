@@ -118,6 +118,20 @@ describe("listOrders — newest-first pagination", () => {
     const zero = await listOrders(0, 0);
     expect(zero.orders.length).toBeLessThanOrEqual(1);
   });
+
+  it("clamps a negative cursor to 0 (no crash, first page)", async () => {
+    const o = makeOrder("BSP-L4-NEG");
+    o.createdAt = "2099-12-31T00:00:00.000Z"; // newest in the shared store
+    await saveOrder(o);
+    const res = await listOrders(5, -10);
+    expect(res.orders[0]?.id).toBe("BSP-L4-NEG");
+  });
+
+  it("exhausts: nextCursor is null past the end", async () => {
+    const res = await listOrders(1, 1_000_000);
+    expect(res.orders).toHaveLength(0);
+    expect(res.nextCursor).toBeNull();
+  });
 });
 
 describe("updateProductionStatus", () => {
@@ -130,6 +144,12 @@ describe("updateProductionStatus", () => {
     expect(updated?.payment.status).toBe("paid"); // state machine untouched
     const persisted = await getOrder("BSP-P1-AAA");
     expect(persisted?.production?.status).toBe("diproses");
+  });
+
+  it("stamps production.updatedAt on every write", async () => {
+    await saveOrder(makeOrder("BSP-P2-BBB"));
+    const updated = await updateProductionStatus("BSP-P2-BBB", "baru");
+    expect(updated?.production?.updatedAt).toBeTruthy();
   });
 
   it("returns null for unknown order ids", async () => {

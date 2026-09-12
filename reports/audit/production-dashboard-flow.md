@@ -1,7 +1,7 @@
 # Audit — production-dashboard-flow
 
 **Tier:** Supporting | **Prefix ID:** `PD`
-**Status:** Track A Tahap 0+1+2 selesai — **dashboard sudah dibangun** (Basic Auth MVP). Tahap 3 (Unit Test + Track Gate) menyusul.
+**Status:** Track A Tahap 0–3 selesai — **dashboard built + tested**. Track Gate: lihat bawah.
 
 **Implementasi (Tahap 2):** `/admin` → `/admin/orders` (server component + `OrderTable` client untuk status/paginasi). API: `GET /api/admin/orders` (paginated), `PATCH /api/admin/orders/[id]` (production status). Auth: Basic Auth via `src/lib/admin-auth.ts` — dicek di `src/proxy.ts` (Next 16: middleware→proxy) **dan** ulang di tiap route handler (defense in depth). Fail-closed: `ADMIN_USERNAME`/`ADMIN_PASSWORD` kosong → 401.
 
@@ -158,6 +158,25 @@
 **Files:** `src/lib/admin-auth.ts`, `src/proxy.ts`, `src/lib/order-storage.ts` (+index/list/production), `src/lib/schemas.ts`, `src/app/api/admin/orders/route.ts`, `src/app/api/admin/orders/[id]/route.ts`, `src/app/admin/page.tsx`, `src/app/admin/orders/page.tsx`, `src/components/admin/OrderTable.tsx`, `.env.local.example`. Tests: `admin-auth.test.ts` (9), `order-storage.test.ts` (+6), `api/admin/orders` route tests (7).
 
 **Verified:** `tsc` clean · `eslint` 0 · vitest 139/139 · `next build` hijau (`ƒ Proxy` registered, `/admin/orders` dynamic) · live curl: `/` 200, `/admin` 401 + `WWW-Authenticate`, `/admin/orders` 401, `/api/admin/orders` 401.
+
+## Unit Test Coverage (Tahap 3)
+
+- `isAdminRequest` / `adminUnauthorized` → `src/lib/admin-auth.test.ts` (9) — valid creds, wrong user/pass, missing/non-Basic/malformed header, no-colon, **env unset → fail-closed**, 401 + `WWW-Authenticate`.
+- `listOrders` → `order-storage.test.ts` (5) — newest-first ordering, cursor pagination no-overlap, limit clamp [1,100], **negative cursor clamp**, exhaustion → `nextCursor: null`.
+- `updateProductionStatus` → `order-storage.test.ts` (3) — set status + persist, **`payment.status` untouched**, `production.updatedAt` stamped, unknown id → null.
+- `GET /api/admin/orders` → `route.test.ts` (3) — 401 tanpa kredensial (defense in depth), 200 + payload shape, 400 invalid query.
+- `PATCH /api/admin/orders/[id]` → `[id]/route.test.ts` (5) — 401, 400 invalid enum, **400 malformed JSON**, 404 unknown, 200 update + payment untouched.
+- `proxy.ts` matcher → non-unit (Edge runtime); live-verified: `/`, `/admin`, `/admin/orders`, `/api/admin/orders` → 401/200 sesuai.
+- `OrderTable` → komponen → Track B (jsdom) opsional.
+
+## Track Gate (Tahap 3)
+
+| Pertanyaan | Keputusan |
+|---|---|
+| User-facing → E2E? | **Nanti** — internal admin surface; Basic Auth journey layak 1 spec saat suite E2E diaktifkan |
+| Test shallow/weak? | **Tidak** — fail-closed, state-machine isolation, pagination edge semua verify behavior |
+| Temuan UI/UX sisa? | Tidak — Track C opsional kalau mau polish |
+| Dampak ke flow lain? | Ya — `order-storage.ts` shared dengan checkout-flow; `saveOrder` kini juga `zadd` index → **cross-flow verified: webhook + create-token tests tetap hijau (143/143)** |
 
 ## Rekap
 
