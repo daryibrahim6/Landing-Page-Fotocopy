@@ -109,6 +109,8 @@ Peka bukan cuma di awal (sebelum eksekusi), tapi sepanjang proses. Pas lagi nger
    - Kasih rekomendasi lengkap + alasan teknis + referensi.
    - Lanjut kalau user acc.
 
+**Level flow (temuan yang masuk audit/sweep):** ikuti `.devin/rules/qa-qc-workflow-and-status-tracking.md` section "Temuan Cross-Flow: Fix In Place" — default fix di tempat + propagasi ke audit flow pemilik.
+
 ### Aturan real-time
 - Begitu ketemu kejanggalan, **langsung flag saat itu juga**. Jangan ditumpuk terus dilaporin sekaligus di akhir kayak checklist basa-basi.
 - Real-time aja. Kalau kecil → fix + lapor. Kalau besar → STOP + lapor.

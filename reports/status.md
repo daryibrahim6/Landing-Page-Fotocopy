@@ -40,5 +40,5 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 1. **Payment flow Wave 1** — order storage, WA admin notif, file upload, pricing matrix, form validation, Snap.js load.
 2. **UI/UX Hybrid cleanup** — font display tweak, logo fallback, remove decorative assets, product images.
 3. **Enable checkout** untuk lebih banyak produk.
-4. **E2E Playwright** — infra siap, spec per-flow ditulis di sesi E2E tersendiri.
+4. **E2E Playwright** — infra ter-setup (`@playwright/test`, `playwright.config.ts`, `e2e/smoke.spec.ts`, chromium terinstall). Spec per-flow ditulis di sesi E2E tersendiri — **belum pernah di-run**.
 5. **Production dashboard** — backlog v2.

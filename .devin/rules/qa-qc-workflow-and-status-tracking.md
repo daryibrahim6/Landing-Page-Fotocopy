@@ -9,6 +9,31 @@ Rules ini berlaku always-on untuk semua task yang berhubungan dengan business ga
 
 **JANGAN PERNAH mencampur kedua mode ini dalam satu batch kerja.** Audit gap analysis dan test execution adalah dua task terpisah dengan tujuan berbeda — mencampurnya menyebabkan hasil dangkal di keduanya.
 
+## Urutan Track Kanonik (wajib)
+
+```
+Tahap 0 (Scope) → Track A (Audit → Fix → Vitest) → Track C (UI/UX) → E2E → Final
+```
+
+- **Track C sebelum E2E** (bukan sesudah): fix Track A + temuan UI/UX sama-sama bisa mengubah UI/teks/selector. E2E di akhir = gate regresi terhadap UI yang sudah stabil, meminimalkan rewrite test.
+- Flow yang sudah punya E2E tetap jalankan existing suite sebagai **smoke check** antar tahap — murah, tangkap regresi dini. Final E2E verification tetap di akhir.
+- Registry flow + vocabulary status + auto-sync laporan: `.devin/rules/flow-registry-and-status.md`.
+
+## Wajib: Riset Eksternal di Setiap Audit (Tahap 1)
+
+Audit TIDAK boleh hanya melihat ke dalam codebase. Untuk tiap area utama yang diaudit, WAJIB ada bagian **"Riset Eksternal / Best-Practice Comparison"** di `reports/audit/[flow].md` yang menjawab:
+
+1. **Best practice industri untuk masalah ini apa?** — pakai `web_search`/dok resmi: OWASP Top 10/ASVS untuk input validation/webhook security; Next.js/React docs untuk data-fetching/rendering/route handlers; Midtrans docs untuk payment/signature; Upstash docs untuk Redis usage; WCAG 2.2 + Nielsen heuristics untuk UI; Baymard untuk checkout UX.
+2. **Apakah ada pendekatan yang lebih baik dari yang dipakai sekarang?** — bandingkan "current approach vs recommended approach" dan jawab eksplisit: *tetap seperti ini karena X* atau *rekomendasi migrasi ke Y dengan trade-off Z*.
+3. **Advisory, bukan blocker** — temuan dari riset masuk sebagai tag `research` / severity P3+ kecuali ada bug nyata. Tujuannya: audit menghasilkan insight "apakah sistem kita selevel standar industri", bukan cuma "apakah ada bug".
+
+Format di audit file (per area yang relevan):
+```
+| Area | Current approach | Best practice (sumber) | Gap? | Rekomendasi |
+```
+
+**Jangan klaim "sudah best practice" tanpa sumber.** Kalau riset menyimpulkan current approach memang benar, tulis sumbernya — bukan cuma kesimpulan.
+
 ## Struktur Folder Wajib
 
 Semua report harus disimpan dengan struktur berikut, TIDAK BOLEH digabung jadi satu file besar:
@@ -28,7 +53,6 @@ reports/
 ├── test-results/
 │   └── [nama-flow].md           ← satu file per flow, hasil eksekusi test
 ├── coverage/                    ← laporan pure-logic coverage per flow
-├── psychotest/                  ← dokumen khusus fitur psychotest
 ├── screenshots/                 ← evidence UI/UX manual (gitignored)
 │   └── [nama-flow]/
 │       └── {before|after|state}-{deskripsi}-{viewport}-{tanggal}.png
@@ -55,28 +79,28 @@ Aturan setiap segment:
 
 Contoh nama file yang BENAR:
 ```
-before-checkout-payment-methods-desktop-2026-07-31.png
-after-checkout-payment-methods-mobile-2026-08-03.png
-state-dashboard-empty-booking-list-tablet-2026-08-03.png
+before-payment-methods-desktop-2026-07-31.png
+after-hero-sticker-card-mobile-2026-08-03.png
+state-empty-portfolio-grid-tablet-2026-08-03.png
 ```
 
 Contoh nama file yang SALAH (dan harus direname):
 ```
-01-booking-url-404-desktop.png              ❌ pakai nomor, tidak ada phase, tidak ada tanggal
+01-checkout-url-404-desktop.png             ❌ pakai nomor, tidak ada phase, tidak ada tanggal
 uxw-01-home-logged-out-navbar-desktop.png   ❌ pakai prefix uxw-, tidak ada phase, tidak ada tanggal
-after-booking-cancel-dialog-2026-07-31.png  ❌ tidak ada viewport
-after-register-full-page-desktop-2026-07-31.png  ❌ sertakan "register" (redundan, folder sudah auth-flow)
+after-order-cancel-dialog-2026-07-31.png    ❌ tidak ada viewport
+after-checkout-full-page-desktop-2026-07-31.png  ❌ sertakan "checkout" (redundan, folder sudah checkout-flow)
 ```
 
 **Aturan tambahan:**
-- JANGAN sertakan nama flow di filename — folder sudah menunjukkan flow-nya. `before-checkout-...` di folder `booking-lifecycle/` sudah jelas ini booking flow.
+- JANGAN sertakan nama flow di filename — folder sudah menunjukkan flow-nya. `before-payment-methods-...` di folder `checkout-flow/` sudah jelas ini checkout flow.
 - Kalau satu temuan punya multiple screenshot (before + after di 3 viewport), semua WAJIB pakai deskripsi yang SAMA, cuma beda phase dan viewport. Contoh: `before-notif-dropdown-desktop-2026-07-31.png` + `after-notif-dropdown-mobile-2026-08-03.png`.
 - File duplikat (deskripsi + viewport + tanggal sama tapi di-rename atau di-take ulang) WAJIB dihapus. Hanya simpan 1 versi.
 - Kalau menemukan screenshot lama yang tidak mengikuti konvensi saat mulai audit flow, WAJIB rename ke format kanonik SEBELUM ambil screenshot baru. Lihat "Screenshot Cleanup" di `reports/workflow/execution-guide-track-c.md` (Track C).
 
 **Kenapa ini wajib (bukan opsional):** temuan UI (Kategori A bug objektif maupun Kategori B advisory) itu klaimnya soal TAMPILAN — deskripsi teks doang ("dropdown kepotong di kanan") itu tidak bisa di-cross-check user tanpa bukti visual asli. Screenshot yang tersimpan permanen itu setara dengan "bukti dari code" yang sudah diwajibkan untuk temuan lain — versi visualnya.
 
-Penamaan `[nama-flow]` harus konsisten di ketiga folder untuk flow yang sama (misal: `booking-flow.md`, `payment-flow.md`, `auth-flow.md`).
+Penamaan `[nama-flow]` harus konsisten di ketiga folder untuk flow yang sama (misal: `checkout-flow.md`, `landing-page-flow.md`, `design-simulator-flow.md`).
 
 ## reports/status.md — Single Source of Truth
 
@@ -86,7 +110,7 @@ Penamaan `[nama-flow]` harus konsisten di ketiga folder untuk flow yang sama (mi
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | [nama flow] | Core / Supporting / Distributed | Done / Belum | Done / In Progress / Belum | Done / In Progress / Belum | Done / In Progress / Belum | Done / Pending / Belum / N/A | Done / Pending / Belum / N/A | Done / Pending / Belum / N/A | AMAN / CLEAR / IN PROGRESS / ADA ISU / BELUM | YYYY-MM-DD | link ke audit |
 
-- **Tier**: Core (11 flow utama), Supporting (6 flow pelengkap), Distributed (6 flow yang logikanya didistribusikan ke flow lain).
+- **Tier**: Core (flow utama: checkout, payment webhook, order storage), Supporting (flow pelengkap: landing page, WhatsApp CTA, design simulator), Distributed (flow yang logikanya didistribusikan ke flow lain — kalau ada).
 - **Scope**: Tahap 0 — apakah boundary flow sudah dibekukan.
 - **Audit / Fix / Vitest**: Track A.
 - **E2E**: integration testing — terpisah dari Track A.
@@ -109,7 +133,7 @@ Penamaan `[nama-flow]` harus konsisten di ketiga folder untuk flow yang sama (mi
 
 Ditemukan dari audit metodologi testing (28 Jul 2026): metodologi testing kita punya 5 asumsi struktural yang bikin kelas bug tertentu SELALU lolos meskipun semua test PASS. Setiap audit (Tahap 1) WAJIB eksplisit cross-check flow yang sedang diaudit terhadap 5 kelas ini, bukan cuma dari sudut pandang flow itu sendiri:
 
-1. **Stale Reference** — apakah ada kode yang asumsikan suatu entity (user, booking, consultant) masih ada/valid, padahal bisa saja sudah dihapus/diubah statusnya di tempat lain? (Test biasanya selalu pakai data fresh yang baru dibuat, jadi referensi yang jadi stale tidak pernah ketest.)
+1. **Stale Reference** — apakah ada kode yang asumsikan suatu entity (order, produk, file upload) masih ada/valid, padahal bisa saja sudah dihapus/diubah statusnya di tempat lain? (Test biasanya selalu pakai data fresh yang baru dibuat, jadi referensi yang jadi stale tidak pernah ketest.)
 2. **Concurrent/Race Condition** — apakah ada state transition yang bisa dipicu dua aksi bersamaan (dua user klik di waktu sama, webhook + cron jalan bersamaan), dan apakah ada guard/locking yang mencegah itu jadi rusak? (Test biasanya jalan sequential satu-satu, race condition tidak pernah ketest.)
 3. **Time-Based State Transition** — apakah ada logic yang bergantung ke jeda waktu (expiry, timeout, idle session), dan apakah ada test yang benar-benar mensimulasikan waktu berlalu (bukan instant)?
 4. **Partial Failure di Multi-Step Process** — kalau suatu proses multi-langkah (transaction, side effect seperti notifikasi/email) gagal DI TENGAH, apakah ada test yang verifikasi konsekuensinya? (Test biasanya cuma verify hasil akhir yang sukses, bukan kegagalan di tengah.)
@@ -132,7 +156,7 @@ Untuk tiap kelas di atas yang relevan dengan flow yang sedang diaudit, WAJIB dic
 1. **Existence-only assertion** — `toBeVisible()`, `toBeInTheDocument()`, `toBeTruthy()` dipakai SENDIRIAN tanpa verifikasi isi/state/nilai spesifik. Elemen "ada" tidak sama dengan elemen "benar".
 2. **Selector kelewat umum/longgar** — assertion secara teknis "lolos" karena selector match elemen yang salah/banyak elemen sekaligus, bukan elemen spesifik yang dimaksud skenario. Selalu pakai selector paling spesifik yang tersedia (`data-testid`, role + name spesifik), bukan tag generic (`div`, `span`).
 3. **Negative assertion menyamar jadi bukti positif** — "tidak ada error muncul" atau "tidak crash" BUKAN bukti "hasil yang benar terjadi". Assertion harus verifikasi POSITIF apa yang SEHARUSNYA terjadi, bukan cuma ketiadaan hal buruk.
-4. **Assertion parsial/tidak lengkap** — skenario menjanjikan sesuatu (misal "redirect ke halaman konfirmasi dengan detail booking yang benar"), tapi assertion cuma cek SATU bagian (URL berubah) tanpa cek bagian lain yang dijanjikan (isi halaman, data yang ditampilkan). Assertion harus membuktikan SELURUH klaim skenario, bukan sebagian.
+4. **Assertion parsial/tidak lengkap** — skenario menjanjikan sesuatu (misal "redirect ke halaman sukses dengan ringkasan order yang benar"), tapi assertion cuma cek SATU bagian (URL berubah) tanpa cek bagian lain yang dijanjikan (isi halaman, data yang ditampilkan). Assertion harus membuktikan SELURUH klaim skenario, bukan sebagian.
 5. **Side effect tidak diverifikasi** — kalau skenario melibatkan efek di luar UI (data tersimpan di DB, notifikasi terkirim, email terkirim, cache ter-invalidate), assertion WAJIB verifikasi itu juga (query DB langsung, cek mock notification service dipanggil, dll) — bukan cuma percaya dari respons UI yang terlihat sukses.
 6. **Fixed sleep/timeout menutupi masalah asli** — `waitForTimeout(3000)` dipakai untuk "nunggu" tanpa alasan jelas itu tanda ada race condition/timing issue yang disembunyikan, bukan diselesaikan. Pakai wait yang presisi (`waitFor` dengan kondisi spesifik), bukan sleep buta.
 7. **Assertion visual yang sebenarnya tidak visual** — assertion terhadap DOM/teks/URL TIDAK BISA membuktikan tampilan visual benar (layout, CSS, responsive) — DOM bisa struktural benar tapi tampilannya rusak. Untuk skenario yang klaimnya soal tampilan/layout, WAJIB pakai `toHaveScreenshot()` atau verifikasi visual manual (lihat Kelas Blind Spot ke-6 di atas) — assertion DOM tidak cukup untuk klaim ini.
@@ -180,16 +204,16 @@ Ini masalah yang secara fungsional nyata rusak/tidak bisa dipakai, bukan opini �
 
 Ini soal selera/pendekatan desain yang bisa didebat — contoh: layout konten di-center dengan max-width sempit vs fit lebar penuh, spacing, pemilihan warna, hierarki visual. **JANGAN PERNAH campur dengan Kategori A** — test/status AMAN tidak boleh terganggu hanya karena preferensi desain, karena itu bukan sesuatu yang "pasti salah".
 
-**PENTING — cek dulu scope `design-taste.md` sebelum dipakai:** file itu (kalau isinya sesuai skill "anti-slop frontend" yang umum) secara eksplisit ditujukan untuk **landing page, portfolio, dan redesign marketing** — BUKAN untuk dashboard, data table, atau multi-step product UI. KonsulExpert sebagian besar adalah dashboard (admin/consultant/client) dan booking flow multi-step — itu di LUAR scope `design-taste.md`. Cek baris deskripsi/scope di awal file itu dulu, JANGAN asumsikan otomatis applicable ke semua halaman.
+**PENTING — cek dulu scope `design-taste.md` sebelum dipakai:** file itu (kalau isinya sesuai skill "anti-slop frontend" yang umum) secara eksplisit ditujukan untuk **landing page, portfolio, dan redesign marketing** — BUKAN untuk dashboard, data table, atau multi-step product UI. BisaPrint sebagian besar ADALAH landing page marketing + checkout flow — jadi `design-taste.md` applicable untuk hampir semua surface. Cek baris deskripsi/scope di awal file itu dulu, JANGAN asumsikan otomatis applicable ke semua halaman.
 
-- **Kalau halaman yang diaudit itu marketing/landing-page-style** (homepage publik, halaman "cara kerja", halaman promosi) — `design-taste.md` applicable, WAJIB dibaca dan diikuti (termasuk dial `DESIGN_VARIANCE`/`MOTION_INTENSITY`/`VISUAL_DENSITY` kalau file itu punya konsep itu).
-- **Kalau halaman yang diaudit itu dashboard/admin panel/booking flow multi-step** (di luar scope file itu) — JANGAN paksa pakai `design-taste.md`. Pakai kerangka usability umum di bawah ini (CRAP, Fitts's Law, Hick's Law, Consistency, Visibility of System Status) sebagai acuan utama, karena project ini belum punya rules desain khusus untuk tipe UI ini.
+- **Kalau halaman yang diaudit itu marketing/landing-page-style** (homepage publik, section produk, promo) — `design-taste.md` applicable, WAJIB dibaca dan diikuti (termasuk dial `DESIGN_VARIANCE`/`MOTION_INTENSITY`/`VISUAL_DENSITY` kalau file itu punya konsep itu).
+- **Kalau halaman yang diaudit itu checkout multi-step / design simulator** (functional UI, bukan marketing) — `design-taste.md` tetap relevan untuk style token, tapi pakai juga kerangka usability umum di bawah ini (CRAP, Fitts's Law, Hick's Law, Consistency, Visibility of System Status) sebagai acuan.
 
 **Di luar apa yang ada di `design-taste.md`, evaluasi Kategori B juga WAJIB merujuk ke kerangka usability yang sudah mapan (bukan opini bebas)** — supaya observasinya presisi dan bisa dipertanggungjawabkan, bukan sekadar "kelihatannya kurang bagus". Yang applicable untuk review UI yang SUDAH JADI (bukan proses desain dari nol seperti riset/wireframing — itu di luar scope QA/QC, harus dilakukan di fase desain terpisah sebelum coding):
 
-- **Visual hierarchy** — apakah elemen paling penting (CTA utama seperti "Bayar"/"Book Now") paling menonjol secara visual (ukuran, warna, posisi), atau tenggelam sama elemen lain yang kurang penting?
+- **Visual hierarchy** — apakah elemen paling penting (CTA utama seperti "Checkout"/"Pesan via WhatsApp") paling menonjol secara visual (ukuran, warna, posisi), atau tenggelam sama elemen lain yang kurang penting?
 - **CRAP principles** — Contrast (elemen beda fungsi harus beda tampilan jelas), Repetition (pola visual konsisten di seluruh app), Alignment (elemen sejajar rapi, tidak berantakan), Proximity (elemen yang berhubungan dikelompokkan dekat, yang tidak berhubungan dipisah jelas).
-- **Fitts's Law** — target yang sering diklik (tombol aksi utama) harus cukup besar dan posisinya masuk akal (tidak terlalu kecil/jauh dari alur natural user), khususnya untuk aksi finansial (bayar, konfirmasi booking).
+- **Fitts's Law** — target yang sering diklik (tombol aksi utama) harus cukup besar dan posisinya masuk akal (tidak terlalu kecil/jauh dari alur natural user), khususnya untuk aksi finansial (bayar, submit checkout).
 - **Hick's Law** — terlalu banyak pilihan/opsi sekaligus (dropdown panjang tanpa grouping, form dengan banyak field tanpa step) meningkatkan waktu keputusan dan potensi error user.
 - **Consistency (Jakob's Law)** — komponen SEJENIS harus berperilaku dan terlihat SAMA di seluruh aplikasi. Kalau ditemukan komponen sejenis (misal beberapa jenis dropdown/modal) dibangun dengan cara berbeda-beda (bukan dari satu wrapper/primitive yang sama), itu sendiri temuan yang WAJIB dicatat — ini juga sumber kenapa bug Kategori A (seperti dropdown yang tidak auto-flip) bisa muncul berulang di tempat berbeda dengan pola yang mirip.
 - **Visibility of system status** — apakah user selalu dapat feedback jelas untuk aksi yang dilakukan (loading state, sukses, gagal)? (Ini beririsan dengan TMB-04 Partial Failure yang sudah dibahas di 5 Kelas Blind Spot Testing — kalau notifikasi gagal terkirim diam-diam, itu juga pelanggaran prinsip ini dari sisi UX.)
@@ -199,32 +223,32 @@ Ini soal selera/pendekatan desain yang bisa didebat — contoh: layout konten di
 
 Selain prinsip di atas, ada dimensi evaluasi lain yang sering kelewat kalau cuma fokus ke CRAP dan alur tugas — checklist ini WAJIB dicek juga, terutama saat UX Walkthrough atau screenshot verification (Kelas Blind Spot ke-6):
 
-- **Kelengkapan struktural dibanding halaman sejenis** — apakah halaman ini kehilangan komponen yang SEHARUSNYA ada, dibandingkan halaman lain yang sejenis/setara (contoh: halaman dashboard lain punya sidebar, halaman ini tidak — apakah itu disengaja atau kelewat)? Ini beda dari inkonsistensi visual biasa — ini soal ADA/TIDAK ADA komponen struktural, bukan soal gaya komponen yang ada.
+- **Kelengkapan struktural dibanding halaman sejenis** — apakah halaman ini kehilangan komponen yang SEHARUSNYA ada, dibandingkan halaman lain yang sejenis/setara (contoh: section produk lain punya CTA card, section ini tidak — apakah itu disengaja atau kelewat)? Ini beda dari inkonsistensi visual biasa — ini soal ADA/TIDAK ADA komponen struktural, bukan soal gaya komponen yang ada.
 - **Proporsi/skala relatif ke ruang tersedia** — apakah elemen (bukan cuma tombol, tapi juga card/konten/gambar) terasa terlalu kecil dibanding ruang kosong di sekitarnya, atau sebaliknya terlalu besar sampai terasa sesak? Ini beda dari Fitts's Law (yang spesifik ke target klik) — ini soal proporsi visual elemen apapun terhadap ruang yang ada.
 
-**Peningkatan struktural proaktif untuk area interaksi UTAMA (beda dari sekadar nyari deficiency):** untuk area yang jadi INTI dari tugas yang sedang di-walkthrough (contoh: jendela chat di flow sesi konsultasi, form booking di flow booking) — WAJIB mikir proaktif seperti UX designer senior dengan dua pertanyaan wajib:
+**Peningkatan struktural proaktif untuk area interaksi UTAMA (beda dari sekadar nyari deficiency):** untuk area yang jadi INTI dari tugas yang sedang di-walkthrough (contoh: canvas di design simulator, form di checkout flow) — WAJIB mikir proaktif seperti UX designer senior dengan dua pertanyaan wajib:
 
-1. **"Apakah alokasi ruang/layout ini benar-benar OPTIMAL untuk tugas ini, atau cuma 'tidak rusak'?"** — Jangan cuma tunggu sampai sesuatu terasa jelas salah. Usulkan peningkatan struktural kalau ada potensi (contoh: area kerja utama diperluas, elemen periferal dibuat collapsible/minimizable, 2-column layout dengan sticky summary di flow booking/checkout).
+1. **"Apakah alokasi ruang/layout ini benar-benar OPTIMAL untuk tugas ini, atau cuma 'tidak rusak'?"** — Jangan cuma tunggu sampai sesuatu terasa jelas salah. Usulkan peningkatan struktural kalau ada potensi (contoh: area kerja utama diperluas, elemen periferal dibuat collapsible/minimizable, 2-column layout dengan sticky summary di flow checkout).
 2. **"Kalau saya mendesain ini dari awal sebagai UX designer senior, apa versi TERBAIKnya — bukan cuma versi yang tidak rusak?"** — Untuk SETIAP temuan, jangan cuma pikirkan "cara memperbaiki yang janggal". Pikirkan: kalau ini desain dari nol, bagaimana solusi optimalnya? Contoh: bukan cuma "tambah stepper", tapi spesifikkan — horizontal di desktop dengan labeled steps, compact "Step 2 of 4" di mobile, completed/current/future states yang jelas. Bukan cuma "tambah empty state", tapi 3 elemen: context (kenapa kosong) + direction (apa yang harus dilakukan) + CTA button.
 
 Usulan ini masuk sebagai temuan dengan opsi solusi + trade-off (sama seperti temuan lain), BUKAN otomatis diimplementasi — kecuali memenuhi kriteria "boleh GAS langsung" yang sudah ada.
 - **Whitespace/jarak antar elemen** — terlalu sesak (elemen saling berhimpitan) atau terlalu longgar (jarak berlebihan yang bikin elemen terkait terasa terpisah)?
 - **Responsive di berbagai breakpoint** — screenshot verification (Kelas Blind Spot ke-6) WAJIB dicek di MINIMAL 3 ukuran viewport (mobile ~375px, tablet ~768px, desktop ~1440px), bukan cuma satu ukuran default. Layout yang benar di desktop bisa rusak total di mobile atau sebaliknya.
 - **Typography readability** — paragraf yang terlalu lebar (baris teks kepanjangan bikin susah dibaca), ukuran/berat font yang tidak konsisten antar elemen yang seharusnya sejenis (misal semua judul card ukurannya beda-beda tanpa alasan).
-- **Empty state (WAJIB 3 elemen)** — bagaimana tampilan halaman saat belum ada data (list booking kosong, belum ada review, dll)? Sering terlewat sehingga terlihat seperti "rusak" padahal cuma belum ada data. Empty state yang baik WAJIB punya 3 elemen: (1) **Context** — kenapa area ini kosong ("Belum ada booking"), (2) **Direction** — apa yang harus user lakukan selanjutnya ("Booking konsultasi pertama Anda"), (3) **CTA** — tombol/link yang actionable untuk mulai mengisi area itu. Referensi: Nielsen Norman Group dashboard research — users spend <3 seconds deciding whether to keep looking at a screen; blank white space dengan no explanation membuat user assume something is broken.
+- **Empty state (WAJIB 3 elemen)** — bagaimana tampilan halaman saat belum ada data (grid portfolio kosong, simulator tanpa item, hasil pencarian kosong, dll)? Sering terlewat sehingga terlihat seperti "rusak" padahal cuma belum ada data. Empty state yang baik WAJIB punya 3 elemen: (1) **Context** — kenapa area ini kosong ("Belum ada desain di canvas"), (2) **Direction** — apa yang harus user lakukan selanjutnya ("Upload desain pertama Anda"), (3) **CTA** — tombol/link yang actionable untuk mulai mengisi area itu. Referensi: Nielsen Norman Group dashboard research — users spend <3 seconds deciding whether to keep looking at a screen; blank white space dengan no explanation membuat user assume something is broken.
 - **Loading state** — bukan cuma "apakah ada indikasi loading" (itu prinsip Visibility of System Status di atas), tapi apakah tampilan loading-nya sendiri rapi (skeleton/spinner yang konsisten) atau blank/berkedip aneh. **Skeleton screen lebih baik dari spinner** untuk data yang populate structural component (table, card, metric panel) — skeleton maintain spatial continuity dan reduce perceived wait time. Spinner boleh untuk inline action (submit button loading state).
 - **Interactive states (hover/focus/disabled)** — apakah tombol/input punya styling yang jelas untuk state selain default (hover, focus saat navigasi keyboard, disabled saat tidak bisa diklik)? Sering cuma state default yang didesain, sisanya default browser mentah yang terlihat tidak konsisten dengan desain sistem. **Disabled button WAJIB punya helper text** yang menjelaskan kenapa disabled ("Pilih paket untuk melanjutkan"), bukan cuma grayed out tanpa konteks.
 - **Native browser dialog (`confirm()`/`alert()`/`prompt()`) dipakai untuk konfirmasi penting** — ini masuk Kategori A (bug objektif, bukan preferensi), karena dialog native TIDAK bisa di-styling, tampilannya beda-beda antar browser/OS, dan blocking (freeze halaman). Kalau ditemukan, catat sebagai temuan yang perlu diganti custom modal/toast yang konsisten dengan desain sistem. **Kalau ada E2E test untuk aksi yang mentrigger dialog native ini, WAJIB cek apakah test-nya menangani dengan benar lewat `page.on('dialog')`** — kalau tidak ditangani dengan benar, dialog bisa "auto-accept/reject" diam-diam tanpa test benar-benar verifikasi isi/perilaku dialog itu, ini pola assertion lemah lagi (lihat Standar Kekuatan Assertion) dalam bentuk berbeda.
 - **Konten/copy standards** — konsistensi kapitalisasi (title case vs sentence case, jangan campur tanpa aturan jelas), tanda baca yang terlihat seperti AI-generated (contoh: em dash `—` dipakai berlebihan) kalau itu bukan gaya penulisan yang diinginkan, terminologi yang konsisten (jangan sebut entity yang sama dengan istilah berbeda-beda di halaman berbeda). Ini beda dari visual styling — ini soal teks/copy itu sendiri.
-- **Kebenaran destinasi navigasi/link** — breadcrumb, menu, tombol "kembali", dan link lain WAJIB diverifikasi benar-benar mengarah ke halaman yang valid dan sesuai konteks (bukan cuma ada link-nya, tapi destinasinya benar). Contoh bug nyata: breadcrumb di halaman dashboard user mengarah ke `/dashboard` generic padahal seharusnya ke path spesifik role user itu (`/dashboard/[role]`). Klik dan verifikasi hasil akhirnya, jangan cuma cek link-nya "ada".
-- **Breadcrumb context di multi-step flow** — flow multi-step (booking, checkout, registrasi) WAJIB punya breadcrumb atau context indicator yang menunjukkan: user ada di flow mana, konsultan/kategori mana, dan bisa kembali ke step sebelumnya. Tanpa ini, user tidak tahu context-nya dan harus pakai browser back button (poor UX). Referensi: SaaSUI Navigation Patterns — "Once users drill into nested records, breadcrumb navigation shows them where they are and gives them a one-click path back up the hierarchy."
-- **Information Architecture (IA) navigation** — sidebar/menu WAJIB dicek: (1) apakah item di-group by user goal atau flat list tanpa grouping? Flat list 6+ item tanpa grouping = cognitive overload (Hick's Law). (2) apakah label sesuai user mental model, bukan internal org chart? (3) apakah active state cukup distinct (bukan cuma beda shade warna, tapi genuinely different visual treatment — background + border + icon fill)? Referensi: SaaS Navigation Design — "Navigation items should reflect how users think about the product, not how it's built internally. Group features by user goal." Active state: "not just a different shade of the same color, but a genuinely different visual treatment."
-- **Mobile navigation pattern** — JANGAN cuma cek "apakah ada mobile nav". Cek apakah pattern-nya appropriate: (1) `<details>`/`<summary>` HTML element BUKAN pattern SaaS standar — pakai Sheet/drawer (slide-over) atau bottom tab bar. (2) Touch target minimum 44px. (3) Hamburger icon jelas di top bar, bukan cuma text label. (4) Bottom tab bar cocok untuk ≤5 item nav (client sidebar). Referensi: Nextcraft SaaS Dashboard Patterns — "Move the sidebar to a bottom tab bar on small screens — thumbs can't reach a left sidebar easily."
-- **Trust signals di flow finansial** — checkout/payment page WAJIB menampilkan trust signals: security badge, "Pembayaran Aman", encryption icon. Tanpa ini, conversion drop karena user ragu keamanan transaksi. Khusus untuk platform yang menyentuh uang seperti KonsulExpert.
+- **Kebenaran destinasi navigasi/link** — breadcrumb, menu, tombol "kembali", dan link lain WAJIB diverifikasi benar-benar mengarah ke halaman yang valid dan sesuai konteks (bukan cuma ada link-nya, tapi destinasinya benar). Contoh bug nyata: tombol "Lihat Semua Produk" mengarah ke anchor `#produk` yang tidak ada di halaman itu, atau link footer ke section yang sudah dihapus. Klik dan verifikasi hasil akhirnya, jangan cuma cek link-nya "ada".
+- **Breadcrumb context di multi-step flow** — flow multi-step (checkout: pilih produk → isi data → bayar) WAJIB punya context indicator yang menunjukkan: user ada di step mana, produk apa yang sedang di-checkout, dan bisa kembali ke step sebelumnya. Tanpa ini, user tidak tahu context-nya dan harus pakai browser back button (poor UX). Referensi: SaaSUI Navigation Patterns — "Once users drill into nested records, breadcrumb navigation shows them where they are and gives them a one-click path back up the hierarchy."
+- **Information Architecture (IA) navigation** — navbar/menu WAJIB dicek: (1) apakah item di-group by user goal atau flat list tanpa grouping? Flat list 6+ item tanpa grouping = cognitive overload (Hick's Law). (2) apakah label sesuai user mental model ("Produk", "Harga", "Cara Order"), bukan istilah internal? (3) apakah active/hover state cukup distinct (bukan cuma beda shade warna, tapi genuinely different visual treatment)? Referensi: SaaS Navigation Design — "Navigation items should reflect how users think about the product, not how it's built internally. Group features by user goal." Active state: "not just a different shade of the same color, but a genuinely different visual treatment."
+- **Mobile navigation pattern** — JANGAN cuma cek "apakah ada mobile nav". Cek apakah pattern-nya appropriate: (1) `<details>`/`<summary>` HTML element BUKAN pattern standar — pakai Sheet/drawer (slide-over) atau menu overlay. (2) Touch target minimum 44px. (3) Hamburger icon jelas di top bar, bukan cuma text label.
+- **Trust signals di flow finansial** — checkout/payment page WAJIB menampilkan trust signals: security badge, "Pembayaran Aman", encryption icon. Tanpa ini, conversion drop karena user ragu keamanan transaksi. Khusus untuk platform yang menyentuh uang seperti BisaPrint (checkout Midtrans).
 - **Keyboard navigation** — verifikasi Tab, Enter, Escape berfungsi di form/flow utama. Focus indicator visible (bukan cuma rely pada color). Referensi: UX Patterns Guide Step Navigation — "Use aria-current on the current labeled step. Do not rely on color alone; combine shape, text, icon, or status copy with accessible contrast."
-- **Flow redundancy check (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)** — apakah user harus melakukan aksi yang sama di 2 tempat berbeda? Contoh: pilih paket di consultant profile page → ke booking page → harus pilih paket lagi. Ini bukan cuma "inefficient" — ini confusing karena user tidak tahu apakah pilihan pertamanya berpengaruh atau tidak. Cek: (1) apakah ada action yang dilakukan di page A lalu harus diulang di page B? (2) apakah ada query param atau state yang dikirim dari page A tapi tidak dikonsumsi di page B? (3) kalau ada redundansi, apakah ini intentional (user bisa ubah pilihan) atau bug (pilihan pertama hilang)? Referensi: NN/g Task Flow — "Users should not have to repeat information they already provided."
-- **Proactive availability display (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)** — untuk flow yang melibatkan pencarian slot/jadwal/tanggal: apakah sistem PROAKTIF menampilkan opsi yang tersedia, atau user harus menebak/trial-and-error? Contoh buruk: date picker kosong, user pilih tanggal → "tidak ada slot" → user harus pilih tanggal lain → repeat. Contoh baik: calendar dengan tanggal yang punya slot di-highlight, atau list "tanggal tersedia" dengan jumlah slot. Cek: (1) apakah user bisa melihat opsi tersedia SEBELUM input? (2) apakah ada feedback "slot tersedia mulai tanggal X" yang actionable? (3) apakah user harus trial-and-error untuk menemukan opsi valid? Referensi: Baymard Calendar UX — "Show available dates proactively, don't make users guess."
-- **Cross-role component consistency (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)** — komponen yang sejenis (star rating, booking card, status badge) WAJIB konsisten tidak hanya antar-page, tapi juga antar-role. Client review form dan consultant rating modal pakai star rating — apakah icon, warna, size, dan interaksi SAMA? Walkthrough dari 1 role saja TIDAK akan menangkap inkonsistensi cross-role. WAJIB walkthrough dari minimal 2 role yang berinteraksi di flow yang sama, lalu bandingkan komponen sejenis.
+- **Flow redundancy check** — apakah user harus melakukan aksi yang sama di 2 tempat berbeda? Contoh BisaPrint: pilih produk di katalog → masuk checkout → harus pilih produk lagi, atau isi ukuran di simulator → hilang saat pindah ke checkout. Ini bukan cuma "inefficient" — ini confusing karena user tidak tahu apakah pilihan pertamanya berpengaruh atau tidak. Cek: (1) apakah ada action yang dilakukan di page A lalu harus diulang di page B? (2) apakah ada query param atau state yang dikirim dari page A tapi tidak dikonsumsi di page B? (3) kalau ada redundansi, apakah ini intentional (user bisa ubah pilihan) atau bug (pilihan pertama hilang)? Referensi: NN/g Task Flow — "Users should not have to repeat information they already provided."
+- **Proactive option display** — untuk flow yang melibatkan pilihan (ukuran, bahan, tipe kertas, jumlah): apakah sistem PROAKTIF menampilkan opsi yang tersedia, atau user harus menebak/trial-and-error? Contoh buruk: input ukuran bebas tanpa daftar ukuran valid → user isi salah → error → repeat. Contoh baik: opsi ukuran/bahan ditampilkan sebagai pilihan jelas dengan harga per opsi. Cek: (1) apakah user bisa melihat opsi tersedia SEBELUM input? (2) apakah ada feedback actionable saat pilihan tidak valid? (3) apakah user harus trial-and-error untuk menemukan opsi valid?
+- **Cross-surface component consistency** — komponen yang sejenis (product card, CTA button, badge harga) WAJIB konsisten tidak hanya antar-section, tapi juga antar-surface (landing vs checkout vs simulator). Tombol WhatsApp di hero dan di product card — apakah icon, warna, size, dan interaksi SAMA? Walkthrough dari 1 surface saja TIDAK akan menangkap inkonsistensi cross-surface. WAJIB bandingkan komponen sejenis di semua surface yang memakainya.
 - **Focus Not Obscured (Riset: WCAG 2.2 SC 2.4.11, NEW in 2.2)** — saat user Tab ke interactive element, apakah focus indicator terlihat atau terhalang sticky header / sticky bottom bar / floating banner? Focus yang di belakang sticky element = user tidak tahu dimana focus-nya. Cek khusus pada page dengan sticky navbar, sticky filter bar, atau floating action button.
 - **Consistent Help Location (Riset: WCAG 2.2 SC 3.2.6, NEW in 2.2)** — help mechanism (help link, contact, FAQ link, support chat) WAJIB muncul di lokasi yang konsisten across halaman. Kalau help link ada di footer di page A tapi di sidebar di page B, user tidak bisa menemukan help dengan cepat. Cek: apakah help link/button ada di lokasi yang sama di semua page?
 - **Form Data Preservation on Error (Riset: SaaS UX #60, NN/g H9)** — kalau form submit gagal (validation error, API error, network timeout), apakah data yang user sudah input tetap ada? Atau form reset dan user harus ketik ulang semua? User WAJIB tidak pernah harus re-enter information yang sudah diketik. Test: isi form → submit → trigger error → cek apakah field masih berisi data sebelumnya.
@@ -233,9 +257,9 @@ Usulan ini masuk sebagai temuan dengan opsi solusi + trade-off (sama seperti tem
 - **Flexibility & Efficiency (Riset: NN/g H7)** — apakah ada accelerator untuk power user? (1) keyboard shortcut untuk frequent action (Ctrl+Enter submit, Esc close modal), (2) quick path untuk returning user (skip onboarding, direct search), (3) bulk action untuk repetitive task (select multiple → action). Tidak harus ada semua, tapi WAJIB dicek apakah flow punya user yang akan frustrated karena tidak ada shortcut.
 - **Help & Documentation (Riset: NN/g H10)** — apakah user bisa menemukan help saat stuck? (1) FAQ page accessible dari navigation? (2) contextual help (tooltip, help icon) di form/flow yang complex? (3) error message yang langsung kasih link ke solusi? Help WAJIB contextual, searchable, dan task-oriented — bukan generic "Contact support".
 - **Jargon Check (Riset: NN/g H2 Match System & Real World)** — apakah semua istilah di UI user-facing atau technical jargon? Cek: (1) label form — "Email" bukan "Email Address Identifier", (2) status — "Menunggu Pembayaran" bukan "PENDING_PAYMENT", (3) error — "Email tidak valid" bukan "Validation failed for field: email (pattern mismatch)". User tidak harus belajar istilah teknis untuk pakai platform.
-- **Modal focus retention (Ditemukan dari manual test UX-0 5 Aug 2026)** — saat user mengetik di form field (input/textarea) di dalam Modal/Dialog, apakah focus tetap di field tersebut? Atau focus lompat ke elemen lain setiap ketik? Root cause umum: Modal `useEffect` dengan function prop di dependency array → re-run setiap parent re-render → `firstFocusable.focus()` lompat ke first button. **Test WAJIB:** buka modal yang punya form, ketik 1 huruf di textarea → focus harus tetap di textarea. Kalau focus lompat, itu bug Kategori A (user tidak bisa mengetik dengan benar di form di dalam modal).
-- **Toggle switch knob containment (Ditemukan dari manual test UX-0 5 Aug 2026)** — toggle/switch knob WAJIB tetap di dalam track saat on maupun off. Knob yang keluar dari track = visual bug Kategori A. Cek: (1) apakah knob punya `left-0` atau `left-0.5` anchor? (2) apakah `translate-x` value benar untuk track width? (3) apakah posisi on dan off simetris (margin kiri = margin kanan)? Test di 3 viewport untuk pastikan tidak ada layout shift.
-- **Flex fixed-size child preservation (Ditemukan dari manual test UX-0 5 Aug 2026)** — elemen dengan fixed `h-*` dan `w-*` (circle, icon container, avatar) di dalam flex container WAJIB punya `shrink-0`. Tanpa itu, elemen ke-squish saat container sempit (text panjang, viewport mobile) dan kehilangan aspect ratio. Circle jadi oval, icon jadi distorted. **Test WAJIB:** di viewport mobile (375px), cek semua flex container dengan fixed-size child + text — child harus maintain size. Lihat juga Scan 21 untuk grep pattern.
+- **Modal focus retention** — saat user mengetik di form field (input/textarea) di dalam Modal/Dialog, apakah focus tetap di field tersebut? Atau focus lompat ke elemen lain setiap ketik? Root cause umum: Modal `useEffect` dengan function prop di dependency array → re-run setiap parent re-render → `firstFocusable.focus()` lompat ke first button. **Test WAJIB:** buka modal yang punya form, ketik 1 huruf di textarea → focus harus tetap di textarea. Kalau focus lompat, itu bug Kategori A (user tidak bisa mengetik dengan benar di form di dalam modal).
+- **Toggle switch knob containment** — toggle/switch knob WAJIB tetap di dalam track saat on maupun off. Knob yang keluar dari track = visual bug Kategori A. Cek: (1) apakah knob punya `left-0` atau `left-0.5` anchor? (2) apakah `translate-x` value benar untuk track width? (3) apakah posisi on dan off simetris (margin kiri = margin kanan)? Test di 3 viewport untuk pastikan tidak ada layout shift.
+- **Flex fixed-size child preservation** — elemen dengan fixed `h-*` dan `w-*` (circle, icon container, avatar) di dalam flex container WAJIB punya `shrink-0`. Tanpa itu, elemen ke-squish saat container sempit (text panjang, viewport mobile) dan kehilangan aspect ratio. Circle jadi oval, icon jadi distorted. **Test WAJIB:** di viewport mobile (375px), cek semua flex container dengan fixed-size child + text — child harus maintain size. Lihat juga Scan 21 untuk grep pattern.
 
 **Aturan cakupan WAJIB untuk semua poin checklist di atas (ini yang sering jadi penyebab temuan kelewat, bukan checklist-nya yang kurang):**
 - **Cek SEMUA instance dari komponen sejenis yang berulang, bukan cuma 1 contoh representatif.** Kalau ada 10 card FAQ dengan badge angka, cek border-radius/styling di SEMUA 10, bukan cuma card pertama — inkonsistensi biasanya baru ketauan kalau dibandingkan across instance, bukan dari 1 instance yang dilihat sendirian.
@@ -249,20 +273,20 @@ Ini blind spot paling berbahaya karena: auditor cuma bisa ngecek yang ada di cod
 
 ### Persona-Needs Matrix (WAJIB sebelum walkthrough per-flow)
 
-Untuk SETIAP role di platform (Client, Consultant, Admin), buat matriks: apa saja hal yang user role ini masuk akal butuhin? Grounding ke:
-- **Competitor analysis** — platform sejenis (BetterHelp, Talkspace untuk mental health; Kalibrr, Upwork untuk marketplace profesional; Shopify admin untuk admin panel)
-- **Design system established** — Material Design, Apple HIG, Polaris (Shopify admin), Carbon (IBM) untuk komponen/pattern yang expected
+Untuk SETIAP persona di platform (Customer/pengunjung, Admin/owner — future dashboard), buat matriks: apa saja hal yang user persona ini masuk akal butuhin? Grounding ke:
+- **Competitor analysis** — platform sejenis (printshop online lokal, e-commerce printing seperti Printerous/UpRint, Shopify storefront untuk referensi checkout)
+- **Design system established** — Material Design, Apple HIG, Baymard checkout guidelines untuk komponen/pattern yang expected
 - **Usability research** — NN/g, Baymard untuk expected features per product type
-- **Platform convention** — apa yang user sudah expect dari platform sejenis (profile photo, settings page, user management, dll)
+- **Platform convention** — apa yang user sudah expect dari toko online sejenis (katalog produk, harga jelas, kontak mudah, bukti sosial/testimoni)
 
 Format matriks:
 
-| Role | Need | Status | Priority | Source |
+| Persona | Need | Status | Priority | Source |
 |------|------|--------|----------|--------|
-| Consultant | Upload foto profil/avatar | ❌ Missing | High | Marketplace convention (Upwork, BetterHelp) |
-| Admin | Edit profil sendiri | ❌ Missing | High | Admin panel convention (Checklist Design, Polaris) |
-| Admin | Manajemen user (create/edit/suspend) | ❌ Missing | High | SaaS admin standard (Netguru, SaaS UX Audit) |
-| Client | Lihat riwayat booking | ✅ Ada | — | — |
+| Customer | Lihat estimasi harga sebelum checkout | ❌ Missing | High | E-commerce convention (Baymard) |
+| Customer | Lacak status order | ❌ Missing | Medium | E-commerce convention |
+| Admin | Lihat daftar order masuk | ❌ Missing | High | Operational need (future dashboard) |
+| Customer | Konsultasi via WhatsApp | ✅ Ada | — | — |
 
 **Aturan prioritas:**
 - **Critical (Blocker)** — blocking user flow utama, tidak bisa pakai platform tanpa ini
@@ -272,54 +296,51 @@ Format matriks:
 
 ### Kategori Gap yang WAJIB Dicek (Universal, Bukan Case-by-Case)
 
-List kategori ini bukan dari contoh konkret yang user sebut, tapi dari riset platform marketplace + SaaS admin + profile UX. Setiap kategori WAJIB dicek untuk setiap role — jawaban "tidak ada gap" untuk suatu kategori WAJIB dinyatakan eksplisit, bukan diam-diam dilewati.
+List kategori ini bukan dari contoh konkret yang user sebut, tapi dari riset e-commerce/printing storefront + checkout UX. Setiap kategori WAJIB dicek untuk setiap persona — jawaban "tidak ada gap" untuk suatu kategori WAJIB dinyatakan eksplisit, bukan diam-diam dilewati.
 
-**1. Profile & Identity Completeness**
-- Avatar/foto profil upload — untuk marketplace, ini trust signal kritis (Wall & Fifth: "profile communicates credibility")
-- Edit informasi dasar akun (nama, email, phone, password) — terpisah dari profil profesional
-- Profil completeness indicator — menunjukkan kelengkapan profil (% atau checklist)
-- Privacy/visibility controls — field mana yang public vs private
-- Delete account / data export — GDPR-like self-service
-- Referensi: UX Patterns Guide Profile Setup, NN/g Form Design
+**1. Storefront & Catalog Completeness**
+- Katalog produk dengan harga — user harus bisa lihat harga/estimasi sebelum komitmen
+- Detail produk per item — ukuran, bahan, opsi finishing, lead time
+- Bukti sosial — testimoni, portfolio hasil cetak, rating
+- Search/filter katalog — kalau produk sudah banyak
+- Referensi: Baymard Product Page & List research, NN/g E-commerce
 
-**2. Admin Panel Completeness**
-- User management — view/search/create/edit/suspend/activate users (Checklist Design Admin Panel, SaaS Admin Panel Design — "5 standard actions: viewing, creating, editing, activating/deactivating, bulk import")
-- Admin profile & settings — admin bisa edit profil sendiri, ganti password
-- System settings — konfigurasi platform (commission rate, payment settings, dll)
-- Danger zone — destructive actions dengan typed confirmation (delete workspace, transfer ownership)
-- Bulk operations — bulk activate/deactivate/export
-- Referensi: Checklist Design Admin Panel, Polaris Admin, Netguru Admin Panel Design
+**2. Checkout & Payment Completeness**
+- Form checkout — nama, kontak, pickup/delivery, catatan, upload file desain
+- Harga transparan — rincian harga (produk + ongkir kalau kirim) sebelum bayar
+- Metode pembayaran jelas — Midtrans Snap methods terlihat
+- Status order setelah bayar — success page, info next step ("order diproses, akan dihubungi admin")
+- Upload file — format yang diterima, batas ukuran, preview
+- Referensi: Baymard Checkout Usability, NN/g Form Design
 
-**3. Settings & Preferences**
-- Notification preferences — user bisa kontrol notifikasi apa yang diterima (email, push, in-app)
-- Account settings — ganti password, 2FA, delete account
-- Language/locale settings — kalau platform support multi-bahasa
-- Referensi: SaaS UX Audit Checklist (Desisle), setting.page
+**3. Communication & Support**
+- WhatsApp CTA — tersedia di semua titik keputusan (hero, product card, footer, checkout)
+- FAQ — menjawab objection umum (lead time, bahan, revisi desain)
+- Kontak alternatif — email, alamat toko, jam operasional
+- Referensi: NN/g Communication Patterns, Baymard Contact UX
 
-**4. Marketplace-Specific (KonsulExpert)**
-- Trust signals di profile konsultan — verification badge, jumlah sesi, response time, rating display
-- Profile completeness untuk konsultan — foto, bio, kredensial, specialization — semua terisi?
-- Search & filter completeness — filter by specialization, price range, availability, rating, location
-- Booking flow completeness — cancel policy, reschedule, refund policy visibility
-- Two-sided review system — client review consultant, consultant review client
-- Referensi: Wall & Fifth Marketplace UX, Baymard Checkout Usability, Olha Bahaieva Marketplace UX
+**4. Trust & Conversion**
+- Trust signals di checkout — "Pembayaran Aman via Midtrans", badge keamanan
+- Lokasi & jam buka jelas — UMKM lokal, user perlu tahu bisa ambil sendiri
+- Garansi/revisi policy — apa yang terjadi kalau hasil cetak salah
+- Referensi: Baymard Trust Signals, NN/g Credibility
 
-**5. Communication & Support**
-- In-app messaging/chat — antara client dan consultant sebelum/sesudah booking
-- Help/support access — FAQ, contact support, help center
-- Notification center — in-app notification dropdown/page
-- Referensi: NN/g Communication Patterns, SaaSUI Support Patterns
+**5. Design Simulator Completeness**
+- Guided flow — user tahu langkah: pilih ukuran → upload → atur layout → export
+- Perhitungan jelas — berapa sticker per sheet, waste percentage
+- Export usable — PNG/PDF yang benar-benar bisa dipakai produksi
+- Error handling — file tidak support, ukuran melebihi sheet
+- Referensi: Canvas/Konva editor conventions
 
-**6. Data & Analytics**
-- Export data — booking history, earnings, transactions (CSV/PDF)
-- Date range filter — di dashboard, di list pages
-- Search functionality — global search atau per-section search
-- Referensi: SaaS UX Audit Checklist, Polaris Data Export
+**6. Admin/Operations (backlog, belum ada dashboard)**
+- Notifikasi order masuk ke admin (saat ini via WhatsApp)
+- Daftar order & status — untuk tracking produksi
+- Referensi: internal ops need
 
 ### Cara Eksekusi Functional Completeness Audit
 
-1. **Identifikasi SEMUA role** di platform (Client, Consultant, Admin, dan sub-role kalau ada)
-2. **Untuk setiap role**, buat Persona-Needs Matrix dengan 6 kategori di atas
+1. **Identifikasi SEMUA persona** di platform (Customer/pengunjung, Admin/owner untuk future dashboard)
+2. **Untuk setiap persona**, buat Persona-Needs Matrix dengan 6 kategori di atas
 3. **Cross-reference dengan code** — grep/read file untuk konfirmasi benar-benar tidak ada (bukan cuma "tidak kelihatan")
 4. **Klasifikasi gap**: Critical / High / Medium / Low
 5. **Untuk setiap gap**, tulis: apa yang missing, kenapa penting, referensi sumber, opsi solusi
@@ -329,9 +350,9 @@ List kategori ini bukan dari contoh konkret yang user sebut, tapi dari riset pla
 ### Senior UX Designer Mindset (WAJIB untuk Functional Completeness, 100 tahun pengalaman)
 
 Jangan cuma ngecek "apa yang broken?" — tanyakan:
-1. **"Kalau saya mendesain platform ini dari awal sebagai UX designer senior dengan 100 tahun pengalaman di marketplace, apa yang pasti saya sertakan?"**
-2. **"Apa yang user expect dari platform sejenis dan tidak menemukan di sini?"**
-3. **"Apa yang admin butuh untuk mengelola platform ini dengan efektif dan tidak punya?"**
+1. **"Kalau saya mendesain platform ini dari awal sebagai UX designer senior dengan 100 tahun pengalaman di e-commerce/printing, apa yang pasti saya sertakan?"**
+2. **"Apa yang user expect dari toko printing online sejenis dan tidak menemukan di sini?"**
+3. **"Apa yang owner/admin butuh untuk mengelola order yang masuk dan tidak punya?"**
 4. **"Apa trust signals yang hilang yang membuat user ragu untuk transaksi?"**
 5. **"Apa settings/preferences yang user masuk akal want to control tapi tidak bisa?"**
 6. **"Apa friction yang user tidak sadari tapi mengurangi conversion/retention?"**
@@ -357,130 +378,130 @@ Checklist di atas sudah komprehensif, tapi banyak item yang terlewat karena terl
 
 ### Scan 1: AI Slop Punctuation
 ```
-grep -rn " — " features/ --include="*.tsx" --include="*.ts"
+grep -rn " — " src/ --include="*.tsx" --include="*.ts"
 ```
 Em dash (` — `) adalah tanda tanda baca yang sangat sering dipakai AI-generated text. Ganti dengan hyphen biasa (` - `), rephrase, atau koma — kecuali kalau em dash memang sengaja untuk dialog/quote (sangat jarang di UI text). **TIDAK perlu riset** — ini consensus anti-pattern, bukan preferensi desain.
 
-### Scan 2: Breadcrumb Dead Links
+### Scan 2: Dead Links & Broken Anchors
 ```
-grep -rn 'href.*"/dashboard"' features/ --include="*.tsx"
+grep -rn 'href="#' src/ --include="*.tsx"
 ```
-`/dashboard` adalah route redirect, bukan page yang user bisa lihat langsung. Setiap breadcrumb yang link ke `/dashboard` (tanpa role suffix) WAJIB diganti ke `/dashboard/client`, `/dashboard/consultant`, atau `/dashboard/admin` sesuai role user di page itu. **Cek juga** apakah route target ada di `app/` directory — kalau tidak ada, itu dead link.
+BisaPrint landing page banyak pakai anchor link (`#produk`, `#faq`, `#kontak`). Setiap anchor href WAJIB punya element dengan `id` yang match di halaman yang sama — anchor tanpa target = link mati. **Cek juga** `href` internal lain (`/checkout`, `/simulator`) — verifikasi route target ada di `src/app/` directory.
 
 ### Scan 3: Capitalization Inconsistency
 ```
-grep -rn 'label:.*"' features/ --include="*.tsx" | grep -i 'breadcrumb\|nav\|sidebar\|menu'
+grep -rn 'label:.*"' src/ --include="*.tsx" | grep -i 'nav\|menu\|breadcrumb'
 ```
-List semua label di Breadcrumb/Navigation component, bandingkan dalam tabel. Flag yang inkonsisten (misal: `"konsultan"` lowercase di satu file, `"Klien"` title case di file lain). Aturan: **title case** untuk semua label yang user-facing (Proper Noun, Page Title, Navigation Item). **TIDAK perlu riset** — ini consensus style guide.
+List semua label di Navigation/Menu component, bandingkan dalam tabel. Flag yang inkonsisten (misal: `"produk"` lowercase di satu file, `"Testimoni"` title case di file lain). Aturan: **konsisten** untuk semua label user-facing — ikuti konvensi dominan di codebase (cek `src/components/layout/Header.tsx`). **TIDAK perlu riset** — ini consensus style guide.
 
 ### Scan 4: Inconsistent Border-Radius pada Komponen Sejenis
 ```
-grep -rn 'rounded-\[' features/ --include="*.tsx"
+grep -rn 'rounded-\[' src/ --include="*.tsx"
 ```
 List semua `rounded-[...]` custom values, bandingkan dengan `rounded-full`, `rounded-lg`, dll yang dipakai di komponen sejenis (misal: badge angka FAQ, avatar, icon container). Flag yang pakai custom value beda untuk komponen yang seharusnya sama. **Riset: Material Design Shape System** untuk guideline border-radius consistency.
 
 ### Scan 5: Missing aria-label pada Icon-Only Buttons
 ```
-grep -rn '<button' features/ --include="*.tsx" | grep -v 'aria-label'
+grep -rn '<button' src/ --include="*.tsx" | grep -v 'aria-label'
 ```
 Icon-only button (tombol yang cuma punya icon, no text) WAJIB punya `aria-label`. Filter manual hasil grep untuk yang benar-benar icon-only (bukan button yang punya text tapi kebetulan tidak ada aria-label). **Riset: WCAG 2.1 SC 4.1.2 Name, Role, Value**.
 
 ### Scan 6: Native confirm()/alert()/prompt()
 ```
-grep -rn 'confirm(\|alert(\|prompt(' features/ --include="*.tsx" --include="*.ts"
+grep -rn 'confirm(\|alert(\|prompt(' src/ --include="*.tsx" --include="*.ts"
 ```
 Native dialog WAJIB diganti custom modal/toast. Sudah ada di checklist atas, tapi grep ini tangkap semua instance sekaligus.
 
-### Scan 7: Emoji & Unicode Symbol in UI (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)
+### Scan 7: Emoji & Unicode Symbol in UI (Ditemukan dari UX sweep 4 Aug 2026)
 ```
 # Windows (PowerShell) — utama, karena MinGW grep tidak support \x{} unicode range:
-Get-ChildItem -Path features/ -Recurse -Include "*.tsx","*.ts" | Select-String -Pattern "[\u23F3\u23F0\u2713\u2605\u2715\u26A0\u2610\u2717\u2714]" | Select-Object Path, LineNumber, Line
+Get-ChildItem -Path src/ -Recurse -Include "*.tsx","*.ts" | Select-String -Pattern "[\u23F3\u23F0\u2713\u2605\u2715\u26A0\u2610\u2717\u2714]" | Select-Object Path, LineNumber, Line
 
 # Untuk emoji (surrogate pair range), pakai .NET regex:
-Get-ChildItem -Path features/ -Recurse -Include "*.tsx","*.ts" | Select-String -Pattern "[\uD83D-\uD83E]" | Select-Object Path, LineNumber, Line
+Get-ChildItem -Path src/ -Recurse -Include "*.tsx","*.ts" | Select-String -Pattern "[\uD83D-\uD83E]" | Select-Object Path, LineNumber, Line
 
 # Linux/Mac (grep -P works):
-grep -rnP '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}]' features/ --include="*.tsx" --include="*.ts"
+grep -rnP '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}]' src/ --include="*.tsx" --include="*.ts"
 ```
 Juga cek unicode symbols yang dipakai sebagai icon: `⏳ ⏰ ✓ ★ ✕ ⚠ ☐ 🚫 📄 🖼️ 🔗 💡`. Project ini pakai Lucide icons (`lucide-react`) sebagai icon library standar — semua icon di UI WAJIB pakai Lucide component (`<Star>`, `<Clock>`, `<Check>`, dll), BUKAN unicode character atau emoji. Unicode symbol kelihatan beda antar OS/browser (Android vs iOS vs Windows vs Mac), tidak bisa di-style (size, color, weight), dan tidak konsisten dengan Lucide icon set yang sudah dipakai di tempat lain. **TIDAK perlu riset** — ini consensus design system, bukan preferensi.
 
 **Cek juga unicode checkmark `✓` di stepper/badge** — ganti ke `<Check className="h-5 w-5" />`. Unicode `★` di rating/button — ganti ke `<Star>` Lucide.
 
-### Scan 8: Flex Layout Without Gap (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)
+### Scan 8: Flex Layout Without Gap (Ditemukan dari UX sweep 4 Aug 2026)
 ```
-grep -rn 'flex.*justify-between' features/ --include="*.tsx" | grep -v 'gap'
+grep -rn 'flex.*justify-between' src/ --include="*.tsx" | grep -v 'gap'
 ```
 `flex justify-between` tanpa `gap` adalah root cause spacing bug pattern: elemen kiri dan kanan saling nempel di viewport sempit (mobile). WAJIB tambah `gap-4` (atau minimal `gap-2`) di parent flex. **TIDAK perlu riset** — ini CSS fundamentals, bukan preferensi.
 
 **Juga cek pattern serupa:** `<dl>` / `<dt>` / `<dd>` yang dipakai dengan `flex` tanpa vertical stacking fallback untuk mobile. Label dan value yang bersebelahan di `flex justify-between` WAJIB punya `flex-col sm:flex-row` fallback kalau value bisa panjang.
 
-### Scan 9: Table Cell Without Horizontal Padding (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)
+### Scan 9: Table Cell Without Horizontal Padding (Ditemukan dari UX sweep 4 Aug 2026)
 ```
-grep -rn '<th\|<td' features/ --include="*.tsx" | grep -v 'px'
+grep -rn '<th\|<td' src/ --include="*.tsx" | grep -v 'px'
 ```
 `<th>` dan `<td>` tanpa `px` (horizontal padding) menyebabkan text dari cell bersebelahan nempel langsung tanpa jarak. Pattern ini sering kelewat karena `py-3` atau `pb-2` sudah ada (vertical padding), tapi horizontal padding lupa ditambah. WAJIB tambah minimal `px-3` di semua `th` dan `td`. **TIDAK perlu riset** — ini HTML/CSS fundamentals.
 
-### Scan 10: Component Variant Inconsistency (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)
+### Scan 10: Component Variant Inconsistency (Ditemukan dari UX sweep 4 Aug 2026)
 ```
-grep -rn 'Star\|star\|rating\|Rating' features/ --include="*.tsx" | grep -v 'test\|spec\|\.md'
+grep -rn 'Star\|star\|rating\|Rating' src/ --include="*.tsx" | grep -v 'test\|spec\|\.md'
 ```
 Cari semua implementasi komponen sejenis (star rating, badge, card, button) dan bandingkan: apakah pakai icon library yang sama? Warna sama? Size sama? Interaksi sama? Multiple implementasi dari komponen yang seharusnya identik adalah sumber inkonsistensi visual dan behavioral.
 
-**Contoh nyata yang ditemukan:** Star rating punya 3 implementasi berbeda — Lucide `<Star>` dengan `fill-yellow-400` (client review form), Unicode `★` dengan `bg-yellow-100` (consultant rating modal), Lucide `<Star>` dengan `fill-amber-400` (RatingStars display component). Warna, icon, dan interaksi semua beda.
+**Contoh nyata yang ditemukan di project lain:** star rating punya 3 implementasi berbeda — Lucide `<Star>` dengan `fill-yellow-400` di satu form, Unicode `★` dengan `bg-yellow-100` di modal lain, `<Star>` dengan `fill-amber-400` di display component. Warna, icon, dan interaksi semua beda. Di BisaPrint, pola yang sama bisa terjadi di CTA button / product card / badge — bandingkan semua instance.
 
-### Scan 11: Query Param Read But Not Consumed (Ditemukan dari UX-1 booking-lifecycle 4 Aug 2026)
+### Scan 11: Query Param Read But Not Consumed (Ditemukan dari UX sweep 4 Aug 2026)
 ```
-grep -rn 'searchParams\|searchParams' app/ --include="*.tsx" --include="*.ts"
+grep -rn 'searchParams' src/app/ --include="*.tsx" --include="*.ts"
 ```
 Cek setiap page yang baca `searchParams` — apakah value-nya benar-benar dikonsumsi (dipass ke component, dipakai untuk fetch, dll) atau cuma di-read lalu diabaikan? Query param yang di-read tapi tidak dikonsumsi = broken flow (user klik link dengan param, tapi param tidak berpengaruh di destination page).
 
-**Contoh nyata yang ditemukan:** `PackagePricingCard` link ke `?package=${pkg.id}`, booking page baca `s.package` set ke state `packageId`, tapi `packageId` tidak pernah dipass ke `<BookingFlow>` — user klik "Pilih Paket Standard" tapi di booking page harus pilih paket lagi dari awal.
+**Contoh nyata yang ditemukan di project lain:** pricing card link ke `?package=${pkg.id}`, halaman tujuan baca param itu ke state, tapi state tidak pernah dipass ke komponen flow — user klik "Pilih Paket" tapi di halaman tujuan harus pilih lagi dari awal. Di BisaPrint, pola yang sama bisa terjadi di `?product=` dari ProductCard → checkout.
 
 ### Scan 12: Missing Loading State (Riset: NN/g H1 Visibility of System Status, SaaS UX #41)
 ```
-grep -rn 'loading\|isLoading\|setLoading' features/ --include="*.tsx" | grep -v 'Skeleton\|animate-spin\|animate-pulse\|skeleton'
+grep -rn 'loading\|isLoading\|setLoading' src/ --include="*.tsx" | grep -v 'Skeleton\|animate-spin\|animate-pulse\|skeleton'
 ```
 Cek hasil grep — file yang sudah pakai `animate-pulse`/`animate-spin`/`Skeleton` sudah ada loading state yang baik. File yang pakai `isLoading`/`setLoading` TAPI tidak punya skeleton/spinner = loading state cuma text "Loading..." atau blank. Skeleton screen WAJIB untuk structural component (table, card, metric panel) — maintain spatial continuity dan reduce perceived wait time. Spinner boleh untuk inline action. Blank/berkedip = bug. **TIDAK perlu riset** — ini consensus UX, NN/g dan SaaS UX checklist sama.
 
 ### Scan 13: Missing aria-live pada Dynamic Feedback (Riset: WCAG 2.2 4.1.3 Status Messages)
 ```
-grep -rn 'toast\|Toast\|notification\|Notification\|error.*message\|setError' features/ --include="*.tsx" | grep -v 'aria-live\|role="alert"\|role="status"'
+grep -rn 'toast\|Toast\|notification\|Notification\|error.*message\|setError' src/ --include="*.tsx" | grep -v 'aria-live\|role="alert"\|role="status"'
 ```
 Cek hasil grep — file yang sudah pakai `aria-live`/`role="alert"`/`role="status"` sudah accessible. File yang pakai toast/notification/setError TAPI tidak punya aria-live = dynamic feedback tidak accessible untuk screen reader user. Toast/notification/error message yang muncul dinamis WAJIB punya `aria-live` agar screen reader user tahu ada feedback. **Riset: WCAG 2.2 SC 4.1.3 Status Messages (Level AA).**
 
 ### Scan 14: Missing prefers-reduced-motion (Riset: WCAG 2.3.3 Animation from Interactions)
 ```
-grep -rn 'motion\|animate\|transition\|framer' features/ --include="*.tsx" | grep -v 'prefers-reduced-motion\|test\|spec'
+grep -rn 'motion\|animate\|transition\|framer' src/ --include="*.tsx" | grep -v 'prefers-reduced-motion\|test\|spec'
 ```
-Project ini pakai Framer Motion (`motion/react`) dan memiliki **0 file** yang respect `prefers-reduced-motion`. User dengan vestibular disorder bisa mengalami motion sickness dari animasi yang tidak bisa di-disable. WAJIB tambah `@media (prefers-reduced-motion: reduce)` fallback atau Framer Motion `useReducedMotion()` hook. **Riset: WCAG 2.2 SC 2.3.3 Animation from Interactions (Level AAA, tapi best practice untuk AA).**
+Project ini pakai Framer Motion. Cek apakah ada file yang respect `prefers-reduced-motion` — user dengan vestibular disorder bisa mengalami motion sickness dari animasi yang tidak bisa di-disable. Kalau tidak ada, WAJIB tambah `@media (prefers-reduced-motion: reduce)` fallback atau `useReducedMotion()` hook. **Riset: WCAG 2.2 SC 2.3.3 Animation from Interactions (Level AAA, tapi best practice untuk AA).**
 
-### Scan 15: Missing autoComplete pada Auth Forms (Riset: WCAG 2.2 3.3.8 Accessible Authentication)
+### Scan 15: Missing autoComplete pada Form Kontak/Checkout (Riset: WCAG 2.2 1.3.5 Identify Input Purpose)
 ```
-grep -rn '<input' features/auth/ --include="*.tsx" | grep -v 'autoComplete'
+grep -rn '<input' src/components/checkout/ src/components/sections/ --include="*.tsx" | grep -v 'autoComplete'
 ```
-Auth forms (`LoginForm`, `RegisterForm`, `forgotPassword`) tidak punya `autoComplete` attribute. Browser autofill tidak akan bekerja optimal — user harus manual ketik email/password setiap kali. WCAG 2.2 3.3.8 Accessible Authentication menyatakan: login tidak boleh depend pada memorization tanpa accessible alternative. Autofill adalah alternative tersebut. WAJIB tambah `autoComplete="email"`, `autoComplete="current-password"`, `autoComplete="new-password"`, dll. **Riset: WCAG 2.2 SC 3.3.8 Accessible Authentication (Level AA).**
+Form checkout/kontak tanpa `autoComplete` bikin browser autofill tidak bekerja optimal — user harus manual ketik nama/email/telepon/alamat setiap kali. WAJIB tambah `autoComplete="name"`, `autoComplete="email"`, `autoComplete="tel"`, `autoComplete="street-address"`, dll sesuai field. **Riset: WCAG 2.2 SC 1.3.5 Identify Input Purpose (Level AA).**
 
 ### Scan 16: Missing maxLength pada Text Input (Riset: SaaS UX #53 Inline Validation)
 ```
-grep -rn '<textarea\|<input type="text"' features/ --include="*.tsx" | grep -v 'maxLength\|maxlength'
+grep -rn '<textarea\|<input type="text"' src/ --include="*.tsx" | grep -v 'maxLength\|maxlength'
 ```
-Cek hasil grep — file yang sudah pakai `maxLength` sudah punya client-side length limit. File yang punya `<textarea>` atau `<input type="text">` TAPI tidak punya `maxLength` = tidak ada client-side length limit, bisa cause layout break (review 500 kata, bio 2000 karakter) dan tidak memberikan feedback sebelum submit. Zod schema mungkin validasi server-side, tapi user tidak tahu batas sampai submit gagal. WAJIB tambah `maxLength` yang sesuai dengan Zod schema. **Riset: SaaS UX #53, NN/g H5 Error Prevention.**
+Cek hasil grep — file yang sudah pakai `maxLength` sudah punya client-side length limit. File yang punya `<textarea>` atau `<input type="text">` TAPI tidak punya `maxLength` = tidak ada client-side length limit, bisa cause layout break (catatan order 2000 karakter, alamat super panjang) dan tidak memberikan feedback sebelum submit. Zod schema mungkin validasi server-side, tapi user tidak tahu batas sampai submit gagal. WAJIB tambah `maxLength` yang sesuai dengan Zod schema. **Riset: SaaS UX #53, NN/g H5 Error Prevention.**
 
 ### Scan 17: Placeholder-Only Labels (Riset: SaaS UX #51, WCAG 2.2 1.3.1 Info and Relationships)
 ```
-grep -rn 'placeholder=' features/ --include="*.tsx" | grep -v '<label\|htmlFor\|aria-label\|aria-labelledby'
+grep -rn 'placeholder=' src/ --include="*.tsx" | grep -v '<label\|htmlFor\|aria-label\|aria-labelledby'
 ```
 Input yang cuma punya `placeholder` tanpa `<label>` adalah masalah karena: (1) placeholder hilang saat user mulai ketik — user kehilangan context, (2) screen reader tidak membaca placeholder sebagai label, (3) browser autofill tidak map field dengan benar. WAJIB setiap input punya `<label>` yang visible (di atas field, bukan di dalam). Floating label pattern acceptable. **Riset: SaaS UX #51, WCAG 2.2 SC 1.3.1 (Level A).**
 
 ### Scan 18: Drag Without Pointer Alternative (Riset: WCAG 2.2 2.5.7 Dragging Movements)
 ```
-grep -rn 'onDrag\|draggable\|onDrop' features/ --include="*.tsx" | grep -v 'onClick\|onKeyDown\|onKeyPress'
+grep -rn 'onDrag\|draggable\|onDrop' src/ --include="*.tsx" | grep -v 'onClick\|onKeyDown\|onKeyPress'
 ```
 WCAG 2.2 2.5.7 menyatakan: setiap fungsi yang pakai dragging WAJIB punya alternative dengan single pointer (click/tap). User dengan motor impairment mungkin tidak bisa drag. File upload dropzone sering drag-only — WAJIB punya "Browse file" button alternative. **Riset: WCAG 2.2 SC 2.5.7 Dragging Movements (Level AA, NEW in 2.2).**
 
 ### Scan 19: Modal useEffect Deps Trap (Ditemukan dari manual test UX-0 5 Aug 2026)
 ```
-grep -rn "useEffect" components/ features/ --include="*.tsx" | grep -i "modal\|dialog\|drawer"
+grep -rn "useEffect" components/ src/ --include="*.tsx" | grep -i "modal\|dialog\|drawer"
 ```
 Cari Modal/Dialog/Drawer components yang punya `useEffect` dengan dependency array. Pattern bug: `useEffect(..., [open, onClose])` dimana `onClose` adalah function prop yang dibuat baru setiap parent render. Setiap parent re-render (misal: user ketik di form di dalam modal) → `onClose` reference berubah → useEffect re-run → focus lompat ke first focusable element → **user kehilangan focus dari input/textarea yang sedang diketik**. 
 
@@ -490,7 +511,7 @@ Cari Modal/Dialog/Drawer components yang punya `useEffect` dengan dependency arr
 
 ### Scan 20: Toggle Knob Without Left Anchor (Ditemukan dari manual test UX-0 5 Aug 2026)
 ```
-grep -rn "absolute.*translate-x\|translate-x.*absolute" features/ --include="*.tsx"
+grep -rn "absolute.*translate-x\|translate-x.*absolute" src/ --include="*.tsx"
 ```
 Cari toggle/switch components yang pakai `absolute` positioning dengan `translate-x` untuk knob movement. Pattern bug: knob pakai `absolute top-0.5` tapi **tidak punya `left-0` atau `left-0.5`** — tanpa anchor horizontal, browser default ke `auto` (center content), jadi knob mulai dari tengah button, bukan dari kiri. `translate-x` geser dari titik yang salah → **knob keluar dari button track**.
 
@@ -500,7 +521,7 @@ Cari toggle/switch components yang pakai `absolute` positioning dengan `translat
 
 ### Scan 21: Flex Fixed-Size Child Without shrink-0 (Ditemukan dari manual test UX-0 5 Aug 2026)
 ```
-grep -rn "flex.*items-center\|flex.*gap" features/ --include="*.tsx" | grep "h-[0-9].*w-[0-9]"
+grep -rn "flex.*items-center\|flex.*gap" src/ --include="*.tsx" | grep "h-[0-9].*w-[0-9]"
 ```
 Cari flex container yang punya child dengan fixed `h-*` dan `w-*` (misal: number circle, icon container, avatar) tetapi **tidak punya `shrink-0`**. Flex item default `flex-shrink: 1` — kalau container sempit (text panjang, viewport mobile), fixed-size child ke-squish dan kehilangan aspect ratio-nya. 
 
@@ -520,7 +541,7 @@ Cari hardcoded `page.waitForTimeout()` di E2E test. Ini anti-pattern #1 menurut 
 ```
 grep -rn "test\.describe\.configure.*serial" e2e/ --include="*.spec.ts"
 ```
-Cari `test.describe.configure({ mode: "serial" })` yang memaksa test jalan berurutan. Test dalam serial mode share state (bookingId, dll) dan bergantung urutan. Kalau test ke-3 fail, test ke-4 sampai ke-10 ikut fail (cascading failure). Tidak bisa run test tunggal dengan andal.
+Cari `test.describe.configure({ mode: "serial" })` yang memaksa test jalan berurutan. Test dalam serial mode share state (orderId, dll) dan bergantung urutan. Kalau test ke-3 fail, test ke-4 sampai ke-10 ikut fail (cascading failure). Tidak bisa run test tunggal dengan andal.
 
 **Fix pattern:** setiap test create + cleanup data sendiri. Hapus serial mode. Pakai `beforeEach` untuk reset state. **Sumber:** Currents.dev "Tests That Depend on Execution Order", Playwright official docs "Test Isolation".
 
@@ -536,7 +557,7 @@ Cari selector yang pakai CSS class atau XPath (`div.rounded-xl`, `aside button:h
 ```
 grep -rn "networkidle" e2e/ --include="*.spec.ts"
 ```
-Cari `waitUntil: "networkidle"` atau `waitForLoadState("networkidle")`. Playwright official docs melarang ini untuk app dengan WebSocket, polling, atau analytics. Project ini punya Socket.IO + polling — `networkidle` bisa never fire atau fire di waktu unpredictable.
+Cari `waitUntil: "networkidle"` atau `waitForLoadState("networkidle")`. Playwright official docs melarang ini untuk app dengan polling, analytics (Meta Pixel/GA), atau koneksi persistent lain — `networkidle` bisa never fire atau fire di waktu unpredictable.
 
 **Fix pattern:** ganti dengan `await expect(locator).toBeVisible()` atau `page.waitForResponse()`. **Sumber:** Playwright official docs, Currents.dev "Over-Reliance on waitForLoadState('networkidle')".
 
@@ -548,13 +569,11 @@ Cari `webServer.command` yang pakai `npm run dev`. Dev mode punya HMR, unoptimiz
 
 **Fix pattern:** pakai `npm run build && npm run start` untuk CI. Dev mode boleh untuk local development dengan `reuseExistingServer: true`. **Sumber:** Next.js docs (production testing), Playwright docs (webServer config).
 
-### Scan 27: Playwright No Auth Setup Project (Audit Test Suite Quality 14 Aug 2026)
+### Scan 27: Playwright Setup Project untuk State Berulang (Audit Test Suite Quality 14 Aug 2026)
 ```
-grep -n "storageState\|setup.*project\|globalSetup.*auth" playwright.config.ts
+grep -n "storageState\|setup.*project\|globalSetup" playwright.config.ts
 ```
-Cari apakah ada auth setup project yang authenticate sekali dan save `storageState`. Kalau tidak, setiap test login via UI — waste ~3-5 detik per test + login flow bisa fail dan bikin test lain ikut fail.
-
-**Fix pattern:** tambah setup project yang login sekali, save `storageState` ke file, lalu project lain pakai `storageState` itu. **Sumber:** Playwright official docs (authentication), QASkills 2026 "Authenticate Once with a Setup Project".
+BisaPrint tidak punya auth, tapi prinsip yang sama berlaku untuk state berulang lain (misal: order yang sudah dibuat, consent/cookie state). Kalau setiap test harus lewat flow pembuatan state yang sama, itu waste waktu + sumber cascading failure. **Fix pattern:** pakai setup project/`globalSetup` yang siapkan state sekali, atau helper `createOrderForTest` yang dipanggil per test. **Sumber:** Playwright official docs (setup/teardown).
 
 ### Scan 28: Playwright `workers: 1` (Disabled Parallelism) (Audit Test Suite Quality 14 Aug 2026)
 ```
@@ -624,13 +643,12 @@ Sebutkan sumber referensi yang dipakai di laporan Kategori B (bukan cuma "menuru
 
 **Kalau ada halaman/komponen yang tidak bisa diakses/di-screenshot** (gagal load, butuh re-login, error sementara, dll) — JANGAN langsung lapor dan berhenti. Coba dulu resolusi wajar sendiri: retry, cek console error, cek apakah butuh re-autentikasi, tunggu loading lebih lama. **Hanya laporkan kalau setelah usaha wajar tetap tidak bisa diakses** — itu baru jadi blocker genuine yang perlu diketahui user.
 
-**DB State Setup (WAJIB untuk page yang butuh specific booking/session state):** Banyak page di project ini butuh specific DB state untuk diakses — misal: session room butuh booking `IN_PROGRESS`, report page butuh booking `COMPLETED`, review page butuh booking `COMPLETED` tanpa review existing. Kalau page tidak bisa diakses karena DB state tidak sesuai:
-1. **Identifikasi** page state yang dibutuhkan (baca route handler / page component untuk tau condition apa yang harus true).
-2. **Buat Prisma script** (`__set-[state].ts` di root project) untuk set booking/session ke state yang dibutuhkan. Gunakan pattern: `import { PrismaClient } from "./lib/generated/prisma/client"` + `import { PrismaPg } from "@prisma/adapter-pg"`.
-3. **Jalankan script** via `npx tsx __set-[state].ts`.
-4. **Akses page** lewat Playwright MCP.
-5. **Setelah selesai, restore DB state** ke kondisi semula via script restore.
-6. **Hapus temp script** setelah selesai — jangan tinggalkan file `__*.ts` di root project.
+**State Setup (WAJIB untuk page/flow yang butuh specific order/payment state):** Beberapa page/flow di project ini butuh state spesifik untuk diverifikasi — misal: halaman sukses order butuh order dengan status `paid`, webhook butuh order `pending` yang valid, tracking butuh order yang ada di storage. Kalau page tidak bisa diakses/diverifikasi karena state tidak sesuai:
+1. **Identifikasi** state yang dibutuhkan (baca route handler / page component untuk tau condition apa yang harus true — cek `src/lib/order-storage.ts` untuk shape `StoredOrder`).
+2. **Buat state lewat jalur real** — paling akurat: jalankan flow-nya (isi checkout → dapat orderId → pakai orderId itu). Alternatif: tulis script temp (`__set-[state].ts` di root) yang panggil `createOrder`/storage helper langsung, atau POST ke API route lokal.
+3. **Akses page** lewat Playwright MCP dengan state yang sudah disiapkan.
+4. **Setelah selesai, bersihkan state** (hapus order test dari Upstash/in-memory).
+5. **Hapus temp script** setelah selesai — jangan tinggalkan file `__*.ts` di root project.
 
 **JANGAN skip page hanya karena tidak bisa diakses di first try.** Buat script, set state, akses page. Kalau setelah itu tetap gagal, baru lapor sebagai blocker.
 
@@ -641,7 +659,7 @@ Sebutkan sumber referensi yang dipakai di laporan Kategori B (bukan cuma "menuru
 **Beda dari Tahap 1 (audit fungsional) dan Kategori A/B (observasi visual pas kebetulan ambil screenshot):** UX Walkthrough adalah Devin BENERAN mencoba menyelesaikan tugas realistis dari flow yang sedang dievaluasi, seperti user pertama kali pakai — bukan cuma menganalisis code atau melihat screenshot statis, tapi benar-benar klik-klik lewat MCP Playwright dan mencatat SENDIRI di mana muncul kebingungan/friksi, dari sudut pandang pengguna.
 
 **Cara kerja:**
-1. Pilih 1 tugas realistis yang representatif untuk flow ini (contoh: "consultant membuat jadwal ketersediaan baru", bukan cuma "buka halaman jadwal").
+1. Pilih 1 tugas realistis yang representatif untuk flow ini (contoh: "customer checkout stiker A3 dengan upload desain", bukan cuma "buka halaman checkout").
 2. Coba selesaikan tugas itu dari awal sampai akhir lewat MCP Playwright, TANPA membaca dulu code implementasinya — supaya benar-benar mensimulasikan first-time user, bukan orang yang sudah tahu logic-nya.
 3. Catat SETIAP titik dimana Devin sendiri harus berhenti/bingung/nebak-nebak apa yang harus dilakukan, istilah yang tidak jelas maknanya, atau opsi yang seharusnya ada tapi tidak ditemukan.
 4. Setelah selesai (atau gagal menyelesaikan), analisis kenapa titik-titik itu terjadi — rujuk ke heuristik di atas.
@@ -703,10 +721,10 @@ UX-0 dianggap selesai kalau:
 ## Definisi "Selesai" untuk UX-0.5 (Functional Completeness Sweep)
 
 UX-0.5 dianggap selesai kalau:
-- Persona-Needs Matrix sudah dibuat untuk SEMUA role (Client, Consultant, Admin)
-- SEMUA 6 kategori gap sudah dicek untuk setiap role
+- Persona-Needs Matrix sudah dibuat untuk SEMUA persona (Customer/pengunjung, Admin/owner)
+- SEMUA 6 kategori gap sudah dicek untuk setiap persona
 - Setiap gap sudah di-cross-reference dengan code (bukan cuma asumsi "tidak ada")
-- 7 pertanyaan Senior UX Designer Mindset sudah dijawab untuk setiap role
+- 7 pertanyaan Senior UX Designer Mindset sudah dijawab untuk setiap persona
 - Laporan tersimpan di `reports/cross-audits/functional-completeness-sweep.md`
 - **UX-0.5 TIDAK termasuk eksekusi fix** — fix dilakukan setelah user approve, terpisah dari UX-0.5. UX-0.5 selesai = laporan selesai, bukan fix selesai.
 
@@ -729,7 +747,7 @@ Jangan cuma ngecek "test pass" — tanyakan:
 
 **Prinsip tambahan:**
 - **Test yang tidak catch bug adalah liability, bukan asset.** Hapus atau rewrite test yang tidak valuable.
-- **Coverage percentage adalah vanity metric.** 100% coverage dengan shallow assertion = 0% confidence. Mutation score yang penting. Target mutation score per criticality: CRITICAL (payment, auth, booking logic) ≥80%, HIGH (notification, review, admin actions) ≥70%, MEDIUM (consultant profile, session logic) ≥60%, LOW (utility, formatting) ≥50%. Source: StrykerJS benchmark 2025-2026 — 75-90% healthy, <60% poor.
+- **Coverage percentage adalah vanity metric.** 100% coverage dengan shallow assertion = 0% confidence. Mutation score yang penting. Target mutation score per criticality: CRITICAL (payment/Midtrans, order storage, pricing calc) ≥80%, HIGH (upload, notifikasi WA, webhook handling) ≥70%, MEDIUM (simulator math, tracking) ≥60%, LOW (utility, formatting) ≥50%. Source: StrykerJS benchmark 2025-2026 — 75-90% healthy, <60% poor.
 - **Test harus isolated dan deterministic.** Test yang depend on test order, shared state, atau timing = test yang akan flaky.
 - **Jangan test implementation detail yang tidak matter.** Test behavior, bukan implementation.
 - **Setiap test harus punya satu alasan untuk FAIL.** Test yang bisa FAIL karena banyak alasan = susah di-debug.
@@ -774,8 +792,8 @@ Setiap vitest file WAJIB diklasifikasikan ke salah satu:
 - Referensi: Martin Fowler — "Test rot: tests that become unreliable over time"
 
 **5. Coverage Gap Analysis**
-- Function penting di `features/*/services/` yang tidak punya test
-- Utility function di `lib/` yang tidak punya test
+- Function penting di `src/lib/` (pricing, midtrans, order-storage, paper-sizes) yang tidak punya test
+- Utility function di `src/lib/utils.ts` yang tidak punya test
 - Schema validation (Zod) yang tidak punya test
 - API route handler yang tidak punya test
 - Referensi: Test Pyramid — unit test untuk logic murni, integration test untuk API, E2E untuk user flow
@@ -827,9 +845,9 @@ Setiap vitest file WAJIB diklasifikasikan ke salah satu:
 ### Criticality Dimension (WAJIB untuk VB-0 prioritization)
 
 Setiap test file WAJIB diberi tag criticality:
-- **CRITICAL**: payment, auth, booking logic (bug = uang hilang / unauthorized access)
-- **HIGH**: notification, review, admin actions (bug = wrong state / data integrity)
-- **MEDIUM**: consultant profile, session logic (bug = UX degradation)
+- **CRITICAL**: payment (Midtrans token/webhook), order storage, pricing calc (bug = uang hilang / order salah)
+- **HIGH**: upload file, notifikasi WA admin (bug = order tanpa file / admin tidak tahu)
+- **MEDIUM**: simulator imposition math, tracking (bug = hasil export salah)
 - **LOW**: utility, formatting, display helper
 
 Priority matrix: **Criticality × Test Quality**. Critical + Shallow = fix pertama. Low + Shallow = fix terakhir.
@@ -847,7 +865,7 @@ Manual mutation testing (ubah code, run test, cek FAIL) masih valid sebagai quic
 **Setup StrykerJS (kalau dipilih):**
 - Install: `npm i -D @stryker-mutator/core @stryker-mutator/vitest-runner`
 - Config: `stryker.conf.json` dengan `testRunner: "vitest"`, `coverageAnalysis: "perTest"`, `thresholds.break: 60`
-- Jalankan: `npx stryker run` (full) atau `npx stryker run --mutate features/payment/services/duitku.ts` (per-file)
+- Jalankan: `npx stryker run` (full) atau `npx stryker run --mutate src/lib/midtrans.ts` (per-file)
 - Mutation score target lihat prinsip tambahan di atas (CRITICAL ≥80%, HIGH ≥70%, MEDIUM ≥60%, LOW ≥50%)
 
 ### Test Maintainability Dimension (WAJIB dicek di VB-1)
@@ -864,9 +882,9 @@ Test bisa valuable tapi unmaintainable = tetap masalah. Tandai sebagai temuan te
 
 Catat execution time per file di VB-0. File dengan >5s execution = candidate untuk optimize atau parallelize. Target: full `npx vitest run` < 60 detik. Kalau test suite lambat, tim akan skip run test = test suite menjadi liability.
 
-### Next.js App Router Testing Boundary (WAJIB untuk KonsulExpert)
+### Next.js App Router Testing Boundary (WAJIB untuk BisaPrint)
 
-KonsulExpert pakai Next.js 16+ App Router. Ada boundary tegas antara apa yang bisa di-test dengan Vitest vs Playwright. Boundary ini ditentukan oleh `await` di async Server Component.
+BisaPrint pakai Next.js 16+ App Router. Ada boundary tegas antara apa yang bisa di-test dengan Vitest vs Playwright. Boundary ini ditentukan oleh `await` di async Server Component.
 
 **Aturan boundary:**
 
@@ -876,26 +894,27 @@ KonsulExpert pakai Next.js 16+ App Router. Ada boundary tegas antara apa yang bi
 | Sync Server Component | Vitest + RTL | jsdom | Tidak ada async/await, render sebagai function biasa |
 | **Async Server Component** | **Playwright E2E** | Real browser | Vitest TIDAK BISA render async RSC. `await` = boundary line. |
 | Server Actions | Vitest (logic) + Playwright (integration) | node/jsdom | Test business logic di Vitest, test form submission di Playwright |
-| Route Handlers (`route.ts`) | Vitest direct invocation | node | Mock Prisma, test request/response handling |
+| Route Handlers (`route.ts`) | Vitest direct invocation | node | Mock Upstash/Blob client, test request/response handling |
 | Full user flows | Playwright | Real browser | Real network, real rendering |
 
-**Yang WAJIB di-mock untuk Vitest (sudah di vitest.setup.ts):**
+**Yang WAJIB di-mock untuk Vitest (sudah di vitest.setup.ts — kalau belum ada, tambahkan):**
 - `next/navigation` (`useRouter`, `usePathname`, `useSearchParams`, `redirect`)
 - `next/headers` (`cookies()`, `headers()`)
-- Prisma client (per test file, untuk service tests)
+- External clients per test file: Upstash Redis (`src/lib/order-storage.ts`), Vercel Blob, Midtrans fetch
 
 **Referensi:** codewithseb.com, nextjslaunchpad.com, sitepoint.com, devcheolu.com, stacknotice.com (5 sources konfirm 2026).
 
-### Server Action Test Matrix (WAJIB untuk protected server actions)
+### API Route Test Matrix (WAJIB untuk endpoint yang menyentuh order/payment)
 
-Setiap server action yang protected WAJIB di-test dengan 4 scenario (codewithseb.com pattern):
+BisaPrint tidak punya user auth — tapi endpoint order/payment tetap WAJIB di-test dengan skenario berikut:
 
-1. **Anonymous** (no auth) → should reject dengan 401/403
-2. **Invalid input** → should validate dan reject dengan error message spesifik
-3. **Wrong owner** (IDOR test) → user A tidak bisa modify resource user B
-4. **Admin override** → admin bisa akses resource manapun
+1. **Invalid input** → should validate dan reject dengan 400 + error message spesifik
+2. **Missing field** → field wajib kosong/null → reject, bukan crash
+3. **Wrong signature** (webhook) → `signature_key` salah → reject 401, order TIDAK berubah
+4. **Idempotent webhook** → callback duplikat dengan payload sama → proses sekali saja
+5. **Order tidak ditemukan** → `orderId` random → 404/handle graceful, bukan 500
 
-4 test ini run dalam milliseconds, catch IDOR-shaped bugs yang sering lolos ke production. IDOR = Insecure Direct Object Reference, salah satu OWASP Top 10.
+Test ini run dalam milliseconds, catch bug validasi/security yang sering lolos ke production.
 
 ### 9 Test Suite Health Indicators + Trade-off Awareness (McMinn et al. ICSE 2025)
 
@@ -941,17 +960,16 @@ Criticality dimension di-upgrade menjadi full risk-based tier system (TestRail, 
 
 **Effort allocation:** T1 = 60-70% effort, T2 = 20-30%, T3 = 10%.
 
-**Risk matrix untuk KonsulExpert (baseline, reassess setiap major release):**
+**Risk matrix untuk BisaPrint (baseline, reassess setiap major release):**
 
 | Module | Impact | Technical | Historical | Score | Tier |
 |--------|--------|-----------|------------|-------|------|
-| Payment (Duitku) | 5 | 4 | 3 | 20 | T1 |
-| Auth (NextAuth) | 5 | 3 | 2 | 15 | T1 |
-| Booking logic | 5 | 4 | 3 | 20 | T1 |
-| Admin dashboard | 3 | 3 | 2 | 9 | T2 |
-| Consultant profile | 3 | 2 | 2 | 6 | T2 |
-| Notification | 2 | 2 | 1 | 4 | T3 |
-| FAQ/Home | 1 | 1 | 1 | 1 | T3 |
+| Payment (Midtrans create-token + webhook) | 5 | 4 | 2 | 20 | T1 |
+| Order storage (Upstash/in-memory) | 4 | 3 | 2 | 12 | T1 |
+| Checkout form + upload | 4 | 3 | 2 | 12 | T1 |
+| Design simulator (imposition math) | 3 | 3 | 1 | 9 | T2 |
+| WhatsApp notification | 2 | 2 | 1 | 4 | T3 |
+| Landing page sections | 1 | 1 | 1 | 1 | T3 |
 
 **Reassessment:** Review risk map setiap major release atau monthly. Look at: production bugs yang escape, code churn per module, tests yang catch real issues vs yang cuma run green.
 
@@ -1060,7 +1078,7 @@ Kerjakan **satu flow dalam satu waktu**, jangan langsung semua flow sekaligus (u
 2. Cari gap dengan kerangka pertanyaan: "kalau sistem ini dipakai oleh banyak user dalam jangka waktu lama (bertahun-tahun), hal apa yang bisa gagal atau belum terhandle di titik ini?" — termasuk edge case kecil (elemen UI duplikat dengan behavior beda, redirect/URL tidak sesuai, state tidak ter-reset, notifikasi yang seharusnya ada tapi tidak dikirim).
 3. Jangan batasi diri ke kategori yang sudah ditentukan sebelumnya — eksplorasi bebas dari hasil analisis kode.
 3B. **Kalau flow yang diaudit menyentuh auth/payment/admin/data pribadi user, WAJIB tambahkan security checklist minimal ini** (bukan full security testing, cukup yang paling murah dan paling kritis untuk project skala ini):
-   - **Authorization boundary** — apakah user A bisa akses/modifikasi resource milik user B hanya dengan mengubah ID di URL/request (IDOR)? Cek endpoint yang terima parameter ID (`bookingId`, `userId`, dll) apakah ada verifikasi kepemilikan, bukan cuma cek "user login" doang.
+   - **Authorization boundary** — apakah siapapun bisa akses order orang lain hanya dengan mengubah ID di URL/request (IDOR)? Cek endpoint yang terima parameter ID (`orderId`, `midtransOrderId`, dll) — apakah ada verifikasi/secret, atau order ID cukup unguessable (cek format di `order-storage.ts`).
    - **Input validation di endpoint finansial** — apakah ada validasi server-side untuk amount/harga (tidak bisa negatif, tidak bisa dimanipulasi dari client), bukan cuma validasi di UI yang bisa di-bypass.
    - Accessibility (a11y) dan performance/load testing SENGAJA tidak dimasukkan sebagai kewajiban di tahap project ini (skala solo developer + bimbingan mentor) — dicatat sebagai backlog untuk fase production-readiness nanti, bukan blocker sekarang.
 4. **Sebelum declare audit ini selesai, lakukan self-recheck dulu:** baca ulang temuan yang sudah dikumpulkan, tanya ke diri sendiri "apa ada sudut yang saya lewatkan — failure case, dampak ke role lain, UI/redirect/state?" Kalau nemu tambahan, masukkan dulu sebelum lapor final. **Cross-check juga secara eksplisit terhadap 5 Kelas Blind Spot Testing + Kelas ke-6 (Visual/Layout Regression) di atas** — untuk masing-masing kelas, tentukan apakah relevan untuk flow ini, dan kalau relevan, apakah itu bug nyata atau gap coverage test.
@@ -1116,7 +1134,7 @@ Setelah user approve rekomendasi dari audit, gap yang perlu di-fix dikerjakan du
 
 ## Cross-Flow Regression Check (Wajib Sebelum Status "AMAN")
 
-Flow di project ini saling terhubung (booking → payment → session → notification, dll berbagi file/service). Fix di satu flow bisa merusak flow LAIN yang sebelumnya sudah AMAN, tanpa ketahuan kalau tidak dicek eksplisit.
+Flow di project ini saling terhubung (checkout → payment token → webhook → order storage → notifikasi, berbagi file/helper). Fix di satu flow bisa merusak flow LAIN yang sebelumnya sudah AMAN, tanpa ketahuan kalau tidak dicek eksplisit.
 
 **Sebelum menandai flow manapun "AMAN", WAJIB:**
 1. Identifikasi flow lain mana yang share file/service dengan flow yang baru di-fix/ditest (cek import, service yang dipanggil lintas-feature).
@@ -1126,6 +1144,71 @@ Flow di project ini saling terhubung (booking → payment → session → notifi
 
 Ini bukan proses berat setiap kali — cukup identifikasi dependency dan smoke test target, bukan re-run semua flow dari nol setiap ada perubahan kecil.
 
+
+## Temuan Cross-Flow: Fix In Place (DEFAULT, Bukan "Catat Lalu Lewat")
+
+> Ditambahkan dari pengalaman project lain. Konteks: audit flow A sering nemu gap yang akarnya ada di file milik flow B (contoh: bug validasi di `order-storage.ts` ketemu saat audit checkout, masalah webhook ketemu saat audit notifikasi). Selama ini temuan begitu cuma "dicatat di audit flow A" lalu dilewat - hasilnya status ngambang dan lu takut ada yang kelewat. Sekarang: **fix di tempat adalah default**, bukan pengecualian.
+
+### Aturan main
+
+1. **Default = fix sekarang.** Temuan di flow A yang akarnya di flow/file B → fix langsung di tempat saat itu juga, dengan analisis root cause yang sama dalamnya seperti temuan in-flow. Jangan nulis "handled by flow B" lalu berhenti.
+2. **Verifikasi kepemilikan dulu.** Sebelum fix, cek: apakah flow B sudah punya entry/temuan untuk ini? Kalau ya, resolve entry itu juga - jangan bikin temuan duplikat.
+3. **Catat di DUA tempat:**
+   - Audit flow A (penemu): temuan + cross-ref ke fix di B.
+   - Audit/status flow B (pemilik file): status temuan di-update sesuai hasil fix.
+   - `reports/status.md` kedua flow kalau perlu.
+4. **Pengecualian STOP + tanya user (jangan fix diam-diam):**
+   - Butuh keputusan produk/bisnis (trade-off nyata).
+   - Refactor besar / breaking change di flow B.
+   - Flow B lagi ada WIP user yang bakal konflik.
+   Kalau bukan 3 hal itu → fix langsung.
+5. **By-design itu sah, tapi harus dibuktikan.** Kalau setelah dicek temuan ternyata memang by-design (misal: order storage fallback in-memory sengaja untuk local MVP karena Upstash belum dikonfigurasi), tulis alasannya eksplisit di audit - bukan cuma "aman".
+6. **Blast radius + targeted test tetap wajib** (aturan Tahap 2 berlaku penuh - cross-flow tidak berarti "quick patch").
+
+### Repo-Wide Interim Sweep (wajib di akhir setiap sesi fix cross-flow)
+
+Setelah fix cross-flow, jalankan scan status kolom terakhir di SEMUA `reports/audit/*.md` (bukan cuma flow yang sedang dikerjakan). Pengalaman 11 Sep: sweep ini nangkep 2 item ngambang (TMB-04 email-verification, updateProfile PARTIAL di auth-flow) yang sudah "dilewat" audit masing-masing flow. Satu command cukup:
+
+```powershell
+# Scan kolom status terakhir untuk status non-terminal
+Get-ChildItem reports/audit -Filter "*.md" | ForEach-Object {
+  $lines=[IO.File]::ReadAllLines($_.FullName); foreach($l in $lines){
+    if($l -match '\|\s*(ACK|ACKNOWLEDGED|OPEN|PARTIAL|DEFERRED)\s*(\(.*\))?\s*\|?\s*$' -and
+       $l -notmatch 'FIXED|RESOLVED|DECIDED|VERIFIED|by-design|DEFERRED-E2E|COVERED'){
+      Write-Host "HIT $($_.BaseName) : $($l.Substring(0,[Math]::Min(110,$l.Length)))"
+    }
+  }
+}
+```
+
+### Deep Recheck (Final Sweep) - stage baku, gak perlu re-prompt manual
+
+### Sweep/Cross-Cutting Findings WAJIB Propagasi ke Audit Flow Pemilik
+
+> Ditambahkan dari insiden nyata di project lain: temuan P1 di sweep report tidak tercatat di audit flow pemiliknya — artinya re-check flow itu tidak akan pernah melihat temuan tersebut. Sweep report boleh jadi master list, tapi audit flow pemilik WAJIB punya copy actionable-nya.
+
+**Aturan untuk SEMUA sweep (UX-0, UX-0.5, VB-0, PR appendix, deep recheck):**
+
+1. Temuan Kategori A / P0-P2 yang akarnya di flow X → **WAJIB di-append ke `reports/audit/[flow-X].md`** dengan ID flow X sendiri (bukan ID sweep) + cross-ref ke sweep report. Contoh: `CF-A-XX (ditemukan via UX0-A6 ronde 3)` — pakai prefix flow BisaPrint (`LP` landing, `CF` checkout, `WA` whatsapp, `DS` simulator).
+2. `reports/status.md` row flow X WAJIB dapat note singkat (`temuan sweep UX-0: CF-A-XX OPEN`) supaya clearance gate flow itu tidak lolos tanpa menyelesaikannya.
+3. Sweep report tetap jadi master list — tapi flow audit adalah tempat fix-nya dieksekusi dan ditutup. Saat fix: update KEDUANYA (sweep report VERIFIED + flow audit FIXED).
+4. "Menunggu approval" di sweep report TIDAK membebaskan flow audit dari punya entry OPEN. Approval cuma soal KAPAN fix, bukan soal flow pemilik boleh tidak tahu.
+5. Status sweep di `status.md` Cross-Cutting table (DONE/ADA ISU) adalah status sweep-nya; flow individual tetap punya tanggung jawab sendiri.
+
+### Status.md Hygiene (mencegah false-positive sweep)
+
+- Kolom notes `status.md` boleh berisi sejarah ("temuan X ditemukan"), tapi JANGAN menyebut temuan yang sudah resolved sebagai "OPEN" - itu bikin sweep keyword menghasilkan false positive dan kepercayaan laporan turun.
+- Setiap perubahan status temuan di audit file → sync `status.md` di commit yang sama. Status drift (audit bilang FIXED, status.md bilang OPEN) adalah bug dokumentasi.
+
+Prompt "LAST DEEP RECHECK, PASTIIN SEMUA CLEAR..." itu sekarang jadi stage baku. Artinya untuk setiap batch flow yang diklaim selesai:
+
+1. Interim sweep repo-wide (command di atas).
+2. `status.md` Final column dicek per flow.
+3. `npx tsc --noEmit` + vitest targeted untuk file yang disentuh.
+4. `git status --short` - pastikan tidak ada file relevan yang lupa di-commit.
+5. Laporan: CLEAR per flow + catatan cross-flow (apa yang disentuh di luar scope, kenapa, statusnya).
+
+Kalau user kirim prompt recheck manual, jawabannya harus didukung bukti dari langkah 1-4, bukan klaim lisan.
 ## Definisi "Selesai" untuk Satu Flow
 
 Satu flow baru dianggap benar-benar selesai (status "AMAN" di reports/status.md) kalau:
@@ -1139,30 +1222,29 @@ Satu flow baru dianggap benar-benar selesai (status "AMAN" di reports/status.md)
 ## Definition of Done — Level Project (Bukan Cuma Per-Flow)
 
 Semua flow individual bisa "AMAN" tapi project belum tentu siap dipresentasikan/deploy production. Project dianggap siap kalau:
-- Semua flow kritis (money-flow, booking-lifecycle, auth, session-delivery, admin-access) sudah berstatus AMAN.
+- Semua flow kritis (checkout-flow, payment-webhook, order-storage, design-simulator) sudah berstatus AMAN.
 - Cross-Flow Regression Check sudah dilakukan untuk semua flow yang saling terhubung, bukan cuma dicek terpisah-pisah per flow.
 - Security checklist minimal (authorization boundary + input validation finansial, lihat Tahap 1 poin 3B) sudah dilakukan untuk SEMUA flow yang menyentuh auth/payment/admin.
 - Tidak ada temuan berstatus OPEN dengan risiko TINGGI yang masih menggantung tanpa keputusan.
 
 **Catatan tambahan (belum wajib sekarang, dicatat sebagai kesadaran/backlog untuk fase production-readiness nanti, bukan blocker untuk skala project ini):**
-- Test data isolation — kalau test dijalankan paralel/bersamaan di masa depan, data seed yang di-share bisa saling mengganggu antar test run. Belum jadi masalah nyata selama test dijalankan sequential seperti sekarang.
-- Data realism drift — seed data untuk testing itu "bersih"/ideal, sementara data user asli nanti bisa lebih berantakan (nama dengan karakter khusus, format tidak standar). Test yang PASS di seed data belum tentu representatif untuk data nyata di production.
-- Dependency/security audit (`npm audit` atau setara) belum ada cadence rutinnya — worth dilakukan periodik terutama menjelang deploy besar, karena ini platform finansial.
-- Keputusan arsitektur besar (seperti pemilihan proxy.ts vs middleware.ts, AUTH_TRUST_HOST) belum ada tempat permanen untuk mendokumentasikan alasannya — worth dicatat di README/PROJECT.md kalau ada keputusan besar ke depan, supaya tidak lupa alasannya beberapa bulan kemudian.
-- Load/concurrency testing sengaja di-defer (sudah dibahas di Tahap 1 poin 3B) — kalau mau sanity-check paling murah suatu saat, cukup coba beberapa booking bersamaan secara manual, tidak perlu tooling khusus dulu.
+- Test data isolation — BisaPrint tidak punya DB/seed; order test dibuat lewat API/storage helper. Kalau test dijalankan paralel di masa depan, order ID yang di-share bisa saling mengganggu — pakai ID unik per test.
+- Data realism drift — data test itu "bersih"/ideal, sementara input user asli bisa lebih berantakan (nama dengan karakter khusus, alamat multi-baris, file desain besar). Test yang PASS di data ideal belum tentu representatif untuk data nyata di production.
+- Dependency/security audit (`npm audit` atau setara) belum ada cadence rutinnya — worth dilakukan periodik terutama menjelang deploy besar, karena ini platform finansial (Midtrans).
+- Keputusan arsitektur besar (misal: Upstash vs in-memory fallback, kenapa tanpa auth, kenapa Midtrans Snap bukan self-hosted form) belum ada tempat permanen untuk mendokumentasikan alasannya — worth dicatat di README/PROJECT.md supaya tidak lupa alasannya beberapa bulan kemudian.
+- Load/concurrency testing sengaja di-defer (sudah dibahas di Tahap 1 poin 3B) — kalau mau sanity-check paling murah suatu saat, cukup coba beberapa checkout bersamaan secara manual, tidak perlu tooling khusus dulu.
 
-## Dua Jenis Seed Data — WAJIB Dipisah, Jangan Dicampur
+## Test Data — WAJIB Deterministic
 
-Seed data untuk **test otomatis** dan seed data untuk **demo/presentasi ke mentor/orang lain** punya tujuan yang saling bertentangan kalau dicampur jadi satu file — WAJIB dipisah jadi dua:
+BisaPrint tidak punya database/seed file — tapi prinsip yang sama berlaku untuk data yang dipakai test:
 
-### `prisma/seed.ts` — untuk test otomatis (E2E, Vitest)
-- **Minimal dan deterministic** — jumlah data harus PASTI dan predictable, karena banyak assertion di test meng-cek angka/kondisi spesifik (misal "expect 3 booking pending"). Data yang terlalu banyak/random bisa bikin test salah pilih elemen atau melambat.
-- Ini yang dipakai di semua alur Tahap 1-4 di atas — JANGAN pernah diganti dengan data demo yang besar, karena bisa merusak assertion yang mengharapkan state spesifik.
+### Data untuk test otomatis (E2E, Vitest)
+- **Minimal dan deterministic** — order test dibuat dengan field pasti (nama, produk, harga fix), karena assertion meng-cek nilai spesifik. Jangan pakai data random yang bisa bikin test salah pilih elemen.
+- **Order test WAJIB dibuat dan dibersihkan oleh test itu sendiri** — pakai helper (misal `createOrderForTest`) atau langsung panggil storage helper. Jangan bergantung pada order yang "kebetulan ada".
+- **Fallback in-memory** (`order-storage.ts` tanpa env Upstash) otomatis fresh per process — itu bagus untuk test, tapi sadar bahwa state tidak persist antar run.
 
-### `prisma/seed-demo.ts` (baru, terpisah) — untuk ditunjukkan ke mentor/orang lain
-- **Representasikan pemakaian realistis dalam jangka waktu tertentu** (kira-kira setara 6 bulan–1 tahun pemakaian) — cukup banyak untuk terlihat "hidup"/real, TAPI JANGAN berlebihan (tidak perlu ribuan record, cukup representatif: puluhan booking dengan berbagai status, beberapa review, beberapa notifikasi, dst — mencakup variasi kondisi, bukan volume besar untuk volume semata).
-- **WAJIB ada beberapa akun contoh yang LENGKAP SEPENUHNYA** — semua field profil terisi, riwayat lengkap (booking dari berbagai status: selesai, dibatalkan, sedang berjalan; review yang sudah diberikan; dst) — supaya kalau ditunjukkan ke mentor/orang lain, akun itu "enak dilihat" dan mendemonstrasikan seluruh fitur, bukan terlihat kosong/baru daftar.
-- **Command terpisah** dari seed test biasa (misal `npm run db:seed:demo`), dan JANGAN PERNAH dijalankan otomatis sebelum test E2E/Vitest — jalankan manual hanya saat memang mau demo, lalu kembalikan ke `seed.ts` biasa sebelum lanjut testing lagi supaya tidak mengganggu assertion yang mengharapkan state minimal.
+### Data untuk demo/screenshot
+- Kalau perlu tampilan "hidup" untuk demo (portfolio terisi, testimoni, produk lengkap) — itu datang dari `src/data/`, bukan dari seed. Edit data file itu untuk kebutuhan demo, bukan bikin state test.
 
 ## Unit Test (Vitest) vs E2E Test (Playwright) — Wajib Dibedakan
 
@@ -1171,17 +1253,17 @@ Selama ini rules dan template prompt cuma fokus ke E2E (Playwright). Ini menyeba
 **Unit Test (Vitest)** — testing fungsi/logic murni secara terisolasi, TANPA browser, TANPA koneksi database/API asli (kalau butuh data, di-mock).
 
 WAJIB ditulis untuk:
-- Kalkulasi (harga, komisi, diskon, refund amount, dll)
-- Validasi input (format email, password strength, business rule validation)
-- Utility function (format tanggal/timezone, parsing, transformasi data)
-- Business logic yang bisa diuji tanpa UI (state machine transition logic, permission/role checking logic)
+- Kalkulasi (harga, imposition math `paper-sizes.ts`, pricing)
+- Validasi input (format email/telepon, validasi checkout form)
+- Utility function (format harga/tanggal, parsing, transformasi data)
+- Business logic yang bisa diuji tanpa UI (order state transition, WA URL builder, signature verification)
 
-**Integration Test (Vitest + Testing Library)** — testing component/hook behavior dengan mocked dependencies, TANPA full browser. Sweet spot antara unit test (terlalu isolated) dan E2E (terlalu lambat). Project sudah install `@testing-library/react` + `@testing-library/jest-dom` + `@vitejs/plugin-react`.
+**Integration Test (Vitest + Testing Library)** — testing component/hook behavior dengan mocked dependencies, TANPA full browser. Sweet spot antara unit test (terlalu isolated) dan E2E (terlalu lambat). Pastikan `@testing-library/react` + `@testing-library/jest-dom` + jsdom ter-setup dulu sebelum menulis test jenis ini.
 
 WAJIB ditulis untuk:
-- Component dengan complex state interaction (form validation rendering, modal open/close, multi-step form state)
-- Hook dengan async logic (React Query cache invalidation, form state management)
-- API route handler dengan mocked Prisma (bukan full browser, tapi bukan pure unit juga)
+- Component dengan complex state interaction (checkout form validation, simulator canvas state)
+- Hook dengan async logic (upload state, fetch order status)
+- API route handler dengan mocked Upstash/Blob/Midtrans (bukan full browser, tapi bukan pure unit juga)
 - Component yang sulit di-test dengan E2E karena state transient (loading state, error state, race condition)
 
 Referensi: Kent C. Dodds — Testing Trophy (integration tests sebagai sweet spot, bukan test pyramid yang menekankan unit).
@@ -1189,7 +1271,7 @@ Referensi: Kent C. Dodds — Testing Trophy (integration tests sebagai sweet spo
 **E2E Test (Playwright)** — testing alur user LENGKAP lewat browser (klik, isi form, navigasi, integrasi antar komponen).
 
 WAJIB ditulis untuk:
-- User flow lintas halaman (booking, checkout, login, dst — yang sudah dicover di workflow Tahap 1-4 di atas)
+- User flow lintas halaman (landing → checkout → pembayaran → sukses — yang sudah dicover di workflow Tahap 1-4 di atas)
 - Interaksi UI yang tidak bisa diuji tanpa render browser (drag-drop, modal, form multi-step)
 
 **Aturan wajib:** Setiap kali audit (Tahap 1) menemukan business logic/fungsi kalkulasi/validasi yang kritis, WAJIB dicatat juga apakah logic itu punya unit test coverage — kalau belum ada, itu jadi temuan gap tersendiri, terpisah dari gap E2E flow. Jangan asumsikan E2E test yang mencakup flow tersebut sudah cukup — E2E menguji "apakah hasil akhirnya benar dari sudut pandang user", bukan "apakah logic kalkulasinya benar di semua kemungkinan input", yang lebih presisi diuji lewat unit test.
@@ -1203,7 +1285,7 @@ WAJIB ditulis untuk:
 Tidak semua temuan/perubahan butuh proses selengkap di atas (audit multi-opsi, self-report checkpoint, update reports/status.md). Pakai panduan ini:
 
 **Proses LENGKAP (semua tahap 1-4 + checkpoint) — WAJIB untuk:**
-- Business logic, data/booking/payment flow, auth, apapun yang menyentuh keputusan produk atau uang.
+- Business logic, data/order/payment flow, webhook, apapun yang menyentuh keputusan produk atau uang.
 - Perubahan yang berdampak ke lebih dari satu flow/halaman.
 
 **Proses RINGKAS (boleh langsung fix + laporan singkat, skip audit multi-opsi) — untuk:**
@@ -1234,56 +1316,46 @@ Sebelum melaporkan sebuah flow sebagai "AMAN" di `reports/status.md`, lakukan la
 
 ## Production Readiness Testing (Cross-Cutting / Appendix)
 
-Section ini berisi test patterns untuk aspek yang TIDAK ter-cover oleh Track A/B/C. Ini adalah gap yang ditemukan saat brainstorming upgrade QA/QC framework (12 Aug 2026), setelah app deploy ke private network `192.168.1.77:30056`.
+Section ini berisi test patterns untuk aspek yang TIDAK ter-cover oleh Track A/B/C — gap yang ditemukan saat upgrade QA/QC framework.
 
-### PR-1: Database ACID Rollback Testing
+### PR-1: Multi-Step Failure Testing (partial failure di proses berantai)
 
-**Kapan WAJIB:** Setiap function yang menggunakan `prisma.$transaction` dengan ≥2 write operations. Khususnya money-flow (`cancelAndRefundBooking`, `initiatePayment`, `expirePendingBookings`, webhook PAID/FAILED/REFUND).
+**Kapan WAJIB:** Setiap function/endpoint yang melakukan ≥2 operasi berurutan dengan side effect. Di BisaPrint: `/api/midtrans/create-token` (buat order → simpan storage → panggil Midtrans), `/api/midtrans/webhook` (verifikasi signature → update order → notifikasi), `/api/upload` (validasi → upload Blob → simpan URL ke order).
 
 **Pattern test (Vitest, no new tools):**
 ```typescript
-it("rollback ketika tx.payment.update throw di tengah transaction", async () => {
-  mockPrisma.$transaction.mockImplementation(async (fn) => {
-    const tx = { ...mockPrisma, payment: { update: vi.fn().mockRejectedValue(new Error("DB connection lost")) } };
-    return fn(tx);
-  });
-  const result = await cancelAndRefundBooking("booking-1", "test");
-  expect(result.success).toBe(false);
-  // Verify tidak ada partial commit — booking.update TIDAK dipanggil
-  expect(mockPrisma.booking.update).not.toHaveBeenCalled();
-  expect(mockPrisma.availability_slot.update).not.toHaveBeenCalled();
+it("gagal di step Midtrans → order tidak disimpan sebagai pending-paid", async () => {
+  // mock storage sukses, mock Midtrans fetch gagal
+  vi.spyOn(storage, "createOrder").mockResolvedValue(order);
+  global.fetch = vi.fn().mockRejectedValue(new Error("Midtrans down"));
+  const res = await POST(makeRequest(validPayload));
+  expect(res.status).toBe(500);
+  // Verify order TIDAK ditandai punya snapToken / status tidak setengah jalan
 });
 ```
 
 **Aturan:**
-- Test WAJIB verifikasi bahwa setelah error di tengah transaction, operasi setelahnya TIDAK dijalankan (tidak ada partial commit).
-- Test WAJIB cover setidaknya 1 skenario error per transaction function utama.
-- Prisma `$transaction` otomatis rollback kalau callback throw — yang di-test adalah apakah KODE KITA melempar error dengan benar ketika intermediate step gagal.
+- Test WAJIB verifikasi bahwa kalau step tengah gagal, state akhir tidak "setengah jadi" (order tanpa token, file terupload tapi order tidak tercatat, dll).
+- Test WAJIB cover setidaknya 1 skenario failure per multi-step endpoint.
+- Storage BisaPrint (Upstash/in-memory) tidak punya transaksi — jadi yang di-test adalah urutan operasi dan compensasi/logic penanganan error-nya.
 
 ### PR-2: Idempotency Testing
 
-**Kapan WAJIB:** Setiap endpoint/function yang bisa dipanggil concurrent oleh user (payment initiate, webhook, payout disburse, booking create).
+**Kapan WAJIB:** Setiap endpoint yang bisa dipanggil berulang/concurrent — webhook Midtrans (Midtrans BISA kirim callback duplikat), create-token (user double-click bayar), upload.
 
 **Pattern test (Vitest, no new tools):**
 ```typescript
-it("hanya 1 request success saat 3 concurrent initiatePayment", async () => {
-  mockPrisma.payment.updateMany
-    .mockResolvedValueOnce({ count: 1 }) // first call wins
-    .mockResolvedValueOnce({ count: 0 }) // second loses (optimistic lock)
-    .mockResolvedValueOnce({ count: 0 }); // third loses
-  const results = await Promise.all([
-    initiatePayment("booking-1", "BCA"),
-    initiatePayment("booking-1", "BCA"),
-    initiatePayment("booking-1", "BCA"),
-  ]);
-  const successCount = results.filter(r => r.success).length;
-  expect(successCount).toBe(1);
+it("webhook duplikat hanya proses sekali", async () => {
+  const payload = makeWebhookPayload({ order_id: "order-1", transaction_status: "settlement" });
+  await POST(makeRequest(payload));
+  await POST(makeRequest(payload)); // duplicate
+  // Verify updateOrderStatus efektif idempotent — notifikasi admin tidak terkirim 2x
 });
 ```
 
 **Aturan:**
-- Test WAJIB simulate concurrent call dengan `Promise.all()`.
-- Test WAJIB verifikasi hanya 1 operation success (idempotency guard works).
+- Test WAJIB simulate call berulang (sequential `await` 2x, atau `Promise.all()` untuk concurrent).
+- Test WAJIB verifikasi side effect tidak terduplikasi (notifikasi WA admin tidak dikirim 2x untuk payment yang sama).
 - Untuk webhook: test duplicate callback dengan signature yang sama → hanya proses sekali.
 
 ### PR-3: Security Scan (Basic)
@@ -1303,8 +1375,52 @@ it("hanya 1 request success saat 3 concurrent initiatePayment", async () => {
 |------|---------------|-------------|---------|
 | **Sentry** | 1 hari sebelum deploy ke public/internet | `npm i @sentry/nextjs` + `npx @sentry/wizard@latest -i nextjs` | Free tier 5K errors/bulan. Catch runtime error yang tidak tertangkap. |
 | **k6** | Pre-public-launch (load test sebelum buka ke user) | `choco install k6` (Windows) atau download dari k6.io | Kirim ribuan concurrent request, ukur response time + error rate. |
-| **Docker** | Setelah CI/CD pipeline ada dan Playwright screenshot flaky cross-OS | Docker Desktop untuk Windows | Standardize environment untuk visual regression test. |
+| **Docker** | Setelah CI/CD pipeline ada dan Playwright screenshot flaky cross-OS | Docker Desktop untuk Windows | Standardize environment untuk visual regression test. Opsional — deploy target Vercel. |
 | **SonarQube** | Kalau mau comprehensive SAST + tech debt tracking | Docker container (self-hosted) atau SonarCloud (SaaS) | `npm audit` + ESLint cukup untuk sekarang. |
-| **Grafana/Prometheus** | Post-deploy ke dedicated server | Docker container | Monitor CPU/RAM/response time server. Butuh infra. |
+| **Vercel Analytics/Speed Insights** | Setelah deploy production | `@vercel/analytics` + `@vercel/speed-insights` | Monitor real-user performance tanpa infra tambahan. |
 
 **Prinsip:** Right tool, right time. Jangan install semua sekaligus — setiap tool butuh setup + maintenance. Install saat milestone-nya tiba, bukan "just in case".
+## Kebijakan Clearance Temuan (WAJIB — anti "ACK ngambang")
+
+Ditambahkan 11 Sep 2026 setelah insiden berulang: temuan audit dibiarkan status ACK/"documented ceiling" berkali-kali padahal bisa dibereskan atau diputuskan. Aturan ini mengikat untuk SEMUA flow.
+
+### Taksonomi status temuan (hanya 4 terminal status)
+
+| Status | Kapan dipakai | Wajib |
+|---|---|---|
+| **FIXED** | Bug/gap sudah diperbaiki di kode + diverifikasi (test/code-check) | Evidence file:line |
+| **RESOLVED-BY-DESIGN** | Bukan bug — verifikasi membuktikan perilaku saat ini memang disengaja/diperlukan | Alasan konkret (bukan "by design" doang — TUNJUKKAN kenapa, misal "order storage fallback in-memory sengaja untuk dev lokal karena Upstash optional di MVP") |
+| **FIXED-via-DECISION** | Butuh keputusan produk/bisnis, user sudah pilih opsi, lalu dieksekusi | Opsi yang dipilih + hasil implementasi |
+| **DEFERRED-E2E** | Murni pekerjaan E2E playbook (authoring batch, re-verify spec drift) | N/A — satu-satunya defer yang sah di Track A |
+
+**`ACK`, `ACKNOWLEDGED`, `documented ceiling`, `monitor`, `keep + monitor` = BUKAN terminal status.** Status itu hanya boleh muncul sebagai status INTERIM di Tahap 1/2 — harus dikonversi ke salah satu dari 4 terminal di atas sebelum flow boleh dinyatakan CLEAR.
+
+### Aturan main per jenis temuan
+
+1. **Bug nyata / improvement yang jelas benar** (fix lokal, tidak ada trade-off produk) → **langsung fix**, jangan dicatat sebagai "opsi". Contoh salah historis: rate-limit in-memory "perlu Redis" — padahal bisa DB-backed tanpa infra baru.
+2. **Trade-off produk/bisnis nyata** (fitur baru, perubahan UX yang user bisa lihat, keputusan yang bisa disesalkan) → **WAJIB present opsi ke user pakai `ask_user_question` tool** (clickable, muncul saat running), JANGAN cuma tulis opsi di markdown lalu lanjut. Sertakan opsi rekomendasi di deskripsi. User tinggal klik → jalankan yang dipilih → catat di audit sebagai FIXED-via-DECISION.
+   - Kalau user decline/skip → status DEFERRED dengan alasan "user declined" dan jangan dibuka lagi diam-diam.
+3. **Klaim "impossible/butuh infra"** → WAJIB cek alternatif dulu sebelum ACK. Hampir semua "butuh Redis" bisa diganti DB count/lock; "butuh service X" bisa diganti pola sederhana yang lebih lemah tapi benar. Hanya boleh jadi catatan kalau SETELAH investigasi memang tidak ada jalan tanpa infra — dan itu harus ditulis sebagai RESOLVED-BY-DESIGN dengan bukti kenapa alternatif tidak jalan.
+4. **Temuan yang memang tidak bisa diubah tanpa merusak UX wajib** (misal endpoint yang harus public karena dipanggil guest) → RESOLVED-BY-DESIGN, bukan ACK.
+
+### Clearance Gate — wajib sebelum klaim "Track A selesai / CLEAR"
+
+Sebelum menulis Final=CLEAR untuk suatu flow:
+
+```powershell
+Select-String -Path reports/audit/[flow].md -Pattern "\bOPEN\b|\bACK\b|PARTIAL|DEFERRED" 
+```
+
+Setiap hit WAJIB salah satu dari:
+- FIXED / RESOLVED-BY-DESIGN / FIXED-via-DECISION (dengan evidence), atau
+- DEFERRED-E2E (murni E2E playbook), atau
+- baris yang memang bukan status temuan (misal kata "Partial Failure" = nama kelas blind spot — boleh diabaikan).
+
+**Kalau masih ada ACK interim → flow BELUM boleh CLEAR.** Eksekusi atau present ke user. Titik.
+
+### Anti-pattern yang dilarang
+
+- "ACK — monitor kalau ada abuse" tanpa mekanisme monitoring yang didefinisikan.
+- "documented ceiling" untuk sesuatu yang sebenarnya bisa difix dengan pola lebih sederhana.
+- Menulis opsi A/B/C di audit file lalu TIDAK menanyakan user — opsi di markdown bukan keputusan.
+- Mengubah ACK lama jadi FIXED tanpa verifikasi kode terkini.

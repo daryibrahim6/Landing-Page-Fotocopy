@@ -5,7 +5,7 @@ description: Workflow pre-push verifikasi sebelum commit/push/MR untuk menghinda
 # Pre-push verifikasi (wajib sebelum commit/push/MR)
 
 Ikuti: `.devin/rules/nextjs-build-cicd-optimization.md`
-Tujuan: pastiin **tidak ada regresi** dari kategori masalah yang pernah kejadian (build-time DB access, rendering strategy per halaman, NODE_ENV ordering di Dockerfile, dll).
+Tujuan: pastiin **tidak ada regresi** dari kategori masalah yang pernah kejadian (env missing saat runtime, rendering strategy salah, warning build yang diabaikan).
 
 > **STOP:** Kalau ada salah satu step gagal, **jangan commit/push dulu**. Fix root cause terlebih dahulu.
 
@@ -14,9 +14,8 @@ Tujuan: pastiin **tidak ada regresi** dari kategori masalah yang pernah kejadian
 Jalankan **sebelum** check lain:
 
 ```bash
-rm -rf node_modules lib/generated tsconfig.tsbuildinfo
+rm -rf node_modules tsconfig.tsbuildinfo
 npm ci
-npx prisma generate
 ```
 
 - `npm audit vulnerabilities` yang muncul saat `npm ci` adalah **warning pre-existing/non-blocking** untuk pre-push. Triage dan fix di branch terpisah, jangan campur ke commit fitur ini.
@@ -35,7 +34,7 @@ npx tsc --noEmit
 Kalau ketemu TypeScript error:
 
 - Jangan cuma list error.
-- Trace ke **akar penyebab tunggal** (misal: perubahan enum di `schema.prisma` tapi declaration/type augmentation belum disesuaiin).
+- Trace ke **akar penyebab tunggal** (misal: type `Product` berubah di `src/types/` tapi `src/data/products.ts` belum disesuaikan).
 - Jelaskan root cause-nya di ringkasan.
 
 ### 2) Build check (WAJIB)
@@ -48,27 +47,23 @@ npm run build
 - Harus sukses **tanpa error** dan **tanpa warning mencurigakan**.
 - Catat halaman apa yang tetap `ƒ` (dynamic) vs `○` (static) kalau ada perubahan signifikan.
 
-### 3) Simulasi DB unreachable (anti build-time DB access)
+### 3) Simulasi env production-kritis kosong (anti runtime-secret coupling)
 
-Simulasikan DB unreachable (pakai non-routable IP):
-
-```bash
-DATABASE_URL=postgresql://user:pass@192.0.2.1:5432/db npm run build
-```
-
-PowerShell (Windows):
+BisaPrint tidak punya database, tapi punya service eksternal yang wajib ada di production: **Upstash Redis** (order storage), **Vercel Blob** (upload), **Midtrans server key** (payment).
 
 ```powershell
-$env:DATABASE_URL = "postgresql://user:pass@192.0.2.1:5432/db"
+# Windows — build tanpa env production-critical
+Remove-Item Env:UPSTASH_REDIS_REST_URL -ErrorAction SilentlyContinue
+Remove-Item Env:BLOB_READ_WRITE_TOKEN -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force .next
 npm run build
 ```
 
-- Pastikan `npm run build` tetap sukses.
-- Pastikan **tidak ada** `prisma:error` fatal.
-- Konfirmasi **tidak ada halaman** yang query Prisma langsung saat build time.
+- Build **harus tetap sukses** meski env itu kosong — env runtime tidak boleh dibutuhkan saat build/SSG.
+- Konfirmasi tidak ada halaman publik (`/`, `/simulator`) yang jadi dynamic gara-gara baca env saat render.
+- Bedakan: env `NEXT_PUBLIC_*` memang di-inline saat build — itu OK. Yang tidak boleh: route handler / server component crash kalau `MIDTRANS_SERVER_KEY`/`UPSTASH_*` kosong **saat build**.
 
-### 4) Unit test check (WAJIB — ini yang paling sering bikin CI prebuild gagal)
+### 4) Unit test check (WAJIB)
 
 ```bash
 npx vitest run
@@ -80,23 +75,24 @@ npx vitest run
 
 ### 5) Environment variables (perubahan terbaru)
 
-Cek `lib/env.ts`:
+Cek `.env.local.example`:
 
-- Pastikan semua env var yang baru ditambah/diubah sudah masuk ke **schema validasi** (Zod).
-- Pastikan env yang boleh kosong di dev/non-production pakai `.optional()`.
-- Pastikan build **tidak gagal** kalau env var tsb kosong di environment tertentu (sudah tercover di step 2 & 4).
+- Pastikan semua env var yang baru ditambah/diubah sudah terdokumentasi di `.env.local.example` (dengan nilai kosong/placeholder — JANGAN nilai asli).
+- `NEXT_PUBLIC_*` = ter-expose ke browser — jangan pernah taruh secret di situ (server key Midtrans wajib non-public).
+- Pastikan build tidak gagal kalau env opsional (Meta Pixel, GA, Maps) kosong.
 
-### 6) E2E targeted smoke (wajib jika menyentuh UI admin, server action, atau flow yang ada E2E)
+### 6) E2E targeted smoke (wajib jika menyentuh checkout, API route, atau komponen yang ada spec-nya)
 
-Kalau branch mengubah file di `features/admin/**/*`, `features/booking/services/actions.ts`, `features/payment/services/reversal.ts`, atau spec E2E:
+Kalau branch mengubah file di `src/components/checkout/**`, `src/app/api/**`, `src/lib/midtrans.ts`, `src/lib/order-storage.ts`, atau spec E2E — **dan spec E2E untuk flow itu sudah ada**:
 
-1. Jalankan **targeted verify** untuk skenario yang paling mungkin kena: `npx playwright test e2e/[flow]/[spec].ts --grep "XXX-NNN" --project=chromium --workers=1`.
+1. Jalankan **targeted verify** untuk skenario yang paling mungkin kena: `npx playwright test e2e/[flow]/[spec].ts --grep "XXX-NNN" --project=chromium`.
 2. Setelah targeted hijau, boleh full run batch tersebut **1x**.
 3. Jika masih fail/skipped setelah 2 kali targeted, **jangan push**. Stop, update `reports/status.md`, `reports/test-results/[flow].md`, `reports/cross-audits/review-change-report.md`, lalu lapor ke user.
 4. Sambil debug, cek ulang checklist E2E:
-   - Row selector unik (client + consultant + package + status, atau `data-*` attribute).
-   - UI label/teks tombol match `lib/constants.ts` dan komponen asli.
-   - Data test deterministic (tidak andalkan seed saja).
+   - Selector unik (`data-testid`, atau kombinasi kategori + nama produk).
+   - UI label/teks tombol match `src/lib/constants.ts` dan komponen asli.
+   - Kondisi test deterministic (tidak andalkan state sisa test lain).
+   - Third-party (Midtrans Snap, Maps) di-stub via `page.route()`.
 
 ### 7) Git hygiene
 
@@ -105,17 +101,18 @@ git diff
 git status
 ```
 
-- Pastikan branch aktif adalah feature branch (`feat/<nama>`), bukan `main`/`dev`.
+- Pastikan branch aktif adalah feature branch (`feat/<nama>`), bukan `main`/`master`.
 - Pastikan semua perubahan yang dimaksud sudah ke-include (nggak ada yang ketinggalan / ke-stash).
+- Pastikan `.env*` / file dengan secret TIDAK ter-stage.
 - Working tree bersih sebelum push.
 
-### 7) Ringkasan akhir (wajib)
+### 8) Ringkasan akhir (wajib)
 
 Kasih ringkasan:
 
 - File apa saja yang berubah
 - Commit message yang direkomendasikan
-- Hasil tiap step (tsc / build / DB-unreachable / vitest / env / git)
+- Hasil tiap step (tsc / build / env-missing / vitest / git)
 - Kesimpulan tegas: **aman untuk push atau belum**
 - Kalau ada yang meragukan: sebutkan **apa yang masih perlu diverifikasi manual** sebelum push
 - Catatan khusus: contoh `npm audit` vulnerabilities non-blocking, tapi perlu triase terpisah

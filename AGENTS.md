@@ -14,12 +14,16 @@ Rules di `.devin/rules/` TIDAK semua always-on. Sebelum mulai task apapun, cek t
 | **SEMUA TASK (always-on)** | `.devin/rules/quality-radar.md` — defect detection mindset, 24 tipe kejanggalan (K1-K24), pre-ship audit |
 | Build gagal, CI/CD error, deploy, rendering strategy (SSG/ISR/dynamic) | `.devin/rules/nextjs-build-cicd-optimization.md` |
 | Nulis/edit test (Playwright/e2e), audit business gap, QA/QC | `.devin/rules/qa-qc-workflow-and-status-tracking.md` |
+| **Re-audit/reprompt planning, batching flow, coverage tracking** | `.devin/rules/flow-coverage-tracking.md` — coverage gate: semua file di `reports/audit/*.md` wajib masuk plan; micro-UX feedback sweep per flow; matrix di `reports/flow-coverage-matrix.md` |
+| **Flow registry, status vocabulary, auto-sync laporan** | `.devin/rules/flow-registry-and-status.md` — `reports/audit/*.md` = kontrak; flow baru wajib register 4 tempat; `AMAN`/`CLEAR` wajib didukung bukti audit; urutan Track A→Track C→E2E; reports wajib auto-sync tiap perubahan |
+| **UI/UX audit / Track C / walkthrough visual** | `.devin/rules/ui-ux-deep-audit.md` — pattern coverage matrix (form/list/modal/nav/feedback/realtime/search/media/auth/error), 3 viewport + keyboard + screen reader, riset eksternal wajib (WCAG 2.2, NN/g, pattern library) |
 | **Debug E2E flaky / test yang gagal berulang kali** | `.devin/rules/e2e-investigation-no-loop.md` — analisis root cause dulu, no blind re-run loop, targeted verify. Untuk perintah cepat bawaan lihat `.devin/workflows/e2e-fast-track.md` |
+| **E2E / Playwright re-run setelah UI/seed/API change** | `.devin/rules/e2e-drift-prevention.md` — pre-flight drift scan: baca komponen/seed/API, cek `data-testid`, targeted verify sebelum full suite |
 | Bikin fitur baru, nentuin arsitektur komponen/module | `.devin/rules/feature-architecture.md` |
 | Pilih/organisasi library, dependency baru | `.devin/rules/lib-architecture.md` |
 | Styling, komponen visual, layout, UI apapun | `.devin/rules/design-taste.md` (walaupun manual-trigger, WAJIB dibaca kalau task ini soal visual) |
 
-**`quality-radar.md` is always-on** — apply 24 tipe kejanggalan (K1-K24) ke setiap task tanpa peduli jenis task. Pre-ship audit (24 quick scan + 6 deep scan) WAJIB sebelum declare task selesai.
+**`quality-radar.md` is always-on** — apply 24 kejanggalan categories (K1-K24) ke setiap task tanpa peduli jenis task. Pre-ship audit (24 quick scan + 6 deep scan) WAJIB sebelum declare task selesai.
 
 **Setelah baca rules yang relevan, sebutkan singkat di awal jawaban: "Baca [nama file] dulu, poin utama yang saya terapkan: ..."** — supaya user bisa cross-check rules-nya beneran dipakai bukan cuma dibaca sekilas.
 <!-- END:routing -->
@@ -29,7 +33,7 @@ Rules di `.devin/rules/` TIDAK semua always-on. Sebelum mulai task apapun, cek t
 
 1. **Skills-first**: Cek skill relevan sebelum coding. Sebut skill yang dipakai atau kenapa tidak ada yang relevan.
 2. **Filter teknis jujur (bukan yes-man)**: Sebelum eksekusi, WAJIB evaluasi request user — cek konsistensi dengan codebase, edge case, bentrok dengan fitur lain. Kalau ada masalah, kasih bukti konkret dari code (file/fungsi), bukan "best practice" generik. Kalau aman, bilang aman dan jalan — jangan cari-cari masalah. Kalau 2+ cara, kasih trade-off + rekomendasi, user putusin. Kalau tech debt signifikan, WAJIB bilang sebelum eksekusi. Detail protocol di `.devin/rules/ponytail.md` section "Kritik Instruksi User".
-3. **Data fetching default**: Dashboard/admin = API Route + TanStack Query. Public = Server Component (query ringan OK). Detail lengkap di `feature-architecture.md` — baca itu untuk task fitur baru.
+3. **Data fetching default**: Public pages = Server Component + static data dari `src/data/`. Checkout/payment/order = API Route + client fetch. Webhook external = Route Handler dengan signature verification. Detail lengkap di `feature-architecture.md` — baca itu untuk task fitur baru.
 4. **Milestone**: Baca `milestones/milestones.md` di awal setiap task.
 5. **Reports**: Update `reports/` setiap perubahan signifikan (refactor/fitur baru/milestone), sesuai struktur di `qa-qc-workflow-and-status-tracking.md`.
 6. **Blueprint**: Jangan pakai `blueprint/` untuk keputusan sehari-hari tanpa konfirmasi user.

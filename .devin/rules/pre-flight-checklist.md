@@ -31,7 +31,7 @@ Jawab sebelum eksekusi, output dalam format ini:
 - Milestone: [milestone aktif / N/A]
 - Skill: [skill yang dipakai / "tidak ada skill relevan, alasan: ..."]
 - Task type: [fitur baru / bug fix / refactor / design]
-- Fitur terkait: [/features/xxx]
+- Fitur terkait: [flow/domain terkait, mis. checkout-flow, design-simulator]
 - Files yang akan terkena: [list]
 - Perlu update reports?: [ya/tidak]
 ```

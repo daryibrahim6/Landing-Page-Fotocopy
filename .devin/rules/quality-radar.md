@@ -94,7 +94,7 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 |-------------|--------------|-----|
 | Page A title `text-xl`, Page B title `text-2xl` (same page type) | Title terlihat beda besar | `text-2xl` untuk page title |
 | Section A title `text-lg`, Section B title `text-xl` (same section type) | Section header beda | `text-lg` untuk section title |
-| Body text `text-sm` vs `text-base` (same context) | Body terlihat beda | `text-sm` untuk dashboard body |
+| Body text `text-sm` vs `text-base` (same context) | Body terlihat beda | `text-sm` untuk body dense, `text-base` untuk section utama |
 | `font-bold` vs `font-semibold` (same heading level) | Boldness beda | `font-bold` untuk headings |
 
 **Self-check:** Apakah text size konsisten per hierarchy level? Cek: page title, section title, subtitle, body, label.
@@ -108,7 +108,7 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 | Page A pakai Spinner, Page B pakai wireframe (same dynamic page) | Loading UX beda | Ganti wireframe ke Spinner |
 | Spinner `size={32}` di page A, `size={24}` di page B (same page type) | Spinner beda besar | Standardisasi `size={32}` |
 | Spinner tanpa `role="status"` | A11y missing | Tambah `role="status" aria-live="polite"` |
-| Subtitle/count text berubah saat data load (e.g. "0 booking" → "5 booking") | Text flash saat loading | Ganti ke static text, pindahkan count ke content area |
+| Subtitle/count text berubah saat data load (e.g. "0 item" → "5 item") | Text flash saat loading | Ganti ke static text, pindahkan count ke content area |
 | Subtitle conditional: `{isLoading ? 'Memuat...' : 'X entri'}` | Subtitle berubah saat load | Ganti ke static text, hapus conditional |
 
 **Self-check:** Apakah loading indicator untuk page/section yang sama type konsisten? Apakah subtitle/statik text TIDAK berubah saat loading? Cek: variant, size, container, a11y, subtitle stability.
@@ -217,22 +217,22 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 
 | Kejanggalan | Cara deteksi | Fix |
 |-------------|--------------|-----|
-| `window.location.reload()` setelah mutation | Full page reload, slow UX | Ganti ke `queryClient.invalidateQueries` |
-| TanStack Query tanpa `queryKey` yang benar | Cache collision antara query berbeda | Pastikan queryKey unique + include filter params |
-| Mutation success tanpa invalidate | Data stale, user lihat data lama | Tambah `queryClient.invalidateQueries({ queryKey: [...] })` |
-| 2 request paralel, result race | Result kedua muncul sebelum pertama | Gunakan `AbortController` atau TanStack Query built-in |
+| `window.location.reload()` setelah mutation | Full page reload, slow UX | Ganti ke update state lokal / `router.refresh()` |
+| Fetch client-side tanpa dedup/abort | Double fetch saat re-render cepat | Pakai `AbortController` atau cleanup di `useEffect` |
+| Mutation success tanpa update state | Data stale, user lihat data lama | Update state/`router.refresh()` setelah sukses |
+| 2 request paralel, result race | Result kedua muncul sebelum pertama | Gunakan `AbortController` atau abaikan response stale |
 
-**Self-check:** Apakah setiap mutation meng-invalidate query yang relevan? Apakah queryKey unique per filter/param?
+**Self-check:** Apakah setiap aksi yang mengubah data me-refresh tampilan yang relevan? Apakah request paralel tidak bisa saling menimpa?
 
 #### K17: Inconsistent Naming
 **Ciri:** Variable/function/file naming beda convention untuk same type.
 
 | Kejanggalan | Cara deteksi | Fix |
 |-------------|--------------|-----|
-| File `getConsultants.ts` vs `fetchConsultants.ts` vs `consultantsApi.ts` (same purpose) | Tidak tahu cari yang mana | Standardisasi: `get<X>.ts`, `create<X>.ts`, `update<X>.ts`, `delete<X>.ts` |
-| Hook `useConsultants.ts` vs `useConsultantQuery.ts` (same hook type) | Tidak tahu cari yang mana | Standardisasi: `use<X>.ts` untuk list, `use<X>Detail.ts` untuk single |
-| Zod schema `consultantSchema` vs `consultantRegisterSchema` (same domain) | Tidak tahu mana untuk create vs update | `<feature><Action>Schema`: `consultantRegisterSchema`, `consultantUpdateSchema` |
-| Type `Consultant` vs `ConsultantType` vs `TConsultant` (same type) | Inconsistent type naming | Standardisasi: `<Feature>` tanpa prefix/suffix: `Consultant`, `ConsultantDetail` |
+| File `getProducts.ts` vs `fetchProducts.ts` vs `productsApi.ts` (same purpose) | Tidak tahu cari yang mana | Standardisasi: `get<X>.ts`, `create<X>.ts`, `update<X>.ts`, `delete<X>.ts` |
+| Hook `useProducts.ts` vs `useProductQuery.ts` (same hook type) | Tidak tahu cari yang mana | Standardisasi: `use<X>.ts` untuk list, `use<X>Detail.ts` untuk single |
+| Zod schema `orderSchema` vs `checkoutOrderSchema` (same domain) | Tidak tahu mana untuk create vs update | `<feature><Action>Schema`: `checkoutOrderSchema`, `orderUpdateSchema` |
+| Type `Product` vs `ProductType` vs `TProduct` (same type) | Inconsistent type naming | Standardisasi: `<Feature>` tanpa prefix/suffix: `Product`, `Order` |
 
 **Self-check:** Apakah naming convention konsisten untuk same type of thing? Cek: services, hooks, schemas, types, components.
 
@@ -252,27 +252,27 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 
 ### Architecture Layer (K19-K21)
 
-#### K19: Feature Folder Violation
-**Ciri:** File di tempat yang salah, melanggar feature-based architecture.
+#### K19: Folder Placement Violation
+**Ciri:** File di tempat yang salah, melanggar struktur `src/` monolithic BisaPrint.
 
 | Kejanggalan | Cara deteksi | Fix |
 |-------------|--------------|-----|
-| Business logic di `lib/` | `lib/` harusnya generic, bukan domain | Pindahkan ke `/features/<feature>/services/` |
-| Schema/type di `lib/schemas.ts` (bukan re-export) | `lib/schemas.ts` = barrel only | Pindahkan definisi ke `/features/<feature>/schema/` |
-| Component di `components/` yang hanya dipakai 1 fitur | Shared = cross-cutting only | Pindahkan ke `/features/<feature>/components/` |
-| Fitur A import dari `features/b/` | Circular dependency risk | Pindahkan shared code ke `lib/` atau shared module |
+| UI component di `src/lib/` | `lib/` = logic only, bukan UI | Pindahkan ke `src/components/<domain>/` |
+| Data statis produk/FAQ di `src/lib/` | Data domain → `src/data/` | Pindahkan ke `src/data/<domain>.ts` |
+| Component di `components/shared/` yang hanya dipakai 1 tempat | Shared = cross-cutting only | Pindahkan ke folder domain-nya (`sections/`, `checkout/`, `design-simulator/`) |
+| Business logic di `app/` page/route | Route = routing + composition | Pindahkan ke `src/lib/` atau komponen domain |
 
-**Self-check:** Apakah file ini di tempat yang benar? Apakah ada import lintas-fitur? Cek `feature-architecture.md` dan `lib-architecture.md`.
+**Self-check:** Apakah file ini di tempat yang benar? Cek `feature-architecture.md` dan `lib-architecture.md`.
 
 #### K20: Data Fetching Pattern Violation
 **Ciri:** Data fetching pattern tidak sesuai dengan type page.
 
 | Kejanggalan | Cara deteksi | Fix |
 |-------------|--------------|-----|
-| Dashboard/admin pakai direct Prisma query di Server Component | Violates rule: dashboard WAJIB API Route + TanStack Query | Pindahkan ke API route + hook |
-| Public page pakai API Route untuk query ringan (single record) | Overkill, bisa langsung di Server Component | Pindahkan ke Server Component |
-| API route tanpa pagination untuk list endpoint | Performance issue untuk large dataset | Tambah pagination (page, pageSize, total) |
-| API route tanpa auth check | Security issue | Tambah `getServerSession()` + role check |
+| Public page fetch API route untuk data statis (produk, FAQ) | Overkill — data sudah ada di `src/data/` | Import langsung di Server Component |
+| Halaman statis memanggil Upstash/Midtrans saat render/build | Build/runtime bergantung ke service eksternal | Pindahkan ke API route / client fetch |
+| API route terima body tanpa validasi | Data jahat masuk handler | Tambah validasi input (Zod/manual guard) |
+| Secret dibaca via `NEXT_PUBLIC_*` | Secret bocor ke bundle client | Pakai env non-public di route handler |
 
 **Self-check:** Apakah data fetching pattern sesuai dengan type page? Cek `feature-architecture.md` Data Fetching Pattern table.
 
@@ -281,12 +281,13 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 
 | Kejanggalan | Cara deteksi | Fix |
 |-------------|--------------|-----|
-| `lib/` import dari `features/` | Circular dependency, lib harusnya tidak tahu domain | Pindahkan logic ke feature, atau buat shared module |
-| `components/ui/` import dari `features/` | Base UI tidak boleh tahu business domain | Pindahkan logic ke feature component |
+| `src/lib/` import komponen UI | lib = logic only | Pindahkan ke `src/components/` |
+| `src/data/` import client server-only (Redis/Blob) dari `src/lib/` | Data file harus pure static | Jangan import; pisahkan konstanta |
+| `components/ui/` import business domain | Base UI tidak boleh tahu domain | Pindahkan logic ke komponen domain |
 | Server Component import Client Component hook | Hook = client only, akan error | Pindahkan ke Client Component atau API route |
-| `app/` route punya business logic (bukan composition) | Route = routing + metadata + composition | Pindahkan logic ke `/features/<feature>/` |
+| `app/` route punya business logic (bukan composition) | Route = routing + metadata + composition | Pindahkan logic ke `src/lib/` |
 
-**Self-check:** Apakah import direction benar? lib → features (OK), features → lib (OK), features → features (BAD), app → features (OK untuk composition only).
+**Self-check:** Apakah import direction benar? `lib` → `data` (OK), `data` → `lib` server-only (BAD), `components` → `lib`/`data` (OK), `app` → `components`/`lib`/`data` (OK untuk composition only).
 
 ---
 
@@ -333,16 +334,16 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 ### Layout Structure Layer (K25-K26)
 
 #### K25: Header-Subtitle Pair Missing
-**Ciri:** Dashboard page punya H1 tapi TIDAK punya subtitle, atau subtitle tidak konsisten antar page.
+**Ciri:** Page/section punya heading tapi TIDAK punya subheading pendukung, atau pola heading+subheading tidak konsisten antar section/page yang sejenis.
 
 | Kejanggalan | Cara deteksi | Fix |
 |-------------|--------------|-----|
-| Page A punya H1 + subtitle, Page B punya H1 only (same page type) | H1 terlihat "telanjang" dibanding tetangga | Tambah subtitle: `mt-1 text-sm text-neutral-500` |
+| Section A punya heading + subheading, Section B heading only (same section type) | Heading terlihat "telanjang" dibanding tetangga | Tambah subheading: `mt-4 text-base text-[var(--color-text-secondary)]` (pola section BisaPrint) |
 | Subtitle pakai dynamic data (`{count} entri`) bukan static text | Subtitle berubah saat data load = flash | Ganti ke static deskripsi page, pindahkan count ke content |
 | Page dengan flex header (H1 + button) tidak punya subtitle | H1 + button terlihat seperti sub header yang terpisah | Tambah subtitle di bawah flex row, BUKAN di dalam flex row |
 | Subtitle pakai conditional loading text (`{isLoading ? 'Memuat...' : 'X'}`) | Text berubah saat load = flash | Ganti ke static text, hapus conditional |
 
-**Self-check:** Apakah SETIAP dashboard page punya pasangan H1 + subtitle? Apakah subtitle static (tidak berubah saat loading)? Bandingkan dengan page tetangga.
+**Self-check:** Apakah section/page yang sejenis punya pola heading + subheading yang konsisten? Apakah subheading static (tidak berubah saat loading)? Bandingkan dengan tetangganya.
 
 #### K26: Static Element Flash
 **Ciri:** Element yang seharusnya statis (header, subtitle, page title) berubah/flash saat data loading.
@@ -359,16 +360,16 @@ Setiap kali coding — bikin baru, edit, review, debug, audit — WAJIB aktifkan
 **Root cause pattern:** Subtitle/count yang pakai `meta?.totalItems ?? 0` atau `{isLoading ? '...' : '...'}` akan render nilai default (0/loading text) saat data belum ada, lalu berubah saat data arrive. Ini menyebabkan text flash. Fix: subtitle HARUS static text yang tidak bergantung pada data loading state. Count/dynamic info dipindahkan ke content area (table header, card, dll).
 
 #### K27: Branding Consistency Missing
-**Ciri:** Logo/brand mark tidak konsisten antar surface (public site vs dashboard vs auth vs mobile).
+**Ciri:** Logo/brand mark tidak konsisten antar surface (header, footer, mobile menu, checkout, simulator).
 
->| Kejanggalan | Cara deteksi | Fix |
->|-------------|--------------|-----|
->| Public navbar pakai logo image, dashboard sidebar cuma text | Bandingkan header semua surface | Tambah logo image yang sama di semua surface |
->| Logo image di desktop tapi tidak di mobile nav | Resize ke 375px, buka mobile menu | Tambah logo image di mobile nav header |
->| Logo size beda antar surface tanpa alasan (h-10 di navbar, h-6 di sidebar) | Visual comparison | Standardisasi size: h-8 untuk sidebar/mobile, h-10 untuk public navbar |
->| Brand name text tanpa logo image di satu surface | Cek setiap `KonsulExpert` text — apakah ada Image sebelumnya? | Tambah `<Image src="/images/logo/logo-icon.webp" />` sebelum text |
+| Kejanggalan | Cara deteksi | Fix |
+|-------------|--------------|-----|
+| Header pakai logo image, footer cuma text | Bandingkan semua surface | Tambah logo image yang sama di semua surface |
+| Logo image di desktop tapi tidak di mobile menu | Resize ke 375px, buka mobile menu | Tambah logo image di mobile nav header |
+| Logo size beda antar surface tanpa alasan | Visual comparison | Standardisasi size per konteks (header vs footer) |
+| Brand name "BisaPrint"/"Bisa Print" text tanpa logo image | Cek setiap brand text — apakah ada Image sebelumnya? | Tambah `<Image src="/assets/brand/logo-bisaprint.webp" />` sebelum text |
 
-**Self-check:** Buka public site, dashboard (desktop + mobile), auth pages. Apakah logo image muncul konsisten di semua surface? Bandingkan src, size, dan alt text.
+**Self-check:** Buka landing page, checkout, simulator (desktop + mobile). Apakah logo image muncul konsisten di semua surface? Bandingkan src, size, dan alt text.
 
 ---
 
@@ -400,7 +401,7 @@ Sebelum bilang "selesai", jawab pertanyaan ini:
 18. Dead code: Apakah tidak ada unused import/dead code? (`tsc --noEmit`)
 
 **Architecture:**
-19. Feature folder: Apakah file di tempat yang benar?
+19. Folder placement: Apakah file di tempat yang benar (`components`/`data`/`lib`)?
 20. Data fetching: Apakah pattern sesuai dengan type page?
 21. Import direction: Apakah import direction benar?
 
@@ -410,9 +411,9 @@ Sebelum bilang "selesai", jawab pertanyaan ini:
 24. Test honesty: Apakah test ngetest correct behavior, bukan dipaksa pass?
 
 **Layout Structure:**
-25. Header-Subtitle pair: Apakah SETIAP dashboard page punya H1 + subtitle? Bandingkan dengan page tetangga.
-26. Static element flash: Refresh F5 — apakah H1 dan subtitle TIDAK berubah dari initial render sampai data load selesai?
-27. Branding consistency: Apakah logo image muncul konsisten di semua surface (public navbar, dashboard sidebar, mobile nav, auth, footer)?
+25. Header-Subtitle pair: Apakah section/page sejenis punya pola heading + subheading yang konsisten? Bandingkan dengan tetangganya.
+26. Static element flash: Refresh F5 — apakah heading dan subheading TIDAK berubah dari initial render sampai data load selesai?
+27. Branding consistency: Apakah logo image muncul konsisten di semua surface (header, footer, mobile menu, checkout, simulator)?
 
 ### Deep Scan (2 menit)
 Kalau quick scan pass, lanjut deep scan:
@@ -422,131 +423,100 @@ Kalau quick scan pass, lanjut deep scan:
 30. **Copy audit:** Baca semua visible text. Ada yang janggal/tidak jelas/bahasa campur?
 31. **Empty/loading/error trio:** Apakah ketiga state untuk section ini sudah ada dan konsisten?
 32. **API contract check:** Apakah response shape API route konsisten dengan yang client expect?
-33. **Security spot-check:** Apakah API route punya auth check? Apakah user input divalidasi?
-34. **ProfileCard check:** Apakah halaman profil punya ProfileCard (avatar + nama + role badge) di top? Tidak ada avatar upload duplikat di form section?
+33. **Security spot-check:** Apakah API route memvalidasi input? Webhook memverifikasi signature? Secret tidak lewat `NEXT_PUBLIC_*`?
+34. **Conversion path check:** Apakah setiap surface produk punya CTA yang jelas (checkout atau WhatsApp)? Tidak ada dead-end di flow konversi?
 35. **Empty state completeness:** Apakah setiap empty state pakai card pattern + icon? Tidak ada plain text empty state?
 
 ---
 
 ## Standard Pattern Reference
 
+> Pattern di bawah digroundkan ke kode BisaPrint yang ada (`src/app/loading.tsx`, `CheckoutForm.tsx`, `ProductCard.tsx`, `SectionWrapper.tsx`, `globals.css`). Kalau codebase berubah, update section ini.
+
 ### Loading
-- **Page-level:** `<Spinner variant="circle-filled" className="text-brand" size={32} />` di `min-h-[50vh]` container dengan `role="status" aria-live="polite"`
-- **Section-level:** Same spinner, `min-h-[30vh]`
-- **Inline:** `size={16}` di `flex items-center gap-2`
-- **Widget:** `size={24}` di `min-h-[20vh]`
-- **Button:** `Loader2 h-4 w-4 animate-spin` (bukan Spinner)
-- **Wireframe:** HANYA untuk static page yang match real layout
-- **DILARANG:** Text "Memuat..." untuk page/section loading, CSS spinners, custom border spinners
+- **Page-level:** `src/app/loading.tsx` — CSS spinner `size-10 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent` + text `Memuat...` `text-sm font-medium text-[var(--color-text-muted)]` di `min-h-[70vh]` flex container
+- **Section-level:** Same spinner pattern, container lebih kecil
+- **Inline/button:** `h-4 w-4 animate-spin` (lucide `Loader2` atau CSS spinner) + text status, button `disabled`
+- **Upload/async inline:** text status kecil `text-xs text-[var(--color-text-muted)]` (contoh: `Mengupload...` di CheckoutForm)
+- Feedback dinamis WAJIB `role="status"` atau `aria-live="polite"` kalau berubah tanpa reload
 
 ### Page Structure
-- **Dashboard container:** `px-4 py-6 lg:px-6`
-- **Public container:** `mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8`
-- **Form container:** `mx-auto max-w-md px-4 py-16 sm:px-6`
-- **Page title:** `text-2xl font-bold text-neutral-900`
-- **Section title:** `text-lg font-bold text-neutral-900`
-- **Subtitle:** `mt-1 text-sm text-neutral-500` — WAJIB setiap dashboard page, HARUS static text (tidak boleh dynamic/conditional)
-- **Header → content gap:** `mt-8` untuk first content element after H1+subtitle
-- **Header pattern:** H1 + subtitle berdekatan (mt-1), LALU mt-8 ke content. JANGAN ada element lain di antara.
-- **Flex header pattern:** Kalau H1 + button di flex row, subtitle di bawah flex row (mt-1), BUKAN di dalam flex row.
+- **Section container:** `SectionWrapper` = `mx-auto max-w-[1440px] px-4 py-16 sm:px-6 md:py-24 lg:px-10 xl:px-14`
+- **Checkout container:** `mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8`
+- **Status page (success/error):** `mx-auto max-w-lg px-4 py-20 text-center`
+- **Section heading (H2):** `font-display text-3xl font-black text-[var(--color-text-primary)] md:text-4xl`
+- **Subheading:** `mx-auto mt-4 max-w-xl text-base text-[var(--color-text-secondary)] md:text-lg` — HARUS static text
+- **Card/section title (H3):** `font-display text-sm md:text-xl font-bold text-[var(--color-text-primary)]`
+- Body font: Poppins (default), display font: `font-display` (Fredoka) untuk heading/CTA besar
 
-### Cards
-- **Standard:** `rounded-xl border border-neutral-200 bg-white p-6`
-- **Status error:** `rounded-xl border border-red-200 bg-red-50 p-6 text-center`
-- **Status success:** `rounded-xl border border-green-200 bg-green-50 p-6 text-center`
-- **Status warning:** `rounded-xl border border-amber-200 bg-amber-50 p-6 text-center`
+### Cards (sticker style)
+- **Standard product card:** `rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-bg-card)]` + `transition hover:-translate-y-1`
+- **Form card:** `rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-soft)] p-6 sm:p-8 md:p-10`
+- **Status error:** `border-red-200 bg-red-50` + text `text-red-600`
+- **Status success:** `border-green-200 bg-green-50` + text `text-green-700`
 
-### Buttons
-- **Primary:** `rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark`
-- **Primary large:** `rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-dark`
-- **Secondary:** `rounded-lg border border-neutral-300 px-6 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50`
-- **Destructive:** `rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50`
-- **Filter pill:** `rounded-lg px-3 py-1.5 text-sm font-medium` + active/inactive color
+### Buttons (pill shape)
+- **Primary:** `rounded-full bg-[var(--color-primary)] px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-[var(--color-primary-muted)] focus-visible:ring-2 focus-visible:ring-primary/50`
+- **Primary large (hero CTA):** `rounded-full px-7 py-4 font-display text-base font-bold`
+- **Outline:** `rounded-full border-2 border-[var(--color-primary)] px-4 py-2.5 text-sm font-bold text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white`
+- **Secondary/neutral:** `rounded-full bg-[var(--color-bg-soft-2)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)]`
+- Toggle pilihan (pickup dsb): `aria-pressed` + style aktif/nonaktif yang jelas
 
 ### Inputs
-- **Standard:** `w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20`
-- **Form layout:** Label above, input, helper below, error below — `space-y-2`
+- **Standard:** `w-full rounded-lg border border-[var(--color-border)] px-3 py-2` + focus ring primary
+- **Error state:** `border-red-400` + pesan `mt-1 text-xs text-red-500` (pola CheckoutForm)
+- **Helper:** `text-xs text-[var(--color-text-muted)]`
+- **Form layout:** Label above, input, helper/error below
 
-### Badges
-- **Shape:** `rounded-full px-2.5 py-0.5 text-xs font-medium`
-- **Success:** `bg-green-100 text-green-700`
-- **Error:** `bg-red-100 text-red-700`
-- **Warning:** `bg-amber-100 text-amber-700`
-- **Neutral:** `bg-neutral-100 text-neutral-600`
-- **Brand:** `bg-brand/10 text-brand`
+### Badges / Pills
+- **Shape:** `rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide`
+- **Featured:** `bg-[var(--color-primary)] text-white`
+- **Category:** `bg-[var(--color-bg-soft-2)] text-[var(--color-text-secondary)]`
+- **Neutral info:** `border border-[var(--color-border)] text-[var(--color-text-muted)]`
 
-### Empty States
-- **Standard:** `rounded-xl border border-neutral-200 bg-neutral-50 p-12 text-center` + icon `h-8 w-8 text-neutral-300` + text `text-sm text-neutral-500` + optional CTA
+### Empty & Error States
+- **Standard:** `mx-auto max-w-lg px-4 py-20 text-center` + circle icon `size-16 rounded-full bg-green-100` (atau warna status) + title + `text-[var(--color-text-secondary)]` message + CTA `rounded-full bg-primary`
+- **Icon WAJIB** — empty/error state tanpa icon terlihat incomplete
+- **Tidak boleh** plain text saja — selalu pakai centered pattern + CTA
+- Error dinamis WAJIB `role="alert"` atau `aria-live`
 
-### Error States
-- **Page-level:** `mx-auto max-w-md px-4 py-16 text-center role="alert"` + title `text-xl font-bold` + message `text-sm text-neutral-500` + retry button
-- **Inline:** `rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 role="alert"`
-- **Retry:** `window.location.reload()` OK untuk error retry. DILARANG untuk post-mutation.
+### Feedback / Status (bukan toast)
+- BisaPrint TIDAK pakai toast library — feedback = inline state (error text, `Mengupload...`, redirect ke success page)
+- Setiap aksi async WAJIB punya: state loading + state error + state success yang visible
+- JANGAN `window.location.reload()` untuk post-mutation — update state / redirect
 
-### Toast
-- `import { toast } from "sonner"`
-- `toast.success()` untuk mutation berhasil
-- `toast.error()` untuk mutation gagal
-- Post-mutation: `queryClient.invalidateQueries` + toast. JANGAN `window.location.reload()`.
-
-### Tables
-- **Wrapper:** `overflow-x-auto rounded-xl border border-neutral-200`
-- **Header:** `bg-neutral-50 text-neutral-500 font-medium` + `scope="col"`
-- **Body:** `divide-y divide-neutral-100` + `hover:bg-neutral-50`
-- **Cell:** `px-4 py-3`
-
-### Colors
-- **Brand:** `#9E2B4A` → `text-brand` / `bg-brand` / `hover:bg-brand-dark` / `bg-brand/10`
-- **Neutral text:** 900 (heading), 700 (label), 600 (body), 500 (subtitle/helper), 400 (muted), 300 (icon empty/disabled)
-- **Neutral border:** 200 (card/table), 300 (input/button outline), 100 (divider)
-- **Neutral bg:** 50 (hover/empty bg), 100 (badge neutral)
-- **Status:** red-50/200/600 (error), green-50/200/600 (success), amber-50/200/600 (warning), blue-50/200/600 (info)
+### Colors (tokens di `globals.css`, pakai `var(--color-*)` atau utility `*-primary` dsb)
+- **Primary:** `--color-primary` `#DE127A` | `--color-primary-light` `#EC91B4` | `--color-primary-muted` `#D66E9E` (hover)
+- **Accent:** `--color-accent` `#E87817` | `--color-accent-light` `#F4A261` | `--color-accent-yellow` `#FFD700`
+- **Text:** `--color-text-primary` `#0F172A` | `--color-text-secondary` `#475569` | `--color-text-muted` `#64748B`
+- **Border:** `--color-border` `#E2E8F0` | strong = primary
+- **Background:** `--color-bg-base` `#FFF` | `--color-bg-soft` `#F8FAFC` | `--color-bg-soft-2` `#F1F5F9` | `--color-bg-card` `#FFF`
+- **Status:** red-* (error), green-* (success), amber-* (warning) — pakai scale Tailwind standar
+- **DILARANG** hardcode hex di component — selalu via token
 
 ### Icons
 - **Library:** `lucide-react`
-- **Inline button:** `h-4 w-4`
-- **Standalone:** `h-5 w-5`
-- **Empty state:** `h-8 w-8 text-neutral-300`
-- **Icon + text:** `mr-2` untuk left icon, SELALU sebelum text
-
-### Spacing
-- **Page header → content:** `mt-8` (STANDARD, bukan mt-6)
-- **Between cards:** `mt-6` atau `space-y-6`
-- **Inside card:** `space-y-3` atau `space-y-4`
-- **Label → input:** `space-y-2`
-- **Input → helper/error:** `mt-1` atau `space-y-1`
+- **Inline button:** `h-4 w-4` | **Standalone:** `h-5 w-5` | **Status circle:** `size-16` container, icon ~`h-8 w-8`
+- **Icon + text:** `gap-1.5`/`gap-2` di flex, icon SELALU sebelum text
 
 ### Naming Convention
-- **Services:** `get<X>.ts`, `create<X>.ts`, `update<X>.ts`, `delete<X>.ts`
-- **Hooks:** `use<X>.ts` (list), `use<X>Detail.ts` (single)
-- **Schema:** `<feature><Action>Schema` — `consultantRegisterSchema`
-- **Type:** `<Feature>` tanpa prefix — `Consultant`, `ConsultantDetail`
-- **Components:** PascalCase — `ConsultantCard.tsx`
-- **Files:** camelCase untuk hooks/services/schemas, PascalCase untuk components
+- **Lib/services:** `get<X>.ts`, domain logic `paper-sizes.ts`, `pricing.ts`, `midtrans.ts`, `wa.ts`
+- **Data:** `products.ts`, `faq.ts` (plural domain di `src/data/`)
+- **Schema:** `<domain><Action>Schema` — `checkoutOrderSchema`
+- **Type:** `<Domain>` tanpa prefix — `Product`, `Order`, `ImpositionResult`
+- **Components:** PascalCase — `ProductCard.tsx`, `CheckoutForm.tsx`
+- **Files:** camelCase untuk lib/data/types, PascalCase untuk components, kebab-case untuk folder
 
 ### Branding
-- **Logo image:** `<Image src="/images/logo/logo-icon.webp" alt="KonsulExpert" width={269} height={342} />` — WAJIB di setiap surface yang menampilkan brand
-- **Logo size:** `h-10` untuk public navbar, `h-8` untuk sidebar/mobile/footer/auth, `h-9` untuk auth split-screen
-- **Logo + text pattern:** `<Image ... />` diikuti text `KonsulExpert` dengan `gap-2`, text pakai `font-bold text-brand`
-- **Surface yang WAJIB punya logo:** public navbar (desktop + mobile), dashboard sidebar (desktop), dashboard mobile nav sheet, auth shell, footer
-- **DILARANG:** Menampilkan text "KonsulExpert" tanpa logo image di surface yang visible ke user
+- **Logo image:** `<Image src="/assets/brand/logo-bisaprint.webp" alt="BisaPrint" />` — WAJIB di surface yang menampilkan brand
+- **Surface yang WAJIB punya logo:** Header (desktop + mobile menu), Footer
+- **Brand text:** "BisaPrint" (satu kata, P besar) — jangan "Bisa Print" di UI copy kecuali di konten yang memang begitu (cek `constants.ts` untuk canonical)
+- **DILARANG:** Menampilkan brand text tanpa logo image di surface yang visible ke user
 
 ### Data Fetching
-- **Dashboard/admin:** API Route + TanStack Query (WAJIB)
-- **Public read-only:** Server Component + direct Prisma (OK untuk query ringan)
-- **Mutations:** Server Actions atau API Route
-- **API routes:** WAJIB auth check + role check + pagination untuk list
-- **Post-mutation:** `queryClient.invalidateQueries` (bukan `window.location.reload()`)
-- **Date serialization:** ISO string sebelum dikirim ke client
-
-### Profile Pages
-- **ProfileCard WAJIB** di setiap halaman profil (client, consultant, settings) — card visual di top dengan avatar (uploadable) + nama + role badge + email/phone masked
-- **Komponen:** `ProfileCard` dari `@/components/shared/ProfileCard` — ambil data dari `useSession()`, terima props `email`, `phone`, `subtitle` untuk override
-- **Avatar upload:** Hanya di ProfileCard (single source of truth). JANGAN duplikasi upload avatar di form section lain
-- **Form section:** Setelah ProfileCard, form edit (nama, phone, dll) tanpa avatar upload lagi
-- **Tanpa ProfileCard = janggal.** Profile page tanpa identity card di top = user tidak punya sense of "ini profil saya" — langsung lompat ke form tanpa konteks visual
-
-### Empty States
-- **Pattern:** `rounded-xl border border-neutral-200 bg-neutral-50 p-12 text-center` + icon `h-8 w-8 text-neutral-300` + text `text-sm text-neutral-500`
-- **Icon WAJIB** — empty state tanpa icon terlihat incomplete dibanding tetangga yang punya
-- **Tidak boleh** plain text saja (`<p className="mt-8 text-sm">Belum ada...</p>`) — selalu pakai card pattern
+- **Public read-only:** Server Component + import langsung dari `src/data/` (products, faq, portfolio, testimonials)
+- **Mutations/checkout:** API Route + client fetch — `/api/midtrans/create-token`, `/api/upload`, `/api/orders/[id]`
+- **Webhooks:** Route Handler + WAJIB signature verification — `/api/midtrans/webhook`
+- **Storage:** `src/lib/order-storage.ts` — Upstash Redis kalau env ada, fallback in-memory (dev only)
+- **Post-mutation:** update state / `router.refresh()` / redirect (bukan `window.location.reload()`)
+- **Secrets:** `MIDTRANS_SERVER_KEY`, `BLOB_READ_WRITE_TOKEN` server-only — JANGAN pakai `NEXT_PUBLIC_` untuk secret

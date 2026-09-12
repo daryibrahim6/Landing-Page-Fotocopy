@@ -4,6 +4,14 @@
 **Auditor:** Devin (Senior QA / Tech Lead mode)
 **Scope:** Landing page UI/UX, checkout/payment flow, produk & pricing, notifikasi, blueprint alignment
 
+> **STATUS UPDATE (12 Sep 2026):** Audit ini historis — ditulis SEBELUM Wave 1 fixes.
+> Temuan yang sudah resolved di kode saat ini (diverifikasi via source):
+> - **PMT-A-001** (order storage) → RESOLVED: `src/lib/order-storage.ts` (Upstash Redis + in-memory fallback).
+> - **PMT-A-002** (WA notif webhook) → RESOLVED: `src/lib/notification.ts` — `notifyAdminNewOrder`/`notifyAdminPaidOrder` dipanggil webhook.
+> - **PMT-A-003** (file upload) → RESOLVED: `/api/upload` + input file di `CheckoutForm.tsx` (max 10MB).
+> - **PMT-A-007** (snap.js) → RESOLVED: dimuat via `next/script` di `src/app/layout.tsx`.
+> Temuan UI/UX (UI-A-*) sebagian resolved via Wave 1 UI overhaul; temuan blueprint/pricing (PMT-A-004/005, section 3) masih open — lihat Backlog di `milestones/milestones.md` dan Open Items di `reports/status.md`.
+
 ---
 
 ## 0. Executive Summary
