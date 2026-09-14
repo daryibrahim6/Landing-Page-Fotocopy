@@ -468,3 +468,19 @@ Feedback user dari screenshot round 1 → fix:
 
 **Cleanup:** `logo-tab.webp` orphan → `_archive/assets/brand/`.
 **Verifikasi:** `<link rel=icon>` DOM serve `/favicon.ico` + `/icon.png` + `/apple-icon.png` baru; footer icon WA render bubble+handset lengkap (screenshot mobile 375px); tsc + eslint clean, vitest 161/161, build hijau (route icon terdaftar static).
+
+## UX Walkthrough — Round 4 (navbar + simulator deep-dive, Sesi 14 Sep 2026)
+
+| Keluhan | Root cause | Fix |
+|---|---|---|
+| Logo navbar "keatasan" | wordmark `text-xl` (line-box 28px) vs mark 36px — glyph center optically naik ~1px | `leading-none` + `translate-y-[0.5px]` di `BrandLogo` — diff terukur -0.5px |
+| Active nav stuck di FAQ saat pindah /simulator | `activeSection` hanya di-drive IntersectionObserver — di route lain observer tidak menemukan section → state terakhir tersimpan | `usePathname` — active diturunkan dari pathname ("/" → observer, "/simulator" → "simulator", lainnya → kosong) |
+| Preset stiker tidak pink saat diklik | tidak ada active-state tracking — pink di screenshot user hanya `:focus-visible` | `isPresetActive` (w+h+shape+portrait match) + `aria-pressed` + filled pink persistent |
+| Upload gambar gede → layout berantakan | (a) stage height fixed 700px di semua lebar → mobile = void panjang; (b) canvas Konva intrinsic-width bikin grid column `min-width:auto` tidak shrink → **horizontal page overflow** | (a) paperScale width-driven + stageHeight diturunkan dari paper (cap ~700px desktop); (b) `minmax(0,1fr)` + `min-w-0` chain — terbukti: vw=375 → stage 329×454, scrollW 365 < 375 |
+| "Gambar hilang satu" setelah resize | transformer attach ke stale Konva node (effect deps `[imageDimensions]` saja) saat ghost re-render; juga design > printable → total=0 → semua cell hilang | transformer re-attach setiap render; clamp designMm ke `PRINT_AREA_MM` (305×460) di load/transform/input + `boundBoxFunc` tolak oversize |
+| Resize manual ribet | hanya corner-drag + input mm | Toolbar canvas: chips Fit/50/80/100mm + slider keep-ratio + badge A3 pindah ke top-left (anti-tumpuk di mobile) |
+| Ikon WA footer ijo sendirian | `text-[#25D366]` vs pin/clock `text-slate-400` | `text-slate-400` — semua ikon kontak monochrome konsisten |
+| Slogan lowercase | copy | "Bisa mewujudkan imajinasi mu" (footer + hero) |
+| AI designer mau ChatGPT | Pollinations client-side langsung | `POST /api/ai-design` — OpenAI `gpt-image-1` (quality=low ≈$0.02/img) kalau `OPENAI_API_KEY` terisi → fallback Pollinations server-side; zod-validated + rate-limit Upstash |
+
+**Verifikasi:** tsc clean, eslint clean, vitest 161/161, build hijau (route `/api/ai-design` terdaftar). Playwright: logo diff -0.5px; nav "Simulasi" pink di /simulator; preset Bulat 5cm `aria-pressed=true` filled pink; upload PNG 6000×4500 → downscale + imposition 2 cell; chip 50 → 50×38mm keep-ratio → 56 pcs (rotated); mobile 375px canvas 329×454 tanpa overflow.

@@ -105,6 +105,17 @@ export function DesignSimulator() {
     setOrientation("portrait");
   }, []);
 
+  // Preset aktif = nilai form sama persis dengan preset — kasih persistent
+  // pink state supaya user tahu preset mana yang sedang kepakai.
+  const isPresetActive = useCallback(
+    (preset: Preset) =>
+      Number(designW) === preset.w &&
+      Number(designH) === preset.h &&
+      shape === preset.shape &&
+      orientation === "portrait",
+    [designW, designH, shape, orientation],
+  );
+
   const applyImageSource = useCallback((src: string) => {
     if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
     blobUrlRef.current = src.startsWith("blob:") ? src : null;
@@ -119,44 +130,64 @@ export function DesignSimulator() {
     setImageDataUrl(null);
   }, []);
 
+  // Downscale gambar raksasa (>4096px) — Konva, jsPDF, dan memori browser
+  // tetap ringan; 4096px di 305mm masih ≈340dpi untuk kebutuhan preview+cetak.
   const handleFileUpload = useCallback((_file: File, dataUrl: string) => {
-    applyImageSource(dataUrl);
+    const img = new window.Image();
+    img.onload = () => {
+      const MAX_DIM = 4096;
+      if (img.width <= MAX_DIM && img.height <= MAX_DIM) {
+        applyImageSource(dataUrl);
+        return;
+      }
+      const scale = MAX_DIM / Math.max(img.width, img.height);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        applyImageSource(dataUrl);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const outType = dataUrl.startsWith("data:image/png") ? "image/png" : "image/jpeg";
+      applyImageSource(canvas.toDataURL(outType, 0.92));
+    };
+    img.onerror = () => applyImageSource(dataUrl);
+    img.src = dataUrl;
   }, [applyImageSource]);
 
-  // Draft AI via Pollinations — anonymous tier, no key. ~1 req/15s limit +
-  // queue global: request bisa jalan 30-60s+ saat server penuh. Timeout
-  // eksplisit + 1 retry supaya queue panjang tidak langsung jadi error.
-  // `referrer` = identitas app (gratis), `private` = design tidak masuk
-  // public feed Pollinations.
+  // Draft AI via /api/ai-design — server pilih OpenAI gpt-image-1 kalau
+  // OPENAI_API_KEY terisi (paid, kualitas terbaik), fallback Pollinations
+  // gratis tanpa key. Timeout eksplisit supaya queue panjang tidak menggantung.
   const handleAiGenerate = useCallback(async () => {
     const prompt = aiPrompt.trim();
     if (!prompt || aiLoading) return;
     setAiLoading(true);
     setAiError(null);
     try {
-      // Prompt template khusus stiker — output diarahkan ke style yang
-      // cocok untuk cetak (flat, clean edge, background polos).
-      const stickerPrompt = `die-cut sticker design, ${prompt}, bold flat vector illustration style, clean sharp edges, centered on plain white background`;
-      const buildUrl = () =>
-        `https://image.pollinations.ai/prompt/${encodeURIComponent(stickerPrompt)}?width=1024&height=1024&model=flux&seed=${Math.floor(Math.random() * 1e6)}&referrer=bisaprint&private=true`;
-
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 120_000);
-        try {
-          const res = await fetch(buildUrl(), { signal: controller.signal });
-          if (!res.ok) continue; // 4xx/5xx sesaat → retry sekali
-          const blob = await res.blob();
-          if (!blob.type.startsWith("image/")) continue;
-          applyImageSource(URL.createObjectURL(blob));
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 120_000);
+      try {
+        const res = await fetch("/api/ai-design", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+          signal: controller.signal,
+        });
+        const data = (await res.json().catch(() => null)) as
+          | { image?: string; error?: string }
+          | null;
+        if (!res.ok || !data?.image) {
+          setAiError(data?.error ?? "Gagal generate draft. Coba lagi ya.");
           return;
-        } catch {
-          // abort (timeout 120s) / network error → retry sekali lalu menyerah
-        } finally {
-          clearTimeout(timer);
         }
+        applyImageSource(data.image);
+      } finally {
+        clearTimeout(timer);
       }
-      setAiError("AI gratis lagi penuh antrean. Tunggu ±1 menit lalu coba lagi ya.");
+    } catch {
+      setAiError("Koneksi ke AI timeout. Coba lagi ya.");
     } finally {
       setAiLoading(false);
     }
@@ -412,7 +443,7 @@ export function DesignSimulator() {
       </div>
 
       {mode === "calculator" ? (
-        <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* Calculator main */}
           <div className="flex flex-col gap-5">
             <p className="rounded-2xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-secondary)]">
@@ -425,16 +456,25 @@ export function DesignSimulator() {
                 Preset Stiker UMKM
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {PRESETS.map((preset) => (
-                  <button
-                    key={preset.name}
-                    type="button"
-                    onClick={() => applyPreset(preset)}
-                    className="min-h-11 rounded-full border-2 border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition hover:border-primary hover:text-primary"
-                  >
-                    {preset.name}
-                  </button>
-                ))}
+                {PRESETS.map((preset) => {
+                  const active = isPresetActive(preset);
+                  return (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => applyPreset(preset)}
+                      aria-pressed={active}
+                      className={cn(
+                        "min-h-11 rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition",
+                        active
+                          ? "border-primary bg-primary text-white"
+                          : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-primary hover:text-primary",
+                      )}
+                    >
+                      {preset.name}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -872,15 +912,17 @@ export function DesignSimulator() {
           </div>
         </div>
       ) : (
-        /* Upload mode */
-        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-          <div className="min-h-[400px]">
+        /* Upload mode — minmax(0,1fr) + min-w-0: canvas Konva punya intrinsic
+            pixel width; tanpa ini grid item tidak bisa shrink di bawah lebar
+            canvas → halaman overflow horizontal ("layout berantakan"). */
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="min-h-[400px] min-w-0">
             {imageDataUrl ? (
               <motion.div
                 key="canvas"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="h-full"
+                className="h-full min-w-0"
               >
                 <DesignCanvas
                   imageDataUrl={imageDataUrl}
@@ -1023,9 +1065,9 @@ export function DesignSimulator() {
                 <p className="text-xs font-semibold text-[var(--color-text-primary)]">Tips</p>
               </div>
               <ul className="mt-2 space-y-1 text-xs text-[var(--color-text-secondary)]">
-                <li>&bull; Resize dari corner handles</li>
-                <li>&bull; Atau isi ukuran L × T di pojok kanan atas</li>
-                <li>&bull; Default A3 BisaPrint</li>
+                <li>&bull; Cepat: chips Fit / 50 / 80 / 100 mm di bawah kanvas</li>
+                <li>&bull; Slider geser = resize keep-ratio otomatis</li>
+                <li>&bull; Presisi: corner handles atau input L × T kanan atas</li>
                 <li>&bull; Gap antar design: 2 mm</li>
               </ul>
             </div>

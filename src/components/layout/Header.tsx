@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { BrandLogo } from "@/components/shared/BrandLogo";
@@ -47,9 +47,19 @@ const SECTION_TO_NAV: Record<string, string> = {
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("produk");
+  // Active state: di landing di-drive IntersectionObserver; di route lain
+  // diturunkan dari pathname — tanpa ini, highlight ngestuck di section
+  // terakhir (mis. FAQ tetap pink saat pindah ke /simulator).
+  const [observedSection, setObservedSection] = useState<string>("produk");
+  const activeSection =
+    pathname === "/"
+      ? observedSection
+      : pathname === "/simulator"
+        ? "simulator"
+        : "";
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -90,6 +100,8 @@ export function Header() {
   }, [isMenuOpen, closeMenu]);
 
   useEffect(() => {
+    if (pathname !== "/") return;
+
     const elements = OBSERVED_SECTIONS.map((id) =>
       document.getElementById(id),
     ).filter((el): el is HTMLElement => el !== null);
@@ -104,7 +116,7 @@ export function Header() {
 
         if (visible.length > 0) {
           const id = visible[0].target.id;
-          setActiveSection(SECTION_TO_NAV[id] ?? "produk");
+          setObservedSection(SECTION_TO_NAV[id] ?? "produk");
           if (window.location.hash !== `#${id}`) {
             window.history.replaceState(null, "", `#${id}`);
           }
@@ -118,7 +130,7 @@ export function Header() {
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">

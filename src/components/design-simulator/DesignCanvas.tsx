@@ -7,6 +7,7 @@ import {
   BISA_PRINT_A3,
   GAP_KISS_CUT_MM,
   MM_TO_PX,
+  PRINT_AREA_MM,
   calculateImposition,
   type ImpositionResult,
 } from "@/lib/paper-sizes";
@@ -26,38 +27,68 @@ export function DesignCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<Konva.Image>(null);
   const transformerRef = useRef<Konva.Transformer>(null);
-  const [containerSize, setContainerSize] = useState({ width: 500, height: 700 });
+  const [containerWidth, setContainerWidth] = useState(500);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [designMm, setDesignMm] = useState({ width: 100, height: 100 });
 
   const paperSize = BISA_PRINT_A3;
 
-  // Calculate scale to fit paper in container
+  // Scale driven oleh LEBAR container saja, lalu stage height diturunkan dari
+  // paper — versi lama mengunci stage 700px fixed sehingga di mobile kertas
+  // mengambang di tengah void panjang (layout "berantakan"). Cap MAX_PAPER_SCALE
+  // menjaga tinggi ≤ ~700px di desktop.
   const padding = PADDING_MM * MM_TO_PX;
-  const availableWidth = containerSize.width - padding * 2;
-  const availableHeight = containerSize.height - padding * 2;
+  const availableWidth = containerWidth - padding * 2;
+  const MAX_PAPER_SCALE = (700 - padding * 2) / (paperSize.heightMm * MM_TO_PX);
   const paperScale = Math.min(
     availableWidth / (paperSize.widthMm * MM_TO_PX),
-    availableHeight / (paperSize.heightMm * MM_TO_PX),
+    MAX_PAPER_SCALE,
     1,
   );
 
   const paperWidthPx = paperSize.widthMm * MM_TO_PX * paperScale;
   const paperHeightPx = paperSize.heightMm * MM_TO_PX * paperScale;
   const mmScale = paperScale * MM_TO_PX;
+  const stageHeight = Math.round(paperHeightPx + padding * 2);
 
-  // Resize observer
+  // Resize observer — width saja; height diturunkan dari paperScale (menghindari
+  // feedback loop: container height = stage height).
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setContainerSize({ width, height });
+        setContainerWidth(entry.contentRect.width);
       }
     });
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
+
+  // Clamp ke area cetak — design lebih besar dari printable area bikin
+  // imposition total=0 → semua cell ghost hilang (gambar "hilang satu").
+  const clampDesignMm = useCallback((w: number, h: number) => ({
+    width: Math.min(PRINT_AREA_MM.width, Math.max(10, Math.round(w))),
+    height: Math.min(PRINT_AREA_MM.height, Math.max(10, Math.round(h))),
+  }), []);
+
+  const imageAspect = imageDimensions.width > 0
+    ? imageDimensions.width / imageDimensions.height
+    : 1;
+
+  // Resize keep-ratio: lebar → tinggi mengikuti aspect gambar asli.
+  const setDesignWidthKeepRatio = useCallback((w: number) => {
+    let height = w / imageAspect;
+    let width = w;
+    if (height > PRINT_AREA_MM.height) {
+      height = PRINT_AREA_MM.height;
+      width = height * imageAspect;
+    }
+    setDesignMm(clampDesignMm(width, height));
+  }, [imageAspect, clampDesignMm]);
+
+  const fitToSheet = useCallback(() => {
+    setDesignWidthKeepRatio(PRINT_AREA_MM.width);
+  }, [setDesignWidthKeepRatio]);
 
   // Load image
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | undefined>(undefined);
@@ -73,8 +104,10 @@ export function DesignCanvas({
       if (cancelled) return;
       setImageDimensions({ width: img.width, height: img.height });
       setLoadedImage(img);
-      const maxDesignW = paperSize.widthMm - PADDING_MM * 2;
-      const maxDesignH = paperSize.heightMm - PADDING_MM * 2;
+      // Initial fit ke AREA CETAK (bukan kertas) — gambar portrait ekstrem
+      // dulu ke-set 465mm > printable 460mm → total=0 → semua cell hilang.
+      const maxDesignW = PRINT_AREA_MM.width;
+      const maxDesignH = PRINT_AREA_MM.height;
       const aspect = img.width / img.height;
       let designW = maxDesignW;
       let designH = designW / aspect;
@@ -110,13 +143,16 @@ export function DesignCanvas({
     }
   }, [designMm, onImpositionChange]);
 
-  // Handle transformer
+  // Re-attach transformer SETIAP render — ghost cells di-remap saat designMm
+  // berubah sehingga imageRef menunjuk node Konva baru; deps lama
+  // [imageDimensions] meninggalkan transformer menempel di node stale dan
+  // gambar tampak "menghilang"/loncat saat di-drag setelah resize.
   useEffect(() => {
     if (transformerRef.current && imageRef.current) {
       transformerRef.current.nodes([imageRef.current]);
       transformerRef.current.getLayer()?.batchDraw();
     }
-  }, [imageDimensions]);
+  });
 
   const handleTransformEnd = useCallback(() => {
     const node = imageRef.current;
@@ -130,11 +166,8 @@ export function DesignCanvas({
     // image renders double-scaled vs the tracked mm size.
     node.scaleX(1);
     node.scaleY(1);
-    setDesignMm({
-      width: Math.max(10, Math.round(newWidthMm)),
-      height: Math.max(10, Math.round(newHeightMm)),
-    });
-  }, [mmScale]);
+    setDesignMm(clampDesignMm(newWidthMm, newHeightMm));
+  }, [mmScale, clampDesignMm]);
 
   const designPxW = designMm.width * mmScale;
   const designPxH = designMm.height * mmScale;
@@ -182,17 +215,17 @@ export function DesignCanvas({
   const offsetY = (paperHeightPx - totalContentH) / 2;
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden rounded-2xl border-2 border-[var(--color-border)] bg-[#f8f8f8]">
+    <div ref={containerRef} className="relative w-full min-w-0 overflow-hidden rounded-2xl border-2 border-[var(--color-border)] bg-[#f8f8f8]">
       <Stage
-        width={containerSize.width}
-        height={containerSize.height}
+        width={containerWidth}
+        height={stageHeight}
         style={{ background: "#f8f8f8" }}
       >
         <Layer>
           {/* Paper sheet */}
           <Rect
-            x={(containerSize.width - paperWidthPx) / 2}
-            y={(containerSize.height - paperHeightPx) / 2}
+            x={(containerWidth - paperWidthPx) / 2}
+            y={(stageHeight - paperHeightPx) / 2}
             width={paperWidthPx}
             height={paperHeightPx}
             fill="white"
@@ -207,7 +240,7 @@ export function DesignCanvas({
           {ghostResult.cols > 1 &&
             Array.from({ length: ghostResult.cols - 1 }, (_, i) => {
               const x =
-                (containerSize.width - paperWidthPx) / 2 +
+                (containerWidth - paperWidthPx) / 2 +
                 offsetX +
                 (i + 1) * cellW -
                 (GAP_MM * mmScale) / 2;
@@ -215,7 +248,7 @@ export function DesignCanvas({
                 <Rect
                   key={`vline-${i}`}
                   x={x}
-                  y={(containerSize.height - paperHeightPx) / 2 + offsetY}
+                  y={(stageHeight - paperHeightPx) / 2 + offsetY}
                   width={1}
                   height={totalContentH}
                   fill="#e0e0e0"
@@ -225,14 +258,14 @@ export function DesignCanvas({
           {ghostResult.rows > 1 &&
             Array.from({ length: ghostResult.rows - 1 }, (_, i) => {
               const y =
-                (containerSize.height - paperHeightPx) / 2 +
+                (stageHeight - paperHeightPx) / 2 +
                 offsetY +
                 (i + 1) * cellH -
                 (GAP_MM * mmScale) / 2;
               return (
                 <Rect
                   key={`hline-${i}`}
-                  x={(containerSize.width - paperWidthPx) / 2 + offsetX}
+                  x={(containerWidth - paperWidthPx) / 2 + offsetX}
                   y={y}
                   width={totalContentW}
                   height={1}
@@ -250,8 +283,8 @@ export function DesignCanvas({
               ? ghosts.map((ghost, i) => (
                   <Group
                     key={`cell-${i}`}
-                    x={(containerSize.width - paperWidthPx) / 2 + ghost.x + ghost.w / 2}
-                    y={(containerSize.height - paperHeightPx) / 2 + ghost.y + ghost.h / 2}
+                    x={(containerWidth - paperWidthPx) / 2 + ghost.x + ghost.w / 2}
+                    y={(stageHeight - paperHeightPx) / 2 + ghost.y + ghost.h / 2}
                     rotation={ghost.rotated ? 90 : 0}
                     listening={i === 0}
                   >
@@ -268,8 +301,8 @@ export function DesignCanvas({
                 ))
               : (
                   <Group
-                    x={containerSize.width / 2}
-                    y={containerSize.height / 2}
+                    x={containerWidth / 2}
+                    y={stageHeight / 2}
                   >
                     <KonvaImage
                       ref={imageRef}
@@ -297,6 +330,14 @@ export function DesignCanvas({
                 anchorCornerRadius={2}
                 boundBoxFunc={(_oldBox, newBox) => {
                   if (newBox.width < 20 || newBox.height < 20) return _oldBox;
+                  // Batasi di area cetak — resize melewati kertas membuat
+                  // imposition total=0 dan semua cell ghost hilang.
+                  if (
+                    newBox.width > PRINT_AREA_MM.width * mmScale ||
+                    newBox.height > PRINT_AREA_MM.height * mmScale
+                  ) {
+                    return _oldBox;
+                  }
                   return newBox;
                 }}
               />
@@ -305,9 +346,46 @@ export function DesignCanvas({
         </Layer>
       </Stage>
 
-      <div className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)] shadow-sm backdrop-blur-sm">
+      <div className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)] shadow-sm backdrop-blur-sm">
         {paperSize.name}
       </div>
+
+      {/* Toolbar resize cepat — user tidak perlu paham mm/drag: chips ukuran
+          populer + Fit + slider keep-ratio. Input L×T tetap ada sebagai
+          jalur presisi (dan keyboard-accessible). */}
+      {loadedImage && (
+        <div className="absolute inset-x-0 bottom-3 flex items-center justify-center">
+          <div className="flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-1 shadow-sm backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={fitToSheet}
+              className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary transition hover:bg-primary hover:text-white"
+            >
+              Fit
+            </button>
+            {[50, 80, 100].map((w) => (
+              <button
+                key={w}
+                type="button"
+                onClick={() => setDesignWidthKeepRatio(w)}
+                className="rounded-full px-2 py-1 text-[11px] font-bold text-[var(--color-text-secondary)] transition hover:bg-[var(--color-bg-soft)] hover:text-primary"
+              >
+                {w}
+              </button>
+            ))}
+            <input
+              type="range"
+              min={10}
+              max={PRINT_AREA_MM.width}
+              step={1}
+              value={designMm.width}
+              onChange={(e) => setDesignWidthKeepRatio(Number(e.target.value))}
+              className="mx-1 w-16 accent-primary sm:w-24"
+              aria-label="Slider ukuran design (keep ratio)"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Keyboard-accessible size controls — canvas drag/resize is not operable
           by keyboard, so provide numeric inputs as the alternative path. */}
@@ -317,9 +395,10 @@ export function DesignCanvas({
           id="dc-width"
           type="number"
           min={10}
+          max={PRINT_AREA_MM.width}
           value={designMm.width}
           onChange={(e) =>
-            setDesignMm((d) => ({ ...d, width: Math.max(10, Number(e.target.value) || 10) }))
+            setDesignMm((d) => clampDesignMm(Number(e.target.value) || 10, d.height))
           }
           className="w-14 rounded-md border border-[var(--color-border)] px-1.5 py-0.5 text-center outline-none focus-visible:border-primary"
           aria-label="Lebar design (mm)"
@@ -330,9 +409,10 @@ export function DesignCanvas({
           id="dc-height"
           type="number"
           min={10}
+          max={PRINT_AREA_MM.height}
           value={designMm.height}
           onChange={(e) =>
-            setDesignMm((d) => ({ ...d, height: Math.max(10, Number(e.target.value) || 10) }))
+            setDesignMm((d) => clampDesignMm(d.width, Number(e.target.value) || 10))
           }
           className="w-14 rounded-md border border-[var(--color-border)] px-1.5 py-0.5 text-center outline-none focus-visible:border-primary"
           aria-label="Tinggi design (mm)"

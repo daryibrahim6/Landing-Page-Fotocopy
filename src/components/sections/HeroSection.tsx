@@ -170,7 +170,7 @@ export function HeroSection() {
               className="font-display text-5xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem]"
               variants={headlineVariants}
             >
-              bisa
+              Bisa
               <br />
               <span className="relative inline-block text-[var(--color-accent-yellow)]">
                 mewujudkan

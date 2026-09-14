@@ -24,7 +24,9 @@ export function BrandLogo({
       />
       <span
         className={cn(
-          "font-display text-xl font-extrabold tracking-tight",
+          // leading-none + translate: tanpa ini line-box text-xl (28px) bikin
+          // wordmark optically naik ~1px dari center mark — keliatan "keatasan".
+          "font-display translate-y-[0.5px] text-xl font-extrabold leading-none tracking-tight",
           light ? "text-white" : "text-[var(--color-text-primary)]",
         )}
       >

@@ -53,7 +53,7 @@ export function Footer() {
             <BrandLogo light />
           </div>
           <p className="mt-3 font-display text-lg font-bold text-slate-200">
-            &ldquo;bisa mewujudkan imajinasi mu&rdquo;
+            &ldquo;Bisa mewujudkan imajinasi mu&rdquo;
           </p>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">
             Percetakan digital Bekasi untuk UMKM dan perorangan &mdash; digital
@@ -130,7 +130,7 @@ export function Footer() {
           </p>
           <ul className="mt-4 space-y-3 text-sm text-slate-400">
             <li className="flex items-start gap-2">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 size-4 shrink-0 text-[#25D366]" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true">
                 <path d={WHATSAPP_ICON_PATH} />
               </svg>
               <a
