@@ -492,3 +492,15 @@ Feedback user dari screenshot round 1 → fix:
 | Logo mark masih "keatasan" setelah CSS align | Bukan CSS — img render 36×36 benar, `objectFit:fill`. **Komposisi internal PNG** yang top-heavy: alpha centroid (483,486) ≈ center, tapi colored centroid (471,475) di atas center (strips biru/kuning top-right + kubah pink kosong atas) → mata baca logo "naik" walau box centered | Rebalance `logo-bisaprint-mark.png`: disc di-scale 0.88 dalam canvas sama + reposisi agar colored centroid = canvas center → disc utuh (tidak di-crop — V4 clip test ditolak, flat edge kelihatan), huruf BP optically centered vs wordmark |
 
 **Verifikasi:** 4× zoom navbar — massa huruf BP centered vs "BisaPrint"; mobile 375px mark proporsional; footer light variant ikut ter-rebalance (shared asset). tsc + eslint clean, vitest 161/161.
+
+## UX Walkthrough — Round 6 (mesin produksi + portfolio poster + OG image, Sesi 14 Sep 2026)
+
+| Request | Eksekusi |
+|---|---|
+| Tampilkan 2 mesin toko | `MachinesSection` baru (id=`mesin`, soft bg) — card AccurioPress C2060 (badge "Warna Produksi") + bizhub 958 ("Mono Kecepatan Tinggi") + card ke-3 **foto toko asli** `company-photo.webp` ("Toko Offline" — trust signal toko beneran). Dot-texture bg di image zone + `object-contain` — aspect mesin beda-beda tetap rapi. Dipasang antara CaraOrder → FormKonsultasi (alur: cara order → mesin → hasil) |
+| Poster archive/hero dimanfaatkan | 5 poster brand (779×972 webp) → `public/assets/portfolio/` — portfolio ganti dari SVG flat ke poster asli per kategori (promosi/dokumen/sablon/stiker-label/custom). Grid `lg:grid-cols-4` → `lg:grid-cols-3` (5 poster + CTA = 6 tile 3×2) |
+| OG image jelek | Rebuild `og-image.png` 1200×630 via PIL — gradient pink brand + mark rebalanced + wordmark + tagline + 5 chip produk; fix alpha-composite bug (chips jadi putih polos → overlay RGBA). Metadata `openGraph`/`twitter` → `.png`. File webp lama → `_archive/` |
+| Foto webp semua | Mesin, toko, 5 poster sudah webp dari archive — tinggal copy, tanpa re-encode |
+
+**Cleanup:** 7 SVG portfolio placeholder → `_archive/assets/portfolio-svg/`; `og-image.webp` → `_archive/assets/brand/`.
+**Verifikasi:** tsc clean, eslint clean, vitest 161/161, build hijau. Screenshot verified: machines section 3 card (mesin×2 + toko), portfolio 5 poster + CTA tile, OG image render langsung dicek.

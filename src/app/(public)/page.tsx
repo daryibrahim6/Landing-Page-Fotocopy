@@ -5,6 +5,7 @@ import { CatalogSection } from "@/components/sections/CatalogSection";
 
 const WhyBisaPrint = dynamic(() => import("@/components/sections/WhyBisaPrint").then((m) => m.WhyBisaPrint));
 const CaraOrderSection = dynamic(() => import("@/components/sections/CaraOrderSection").then((m) => m.CaraOrderSection));
+const MachinesSection = dynamic(() => import("@/components/sections/MachinesSection").then((m) => m.MachinesSection));
 const FormKonsultasi = dynamic(() => import("@/components/sections/FormKonsultasi").then((m) => m.FormKonsultasi));
 const PortfolioGallery = dynamic(() => import("@/components/sections/PortfolioGallery").then((m) => m.PortfolioGallery));
 const Testimonials = dynamic(() => import("@/components/sections/Testimonials").then((m) => m.Testimonials));
@@ -27,6 +28,9 @@ export default function HomePage() {
       <WavyDivider color="#F8FAFC" flip />
 
       <CaraOrderSection />
+      <WavyDivider color="#F8FAFC" flip />
+
+      <MachinesSection />
       <WavyDivider color="#FFFFFF" flip={false} />
 
       <FormKonsultasi />

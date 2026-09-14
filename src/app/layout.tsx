@@ -44,14 +44,14 @@ export const metadata: Metadata = {
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
     url: SITE_URL,
-    images: [{ url: "/assets/brand/og-image.webp", width: 1200, height: 630 }],
+    images: [{ url: "/assets/brand/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Bisa Print – Percetakan Digital Bekasi",
     description:
       "Jasa cetak digital printing: stiker, banner, kartu nama, DTF kaos, print dokumen. Order mudah via WhatsApp.",
-    images: ["/assets/brand/og-image.webp"],
+    images: ["/assets/brand/og-image.png"],
   },
   robots: { index: true, follow: true },
   ...(process.env.GOOGLE_SITE_VERIFICATION

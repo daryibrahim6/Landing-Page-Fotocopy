@@ -6,56 +6,42 @@ export interface PortfolioItem {
   aspectRatio?: "square" | "portrait" | "landscape";
 }
 
-// TODO: ganti SVG mockup ini dengan foto hasil cetak asli saat owner mengirimkan dokumentasi.
-// File ilustrasi: public/assets/portfolio/*.svg
+// Poster showcase brand BisaPrint — mockup produk per kategori.
+// File: public/assets/portfolio/*.webp (779×972 ≈ 4:5)
 export const portfolioItems: PortfolioItem[] = [
   {
     id: "pf-001",
-    title: "Stiker Label Produk UMKM",
-    category: "Stiker & Label",
-    image: "/assets/portfolio/sticker-sheet.svg",
-    aspectRatio: "square",
+    title: "Media Promosi",
+    category: "Brosur, Poster, Banner, Voucher",
+    image: "/assets/portfolio/cetak-promosi.webp",
+    aspectRatio: "portrait",
   },
   {
     id: "pf-002",
-    title: "Kartu Nama Premium",
-    category: "Digital Print",
-    image: "/assets/portfolio/kartu-nama.svg",
+    title: "Dokumen & Jilid",
+    category: "Print, Skripsi, Laminating",
+    image: "/assets/portfolio/cetak-dokumen.webp",
     aspectRatio: "portrait",
   },
   {
     id: "pf-003",
-    title: "Poster & Banner Event",
-    category: "Digital Print",
-    image: "/assets/portfolio/poster-banner.svg",
-    aspectRatio: "square",
+    title: "Sablon & Apparel",
+    category: "DTF Kaos, Totebag, Polo, Topi",
+    image: "/assets/portfolio/sablon.webp",
+    aspectRatio: "portrait",
   },
   {
     id: "pf-004",
-    title: "Undangan & Kartu Acara",
-    category: "Produk Custom",
-    image: "/assets/portfolio/undangan.svg",
+    title: "Stiker, Label & Sertifikat",
+    category: "Stiker Vinyl, Label UMKM, Kartu Nama",
+    image: "/assets/portfolio/terbaik.webp",
     aspectRatio: "portrait",
   },
   {
     id: "pf-005",
-    title: "Print Dokumen & Jilid",
-    category: "Dokumen",
-    image: "/assets/portfolio/dokumen-jilid.svg",
-    aspectRatio: "landscape",
-  },
-  {
-    id: "pf-006",
-    title: "Packaging & Paper Bag",
-    category: "Produk Custom",
-    image: "/assets/portfolio/packaging-box.svg",
-    aspectRatio: "square",
-  },
-  {
-    id: "pf-007",
-    title: "Sablon DTF & Merchandise",
-    category: "Sablon",
-    image: "/assets/portfolio/merch-kaos.svg",
+    title: "Produk Custom",
+    category: "Undangan, Packaging, Merch Event",
+    image: "/assets/portfolio/custom-produk.webp",
     aspectRatio: "portrait",
   },
 ];

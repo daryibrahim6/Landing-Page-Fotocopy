@@ -42,7 +42,7 @@ function PortfolioTile({
             alt={item.title}
             fill
             className="object-cover"
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           />
         ) : (
           <div className={cn("flex h-full w-full flex-col items-center justify-center gap-2 p-6 text-center bg-gradient-to-br", gradients[index % gradients.length])}>
@@ -85,8 +85,8 @@ export function PortfolioGallery() {
         </p>
       </ScrollReveal>
 
-      {/* Grid seragam — 7 item + 1 tile CTA = 8 tile rapi, tanpa bolong masonry */}
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Grid seragam — 5 poster + 1 tile CTA = 6 tile rapi 3×2, tanpa bolong masonry */}
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {portfolioItems.map((item, index) => (
           <PortfolioTile key={item.id} item={item} index={index} />
         ))}
