@@ -504,3 +504,12 @@ Feedback user dari screenshot round 1 → fix:
 
 **Cleanup:** 7 SVG portfolio placeholder → `_archive/assets/portfolio-svg/`; `og-image.webp` → `_archive/assets/brand/`.
 **Verifikasi:** tsc clean, eslint clean, vitest 161/161, build hijau. Screenshot verified: machines section 3 card (mesin×2 + toko), portfolio 5 poster + CTA tile, OG image render langsung dicek.
+
+## UX Walkthrough — Round 7 (logo cache-bust, Sesi 14 Sep 2026)
+
+| Keluhan | Root cause | Fix |
+|---|---|---|
+| Logo mark MASIH "keatasan" setelah rebalance | **`next/image` optimizer cache** — URL `/assets/brand/logo-bisaprint-mark.png` sama → browser+CDN serve versi full-bleed LAMA (terukur: alpha fill 0→35.875 edge-to-edge, padahal file baru harusnya margin ~2.5px). Rebalance v3 sudah benar di file tapi tidak pernah sampai ke mata user | Rename → `logo-bisaprint-mark-v2.png` (cache-bust permanen — juga aman untuk Vercel image cache saat deploy). Verified: disc alpha 2.5→34.25, visual center 18.375 vs box 18 — optically centered |
+
+**Catatan proses:** ini pelajaran penting — mengganti isi file gambar tanpa mengganti nama = stale di setiap layer cache (browser, next/image, CDN). Rename adalah satu-satunya cara andal.
+**Verifikasi:** 4× zoom navbar — massa huruf BP sejajar x-height wordmark; tsc clean.
