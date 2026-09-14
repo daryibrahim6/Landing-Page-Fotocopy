@@ -3,7 +3,7 @@
 Single source of truth kondisi per flow. Detail temuan ada di `reports/audit/[flow].md`.
 Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 
-**Last updated:** 12 September 2026
+**Last updated:** 14 September 2026
 
 > **Milestone 7 (feedback owner) terkirim — commit `56733f0`:** etalase dipangkas ke 7 produk + card "Produk Lainnya", upload preview kini tile design ke semua cell, fix math imposition (gap antar-cell), harga per-lembar tier (placeholder — tunggu price list owner), AI draft via Pollinations (gratis, tanpa key), kode order BSP-XXXX di WA checkout. 157/157 tests, build hijau.
 
@@ -36,6 +36,8 @@ Vocabulary status mengikuti `.devin/rules/flow-registry-and-status.md`.
 **Functional Completeness Sweep (UX-0.5):** Done — `reports/cross-audits/functional-completeness-sweep.md` (12 Sep 2026). 15 gap (1 Critical + 3 High + 4 Medium + 7 Low). Fixed: FC-01 (order WA tidak tersimpan → `POST /api/orders` + `payment.method`), FC-02 (FAQ garansi/revisi), FC-03 (trust line checkout), FC-04 (status produksi "batal"). Menunggu data/keputusan owner: rekening bank (FC-07), tarif kirim (FC-05), auto-confirm budget (FC-15).
 
 ## Recently Completed
+
+- **14 Sep 2026** — **UX Rounds 3-5 (visual polish + simulator deep-fix):** favicon dari mark brand (`favicon.ico`/`icon.png`/`apple-icon.png`), ikon WA lengkap via `src/lib/brand-icons.ts` single source (6 file dimigrasikan), logo mark di-rebalance optically (disc 0.88 + centroid-centered — fix "keatasan"), navbar active state pakai `usePathname` (fix stuck di FAQ saat ke /simulator), preset stiker `aria-pressed` + filled pink, **simulator**: fix overflow upload gede (`minmax(0,1fr)` + width-driven stage), transformer stale-node re-attach, clamp ukuran ke printable area, toolbar resize (chips Fit/50/80/100 + slider keep-ratio), footer ikon monochrome + slogan kapital, `POST /api/ai-design` (OpenAI `gpt-image-1` → fallback Pollinations, zod + rate-limit). 161/161 tests, build hijau, Playwright-verified 1440/375px. Commit `149cc24` + fix mark `public/assets/brand/logo-bisaprint-mark.png`.
 
 - **12 Sep 2026 (malam)** — **UX-0.5 Functional Completeness Sweep + fix batch:** audit persona Customer+Admin × 7 kategori → 15 gap. Fix dieksekusi: `POST /api/orders` (order WA-only kini tercatat — `payment.method: "whatsapp"`, badge "via WA" di dashboard, notif admin terpicu, success page bisa lookup), `buildStoredOrder`/`generateOrderId` dipindah ke `src/lib/orders.ts` (shared create-token + orders), status produksi "batal", FAQ +2 (garansi, revisi), trust line checkout, AI panel resilience (timeout 120s + retry + `referrer`/`private` params — root cause: antrean anonymous Pollinations 30-60s). 161/161 tests, tsc/eslint clean, live-verified.
 

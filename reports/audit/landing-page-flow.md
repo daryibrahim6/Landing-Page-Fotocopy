@@ -484,3 +484,11 @@ Feedback user dari screenshot round 1 → fix:
 | AI designer mau ChatGPT | Pollinations client-side langsung | `POST /api/ai-design` — OpenAI `gpt-image-1` (quality=low ≈$0.02/img) kalau `OPENAI_API_KEY` terisi → fallback Pollinations server-side; zod-validated + rate-limit Upstash |
 
 **Verifikasi:** tsc clean, eslint clean, vitest 161/161, build hijau (route `/api/ai-design` terdaftar). Playwright: logo diff -0.5px; nav "Simulasi" pink di /simulator; preset Bulat 5cm `aria-pressed=true` filled pink; upload PNG 6000×4500 → downscale + imposition 2 cell; chip 50 → 50×38mm keep-ratio → 56 pcs (rotated); mobile 375px canvas 329×454 tanpa overflow.
+
+## UX Walkthrough — Round 5 (logo optical rebalance, Sesi 14 Sep 2026)
+
+| Keluhan | Diagnosis | Fix |
+|---|---|---|
+| Logo mark masih "keatasan" setelah CSS align | Bukan CSS — img render 36×36 benar, `objectFit:fill`. **Komposisi internal PNG** yang top-heavy: alpha centroid (483,486) ≈ center, tapi colored centroid (471,475) di atas center (strips biru/kuning top-right + kubah pink kosong atas) → mata baca logo "naik" walau box centered | Rebalance `logo-bisaprint-mark.png`: disc di-scale 0.88 dalam canvas sama + reposisi agar colored centroid = canvas center → disc utuh (tidak di-crop — V4 clip test ditolak, flat edge kelihatan), huruf BP optically centered vs wordmark |
+
+**Verifikasi:** 4× zoom navbar — massa huruf BP centered vs "BisaPrint"; mobile 375px mark proporsional; footer light variant ikut ter-rebalance (shared asset). tsc + eslint clean, vitest 161/161.
