@@ -19,7 +19,7 @@ export function BrandLogo({
         alt="Logo BisaPrint"
         width={966}
         height={975}
-        className="size-9 shrink-0"
+        className="size-9 shrink-0 translate-y-[2px]"
         priority
       />
       <span

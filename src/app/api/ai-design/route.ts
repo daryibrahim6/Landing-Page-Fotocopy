@@ -3,10 +3,13 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { z } from "zod";
 import { redis } from "@/lib/redis";
 
-// Draft AI designer untuk simulator. Provider:
+// Draft AI designer untuk simulator. Provider chain (yang pertama berhasil menang):
 // - OPENAI_API_KEY terisi → OpenAI Images API (gpt-image-1, berbayar per image,
 //   kualitas/konsistensi terbaik — request dari client yang mau ChatGPT).
-// - Kosong → fallback Pollinations anonymous tier (gratis, tanpa key, bisa antre).
+// - GEMINI_API_KEY terisi → Gemini image generation (free tier AI Studio —
+//   client cukup bikin key gratis di aistudio.google.com, tanpa kartu).
+// - Keduanya kosong → fallback Pollinations anonymous tier (gratis, tanpa key, bisa antre).
+// Semua provider optional — app tidak pernah bergantung ke satu vendor.
 // Prompt template di server (bukan client) supaya style die-cut konsisten.
 const ratelimit = redis
   ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "1 m") })
@@ -74,7 +77,51 @@ export async function POST(request: Request) {
           });
         }
       }
-      // OpenAI error (quota, dll) → jatuh ke Pollinations, bukan gagal total.
+      // OpenAI error (quota, dll) → jatuh ke provider berikutnya.
+    }
+
+    // Gemini path — free tier AI Studio. Model bisa di-override via env karena
+    // nama model image gen Gemini berubah-ubah antar preview/GA.
+    if (process.env.GEMINI_API_KEY) {
+      const model =
+        process.env.GEMINI_IMAGE_MODEL ||
+        "gemini-2.0-flash-preview-image-generation";
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 60_000);
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: stickerPrompt }] }],
+              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+            }),
+            signal: controller.signal,
+          },
+        );
+        if (res.ok) {
+          const data = (await res.json()) as {
+            candidates?: {
+              content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] };
+            }[];
+          };
+          const img = data.candidates?.[0]?.content?.parts?.find(
+            (p) => p.inlineData?.data,
+          );
+          if (img?.inlineData) {
+            return NextResponse.json({
+              image: `data:${img.inlineData.mimeType ?? "image/png"};base64,${img.inlineData.data}`,
+              provider: "gemini",
+            });
+          }
+        }
+      } catch {
+        // abort/network → jatuh ke Pollinations
+      } finally {
+        clearTimeout(timer);
+      }
     }
 
     // Pollinations fallback — gratis, ~1 req/15s + queue global. 2 attempt

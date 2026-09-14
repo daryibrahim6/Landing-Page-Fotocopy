@@ -513,3 +513,12 @@ Feedback user dari screenshot round 1 → fix:
 
 **Catatan proses:** ini pelajaran penting — mengganti isi file gambar tanpa mengganti nama = stale di setiap layer cache (browser, next/image, CDN). Rename adalah satu-satunya cara andal.
 **Verifikasi:** 4× zoom navbar — massa huruf BP sejajar x-height wordmark; tsc clean.
+
+## UX Walkthrough — Round 8 (logo turun + Gemini fallback, Sesi 14 Sep 2026)
+
+| Item | Detail |
+|---|---|
+| Logo "kurang turun" | Setelah cache-bust fix, mark sudah centered geometris (diff 0) tapi disc tetap terbaca "naik" karena kubah kosong di atas + huruf di dalam disc. Apply `translate-y-[2px]` pada img mark — massa huruf BP sekarang duduk sejajar baseline wordmark. Verified 5× zoom + navbar pill 1× |
+| Gemini fallback (gratis) | Provider chain `/api/ai-design`: OpenAI → **Gemini** (`generateContent` + `responseModalities:["TEXT","IMAGE"]`, timeout 60s, model env-configurable `GEMINI_IMAGE_MODEL` default `gemini-2.0-flash-preview-image-generation`) → Pollinations. Client cukup bikin key gratis di aistudio.google.com — jawaban untuk "Plus tetep bayar ya?" |
+
+**Verifikasi:** tsc + eslint clean, vitest 161/161.
