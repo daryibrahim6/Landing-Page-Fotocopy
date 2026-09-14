@@ -15,7 +15,7 @@ export function BrandLogo({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <Image
-        src="/assets/brand/logo-bisaprint-mark.png"
+        src="/assets/brand/logo-bisaprint-mark-v2.png"
         alt="Logo BisaPrint"
         width={966}
         height={975}
